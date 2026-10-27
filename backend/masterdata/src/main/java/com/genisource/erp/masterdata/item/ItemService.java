@@ -5,13 +5,14 @@ import com.genisource.erp.masterdata.category.ItemCategory;
 import com.genisource.erp.masterdata.category.ItemCategoryRepository;
 import com.genisource.erp.masterdata.partner.Partner;
 import com.genisource.erp.masterdata.partner.PartnerRepository;
-import com.genisource.erp.masterdata.shared.Codes;
-import com.genisource.erp.masterdata.shared.RecordStatus;
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.Codes;
+import com.genisource.erp.platform.common.RecordStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.masterdata.uom.Uom;
 import com.genisource.erp.masterdata.uom.UomRepository;
 import com.genisource.erp.platform.audit.AuditService;
 import com.genisource.erp.platform.common.ApiException;
+import com.genisource.erp.platform.common.ItemUsageGuard;
 import com.genisource.erp.platform.common.PageResponse;
 import com.genisource.erp.platform.security.CurrentUser;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,10 @@ import java.util.stream.Collectors;
  *   <li>facets must stay consistent — a service cannot be manufactured, an item that is
  *       not purchased cannot name a default supplier, a purchasing unit needs a factor;</li>
  *   <li>an item used as a component of a released BOM cannot be deactivated, otherwise
- *       planning would expand into a material nobody can buy.</li>
+ *       planning would expand into a material nobody can buy;</li>
+ *   <li>an item still held by another module cannot be deactivated either — the stock
+ *       module contributes that check through {@link ItemUsageGuard}, so master data
+ *       never has to know that stock exists.</li>
  * </ol>
  */
 @Service
@@ -54,6 +58,7 @@ public class ItemService {
     private final PartnerRepository partners;
     private final UomRepository uoms;
     private final BomRepository boms;
+    private final List<ItemUsageGuard> usageGuards;
     private final AuditService audit;
 
     public ItemService(ItemRepository items,
@@ -61,12 +66,14 @@ public class ItemService {
                        PartnerRepository partners,
                        UomRepository uoms,
                        BomRepository boms,
+                       List<ItemUsageGuard> usageGuards,
                        AuditService audit) {
         this.items = items;
         this.categories = categories;
         this.partners = partners;
         this.uoms = uoms;
         this.boms = boms;
+        this.usageGuards = usageGuards;
         this.audit = audit;
     }
 
@@ -150,6 +157,9 @@ public class ItemService {
                 throw ApiException.inUse(
                         "Item " + item.getCode() + " is used by released BOM(s) of " + itemNames(parents)
                                 + " as a component or substitute and cannot be deactivated");
+            }
+            for (ItemUsageGuard guard : usageGuards) {
+                guard.assertCanDeactivate(id);
             }
         }
         item.setStatus(target);

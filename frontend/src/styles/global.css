@@ -1176,6 +1176,27 @@ textarea.input {
   color: var(--muted-2);
 }
 
+/* A neutral chip for the things that carry no judgement: warehouse types, document
+   types, movement kinds. It must not look like a state, or the eye reads a meaning
+   into it that is not there. */
+.tag--neutral {
+  border-color: var(--line-strong);
+  background: var(--paper-3);
+  color: var(--muted);
+}
+
+.tag--posted {
+  border-color: rgba(29, 107, 78, 0.4);
+  background: rgba(29, 107, 78, 0.08);
+  color: var(--green);
+}
+
+.tag--reversed {
+  border-color: rgba(168, 106, 18, 0.4);
+  background: rgba(168, 106, 18, 0.08);
+  color: var(--amber);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -1258,6 +1279,29 @@ textarea.input {
   padding: 10px 0 0;
 }
 
+/* A read-only list of lines inside a drawer. The table variant above is for editable
+   grids; this one is for showing what a posted document or a batch contains, where a
+   column header would be noise and a row of figures needs no grid at all. */
+.line-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line-strong);
+}
+
+.line-list__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.line-list__row > span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
 /* BOM lines are cards rather than table rows: each line owns a component reference, a
    quantity, a loss rate and an optional substitute list, which does not fit one row. */
 .bom-line {
@@ -1309,6 +1353,54 @@ textarea.input {
 
 .bom-line .field > label {
   font-size: 9px;
+}
+
+/* Document lines are a plain grid, not cards: a receipt line is an item, a quantity
+   and a price, and the columns stay the same whether the type is a receipt, an issue,
+   a transfer or a count. The extra count column only appears for a count, so the grid
+   is declared per variant rather than stretched with empty cells. */
+.doc-line {
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  padding: 10px 12px;
+  margin-bottom: 9px;
+}
+
+.doc-line__head,
+.doc-line__row {
+  display: grid;
+  gap: 9px;
+  align-items: center;
+}
+
+.doc-line__head {
+  grid-template-columns: minmax(0, 1fr) 96px 96px 64px;
+}
+
+.doc-line__head--count {
+  grid-template-columns: minmax(0, 1fr) 96px 96px 96px 64px;
+}
+
+.doc-line__head span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+}
+
+.doc-line__row {
+  grid-template-columns: minmax(0, 1fr) 96px 96px 64px;
+  margin-top: 9px;
+}
+
+.doc-line__row--count {
+  grid-template-columns: minmax(0, 1fr) 96px 96px 96px 64px;
+}
+
+.doc-line .input {
+  height: 32px;
+  font-size: 13px;
 }
 
 /* ------------------------------------------------------------------- tree */

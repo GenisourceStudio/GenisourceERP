@@ -236,7 +236,160 @@ erDiagram
 
 实现要点：只沿 `RELEASED` 边递归、`SCALE = 6` + `HALF_UP`、路径集合命中即标 `source = "CYCLE"`、`maxLevels` 夹在 1–20。
 
-## M2–M5 规划（示意）
+## M2 已实现
+
+迁移脚本 `backend/inventory/src/main/resources/db/migration/V4__inventory.sql`，8 张表。
+
+```mermaid
+erDiagram
+    inv_warehouse ||--o{ inv_location : contains
+    md_item ||--o{ inv_lot : "tracked by"
+    md_item ||--o{ inv_stock : "held as"
+    md_item ||--o{ inv_movement : "moved as"
+    inv_warehouse ||--o{ inv_stock : holds
+    inv_warehouse ||--o{ inv_movement : "moves through"
+    inv_location ||--o{ inv_stock : holds
+    inv_location ||--o{ inv_movement : "moves through"
+    inv_lot ||--o{ inv_stock : "held as"
+    inv_lot ||--o{ inv_movement : "moved as"
+    inv_warehouse ||--o{ inv_document : "source of"
+    inv_document ||--o{ inv_document_line : contains
+    md_item ||--o{ inv_document_line : "line for"
+    inv_lot ||--o{ inv_document_line : "line for"
+    inv_document ||--o{ inv_movement : "posted as"
+
+    inv_warehouse {
+        bigint id PK
+        bigint tenant_id FK
+        varchar code "UK with tenant_id"
+        varchar name
+        varchar warehouse_type "RAW / SEMI / FINISHED / GENERAL"
+        varchar address
+        varchar status
+        bigint row_version
+    }
+    inv_location {
+        bigint id PK
+        bigint tenant_id FK
+        bigint warehouse_id FK
+        varchar code "UK with warehouse_id"
+        varchar name
+        varchar status
+        bigint row_version
+    }
+    inv_lot {
+        bigint id PK
+        bigint tenant_id FK
+        bigint item_id FK
+        varchar lot_no "UK with item_id"
+        varchar lot_type "LOT / SERIAL"
+        date production_date
+        date expiry_date
+        varchar status
+        bigint row_version
+    }
+    inv_stock {
+        bigint id PK
+        bigint tenant_id FK
+        bigint warehouse_id FK
+        bigint location_id FK "nullable"
+        bigint item_id FK
+        bigint lot_id FK "nullable"
+        numeric on_hand
+        numeric reserved
+        numeric in_transit
+        numeric locked
+        numeric avg_cost
+        numeric total_amount
+        bigint row_version
+    }
+    inv_document {
+        bigint id PK
+        bigint tenant_id FK
+        varchar doc_no "UK with tenant_id"
+        varchar doc_type "INBOUND / OUTBOUND / TRANSFER / COUNT"
+        varchar status "DRAFT / POSTED / REVERSED"
+        bigint warehouse_id FK
+        bigint location_id FK
+        bigint to_warehouse_id FK
+        bigint to_location_id FK
+        bigint partner_id FK
+        date biz_date
+        bigint reversal_of FK "self reference"
+        timestamptz posted_at
+        varchar created_by
+        bigint row_version
+    }
+    inv_document_line {
+        bigint id PK
+        bigint tenant_id FK
+        bigint document_id FK "ON DELETE CASCADE"
+        integer line_no "UK with document_id"
+        bigint item_id FK
+        bigint lot_id FK
+        numeric qty
+        numeric unit_cost
+        numeric counted_qty
+    }
+    inv_movement {
+        bigint id PK
+        bigint tenant_id FK
+        bigint document_id FK
+        bigint document_line_id FK
+        varchar movement_type "RECEIPT / ISSUE / TRANSFER_OUT / TRANSFER_IN / COUNT_GAIN / COUNT_LOSS"
+        varchar direction "IN / OUT"
+        bigint item_id FK
+        bigint lot_id FK
+        bigint warehouse_id FK
+        bigint location_id FK
+        numeric qty
+        numeric unit_cost
+        numeric amount
+        numeric balance_qty_after
+        numeric balance_amount_after
+        varchar ref_type
+        varchar ref_id
+        varchar operator
+        timestamptz moved_at
+    }
+    inv_doc_counter {
+        bigint id PK
+        bigint tenant_id
+        varchar prefix "RK / CK / YK / PD"
+        date biz_date
+        integer next_no
+    }
+```
+
+要点：
+
+- **余额与流水分开**：`inv_stock` 回答「现在有多少」，就地改写；`inv_movement` 回答「怎么变成这样」，只追加。两者在同一个事务里改，因此永远不会不一致
+- **`inv_stock` 的唯一键跨两个可空外键**（`location_id`、`lot_id`）：物料可以只记在仓库层、可以不带批次。PG 的唯一索引把 NULL 视为互不相同，所以索引用 `COALESCE(..., 0)` 折叠 —— 哨兵值 0 不会撞，因为 `BIGSERIAL` 从 1 开始
+- **四个数量**：`on_hand` 是在库、`reserved` 是已被销售单占用、`locked` 是被质检或生产占用、`in_transit` 是在途。可用量 = `on_hand - reserved - locked`。M2 里 `reserved` / `locked` 恒为 0 —— 列先留着，因为 MRP 与销售马上要用，而一张装着活数据的余额表临时加列是要迁移的
+- **批次与序列号同表**：`inv_lot.lot_type` 区分 `LOT` 与 `SERIAL`。序列号就是「只有一件的批次」，这样库存键、流水与追溯查询对两种情况是同一套逻辑，只有一个地方要查
+- **单据只追加，不修改**：`DRAFT → POSTED → REVERSED`。冲销不是改原单据，而是生成一张红字单据在旁边，原单据留在账上 —— 审计要看到的是「错的那张」和「改的那张」，不是一个被抹平的空档
+- **`inv_movement` 没有 `updated_at`**：流水一旦写下就不再变，冲销也是新增一条。它继承 platform 的 `TenantAppendOnlyEntity`，而不是 `TenantScopedEntity`
+- **`inv_doc_counter` 是单号计数器**：单号形如 `RK-20261027-0001`（类型前缀 + 业务日期 + 当日流水号）。用 `INSERT ... ON CONFLICT DO UPDATE` 原子取号，而不是「数一数已有几张再 +1」—— 后者在两人同时保存时会发出重号
+- 上图**不含** `created_at` / `updated_at` 与纯描述性文本字段（`remark`、`address`）
+
+### 移动加权平均怎么算
+
+规则只写一次，避免三个地方各算一遍：
+
+1. **总额是权威值**，单位均价由它推导（`total ÷ qty`）
+2. **入库**：`total += qty × 单价`，然后重算均价
+3. **出库**：按当前均价计价，`total -= qty × 均价`
+4. **清空**：数量归零时总额与均价一并归零，下一笔入库从头开始算，不继承旧均价
+
+总额之所以是权威值：它只做加减，**精确累积**。若以均价为准，每一笔入库都要拿一个四舍五入过的均价去乘数量，误差会在几千笔流水里滚雪球。
+
+**冲销不走"出库 + 入库"**：红字单据按原流水的**原值**逐笔反向调整。若改用今天的均价冲销，期间均价一旦变动就会留下残值，流水将不再等于余额。
+
+### 库存计价
+
+M2 采用**移动加权平均**：每次入库重算 `avg_cost = (旧金额 + 入库金额) / (旧数量 + 入库数量)`。FIFO 作为企业版可选。标准成本法依赖成本核算模块（企业版）。
+
+## M3–M5 规划（示意）
 
 ```mermaid
 erDiagram
@@ -271,7 +424,6 @@ erDiagram
 
 ### 关键设计点
 
-- **`inv_stock`**：按 `(tenant_id, warehouse_id, location_id, item_id, lot_id, sn)` 唯一；数量拆成 `on_hand` / `reserved` / `in_transit` / `locked`，可用量 = `on_hand - reserved - locked`
 - **`mrp_run`**：快照式——记录运算参数与产出，便于复算对比；不覆盖历史
 - **`prd_production_order`**：状态机 `PLANNED → RELEASED → IN_PROGRESS → COMPLETED → CLOSED`，`mes_wo_no` 关联 MES 执行工单
 - **`fin_voucher`**：`source_type` + `source_id` 反查业务源头，保证「凭证可追溯回单据」

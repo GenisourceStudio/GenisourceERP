@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.workcenter;
 
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.RecordStatus;
 import com.genisource.erp.platform.common.VersionedTenantEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

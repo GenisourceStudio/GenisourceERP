@@ -1,4 +1,4 @@
-package com.genisource.erp.masterdata.shared;
+package com.genisource.erp.platform.common;
 
 /**
  * Lifecycle of a master-data record (item, category, partner, work centre).

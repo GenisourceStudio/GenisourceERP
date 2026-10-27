@@ -2,8 +2,8 @@ package com.genisource.erp.masterdata.category;
 
 import com.genisource.erp.masterdata.item.ItemDtos;
 import com.genisource.erp.masterdata.item.ItemRepository;
-import com.genisource.erp.masterdata.shared.Codes;
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.Codes;
+import com.genisource.erp.platform.common.RecordStatus;
 import com.genisource.erp.platform.audit.AuditService;
 import com.genisource.erp.platform.common.ApiException;
 import com.genisource.erp.platform.security.CurrentUser;

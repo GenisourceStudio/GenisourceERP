@@ -32,8 +32,10 @@ export const NAV: NavGroup[] = [
   {
     key: 'inventory',
     items: [
-      { path: '/inventory/stock', key: 'stock', milestone: 'M2' },
-      { path: '/inventory/movements', key: 'movement', milestone: 'M2' },
+      { path: '/inventory/stock', key: 'stock' },
+      { path: '/inventory/documents', key: 'inventoryDocument' },
+      { path: '/inventory/movements', key: 'movement' },
+      { path: '/inventory/warehouses', key: 'warehouse' },
     ],
   },
   {

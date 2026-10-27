@@ -1,7 +1,7 @@
 package com.genisource.erp.masterdata.partner;
 
-import com.genisource.erp.masterdata.shared.Codes;
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.Codes;
+import com.genisource.erp.platform.common.RecordStatus;
 import com.genisource.erp.platform.audit.AuditService;
 import com.genisource.erp.platform.common.ApiException;
 import com.genisource.erp.platform.common.PageResponse;

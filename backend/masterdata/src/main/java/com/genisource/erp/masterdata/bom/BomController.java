@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.bom;
 
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.masterdata.shared.VersionRequest;
 import com.genisource.erp.platform.common.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;

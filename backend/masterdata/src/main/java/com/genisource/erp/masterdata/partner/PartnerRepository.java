@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.partner;
 
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.RecordStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

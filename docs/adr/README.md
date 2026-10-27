@@ -10,3 +10,4 @@
 | [0002](0002-row-level-multi-tenancy.md) | 共享 schema + 行级租户隔离 | Accepted |
 | [0003](0003-stateless-jwt-auth.md) | 无状态 JWT 认证 | Accepted |
 | [0004](0004-maven-multi-module-open-core.md) | Maven 多模块承载 Open Core 边界 | Accepted |
+| [0005](0005-cross-module-constraints-via-platform-spi.md) | 跨模块约束通过 platform SPI 表达 | Accepted |

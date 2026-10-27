@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.bom;
 
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

@@ -35,7 +35,9 @@ class ModuleBoundaryTest {
         ArchRule rule = noClasses()
                 .that().resideInAPackage("com.genisource.erp.platform..")
                 .should().dependOnClassesThat()
-                .resideInAPackage("com.genisource.erp.masterdata..")
+                .resideInAnyPackage(
+                        "com.genisource.erp.masterdata..",
+                        "com.genisource.erp.inventory..")
                 .because("the platform is the shared kernel every other module builds on")
                 .allowEmptyShould(true);
         rule.check(classes);
@@ -54,18 +56,6 @@ class ModuleBoundaryTest {
     }
 
     @Test
-    @DisplayName("master data does not depend on the bootstrap")
-    void masterDataDoesNotDependOnBootstrap() {
-        ArchRule rule = noClasses()
-                .that().resideInAPackage("com.genisource.erp.masterdata..")
-                .should().dependOnClassesThat()
-                .haveFullyQualifiedName("com.genisource.erp.ErpApplication")
-                .because("a module must be usable without the application that assembles it")
-                .allowEmptyShould(true);
-        rule.check(classes);
-    }
-
-    @Test
     @DisplayName("master data does not reach into a downstream domain module")
     void masterDataStaysInsideItsBoundary() {
         ArchRule rule = noClasses()
@@ -79,6 +69,37 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.production..",
                         "com.genisource.erp.finance..")
                 .because("master data is the base of the dependency graph, not a consumer of it")
+                .allowEmptyShould(true);
+        rule.check(classes);
+    }
+
+    @Test
+    @DisplayName("inventory does not reach into a downstream domain module")
+    void inventoryStaysInsideItsBoundary() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.genisource.erp.inventory..")
+                .should().dependOnClassesThat()
+                .resideInAnyPackage(
+                        "com.genisource.erp.procurement..",
+                        "com.genisource.erp.sales..",
+                        "com.genisource.erp.mrp..",
+                        "com.genisource.erp.production..",
+                        "com.genisource.erp.finance..")
+                .because("purchasing and sales post to stock; stock must not know them yet")
+                .allowEmptyShould(true);
+        rule.check(classes);
+    }
+
+    @Test
+    @DisplayName("master data does not depend on the bootstrap")
+    void domainModulesDoNotDependOnBootstrap() {
+        ArchRule rule = noClasses()
+                .that().resideInAnyPackage(
+                        "com.genisource.erp.masterdata..",
+                        "com.genisource.erp.inventory..")
+                .should().dependOnClassesThat()
+                .haveFullyQualifiedName("com.genisource.erp.ErpApplication")
+                .because("a module must be usable without the application that assembles it")
                 .allowEmptyShould(true);
         rule.check(classes);
     }

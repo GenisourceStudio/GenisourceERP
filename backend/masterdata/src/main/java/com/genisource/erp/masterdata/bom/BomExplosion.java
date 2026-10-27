@@ -2,7 +2,7 @@ package com.genisource.erp.masterdata.bom;
 
 import com.genisource.erp.masterdata.item.Item;
 import com.genisource.erp.masterdata.item.ItemRepository;
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.platform.common.ApiException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

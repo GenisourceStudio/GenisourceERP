@@ -2,8 +2,8 @@ package com.genisource.erp.masterdata.routing;
 
 import com.genisource.erp.masterdata.item.Item;
 import com.genisource.erp.masterdata.item.ItemRepository;
-import com.genisource.erp.masterdata.shared.Codes;
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.Codes;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.masterdata.workcenter.WorkCenter;
 import com.genisource.erp.masterdata.workcenter.WorkCenterRepository;
 import com.genisource.erp.platform.audit.AuditService;

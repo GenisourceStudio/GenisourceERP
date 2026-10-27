@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.item;
 
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.RecordStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -52,4 +52,19 @@ public interface ItemRepository extends JpaRepository<Item, Long>, JpaSpecificat
     List<Item> searchTop(@Param("term") String term,
                          @Param("status") RecordStatus status,
                          Pageable pageable);
+
+    /**
+     * Ids of the items matching a term.
+     *
+     * <p>Used by the stock screen, whose search box spans item codes, batch numbers and
+     * warehouse codes at once. Resolving the matches to ids first keeps the balance
+     * query a plain indexed lookup instead of a join across three master tables.
+     */
+    @Query("""
+            select i.id from Item i
+            where lower(i.code) like :term
+               or lower(i.name) like :term
+               or lower(coalesce(i.spec, '')) like :term
+            """)
+    List<Long> searchIds(@Param("term") String term, Pageable pageable);
 }

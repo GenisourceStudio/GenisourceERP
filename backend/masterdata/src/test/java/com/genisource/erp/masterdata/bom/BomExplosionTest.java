@@ -3,7 +3,7 @@ package com.genisource.erp.masterdata.bom;
 import com.genisource.erp.masterdata.item.Item;
 import com.genisource.erp.masterdata.item.ItemRepository;
 import com.genisource.erp.masterdata.item.ItemType;
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.platform.common.BaseEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -29,7 +29,10 @@ public enum ErrorCode {
     DUPLICATE_CODE("duplicate_code"),
     IN_USE("in_use"),
     INVALID_STATE("invalid_state"),
-    BOM_CYCLE("bom_cycle");
+    BOM_CYCLE("bom_cycle"),
+
+    // --- inventory -----------------------------------------------------------
+    INSUFFICIENT_STOCK("insufficient_stock");
 
     private final String key;
 

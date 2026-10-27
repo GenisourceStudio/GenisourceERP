@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.partner;
 
-import com.genisource.erp.masterdata.shared.RecordStatus;
+import com.genisource.erp.platform.common.RecordStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;

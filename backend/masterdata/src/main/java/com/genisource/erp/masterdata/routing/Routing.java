@@ -1,6 +1,6 @@
 package com.genisource.erp.masterdata.routing;
 
-import com.genisource.erp.masterdata.shared.RevisionStatus;
+import com.genisource.erp.platform.common.RevisionStatus;
 import com.genisource.erp.platform.common.ApiException;
 import com.genisource.erp.platform.common.VersionedTenantEntity;
 import jakarta.persistence.CascadeType;

@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "Plan · Buy · Sell · Stock · MRP",
-    "milestone": "M1 master data"
+    "milestone": "M2 inventory"
   },
   "nav": {
     "group": {
@@ -26,7 +26,9 @@
     "productionOrder": "Production orders",
     "voucher": "Vouchers",
     "audit": "Audit log",
-    "user": "Users & roles"
+    "user": "Users & roles",
+    "inventoryDocument": "Stock documents",
+    "warehouse": "Warehouses & bins"
   },
   "login": {
     "title": "Sign in",
@@ -70,7 +72,11 @@
     "firstPage": "First page",
     "lastPage": "Last page",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "allWarehouses": "All warehouses",
+    "allTypes": "All types",
+    "pleaseSelect": "Select",
+    "activate": "Activate"
   },
   "status": {
     "record": {
@@ -81,6 +87,11 @@
       "DRAFT": "Draft",
       "RELEASED": "Released",
       "OBSOLETE": "Obsolete"
+    },
+    "document": {
+      "DRAFT": "Draft",
+      "POSTED": "Posted",
+      "REVERSED": "Reversed"
     }
   },
   "itemType": {
@@ -96,7 +107,7 @@
     "BOTH": "Customer and supplier"
   },
   "dashboard": {
-    "title": "Dashboard",
+    "title": "Workspace",
     "subtitle": "Platform status",
     "card": {
       "tenant": "Tenant",
@@ -105,19 +116,19 @@
       "permission": "Permissions"
     },
     "delivered": {
-      "title": "Delivered in M1",
-      "tenant": "Items with purchasing, sales, manufacturing and costing facets",
-      "auth": "Multi-level BOMs with revisions and approved substitutes",
-      "schema": "Routings and work centres with capacity, efficiency and rates",
-      "deploy": "One partner model covering customers and suppliers"
+      "title": "M2 delivered",
+      "tenant": "Warehouses and bins: where goods are received and issued",
+      "auth": "Stock documents: receipt, issue, transfer and count; posting moves stock",
+      "schema": "Live balances and six kinds of ledger entry, traceable line by line",
+      "deploy": "Moving weighted average costing, exact red-ink reversals"
     },
     "next": {
-      "title": "Next up",
-      "body": "M2 delivers the stock ledger, goods movements and moving-average costing."
+      "title": "Next",
+      "body": "M3 delivers procure-to-pay and order-to-cash, with an approval flow."
     },
     "scope": {
-      "title": "Where the boundary is",
-      "body": "Master data is maintainable, but nothing downstream consumes it yet: inventory, purchasing, sales and MRP arrive in M2–M4. Entries marked \"Planned\" in the rail are not shipped."
+      "title": "Where the edge is today",
+      "body": "Stock can be recorded, but there are no upstream documents yet: purchasing and sales arrive in M3 and will drive stock, receivables and payables automatically. Entries marked as not open are still to come."
     }
   },
   "page": {
@@ -347,6 +358,108 @@
     "confirm": {
       "deactivateTitle": "Deactivate work centre",
       "deactivateBody": "Deactivate {{code}}? It can no longer be used by new operations."
+    }
+  },
+  "warehouseType": {
+    "RAW": "Raw material",
+    "SEMI": "Semi-finished",
+    "FINISHED": "Finished goods",
+    "GENERAL": "General"
+  },
+  "docType": {
+    "INBOUND": "Receipt",
+    "OUTBOUND": "Issue",
+    "TRANSFER": "Transfer",
+    "COUNT": "Count"
+  },
+  "movementType": {
+    "RECEIPT": "Receipt",
+    "ISSUE": "Issue",
+    "TRANSFER_OUT": "Transfer out",
+    "TRANSFER_IN": "Transfer in",
+    "COUNT_GAIN": "Count gain",
+    "COUNT_LOSS": "Count loss"
+  },
+  "inventory": {
+    "searchPlaceholder": "Search item code, batch number or warehouse",
+    "searchMovementsPlaceholder": "Search document number",
+    "searchDocumentsPlaceholder": "Search document number",
+    "emptyWarehouses": "No warehouses yet",
+    "emptyWarehousesBody": "Create a warehouse first, so goods have somewhere to go.",
+    "emptyLocations": "This warehouse has no bins yet",
+    "emptyStock": "No stock yet",
+    "emptyStockBody": "Post a receipt and the stock will show up here.",
+    "emptyMovements": "No movements yet",
+    "emptyMovementsBody": "Every receipt and issue shows up here once a document is posted.",
+    "emptyDocuments": "No stock documents yet",
+    "emptyDocumentsBody": "Create a document to receive, issue, transfer or count.",
+    "section": {
+      "header": "Header",
+      "lines": "Lines"
+    },
+    "field": {
+      "code": "Code",
+      "name": "Name",
+      "warehouseType": "Warehouse type",
+      "address": "Address",
+      "remark": "Remark",
+      "locations": "Bins",
+      "stockItems": "Items in stock",
+      "warehouse": "Warehouse",
+      "toWarehouse": "Destination",
+      "location": "Bin",
+      "lot": "Batch",
+      "item": "Item",
+      "onHand": "On hand",
+      "available": "Available",
+      "avgCost": "Average cost",
+      "totalAmount": "Total value",
+      "unitCost": "Unit cost",
+      "amount": "Amount",
+      "balanceAfter": "Balance after",
+      "qty": "Quantity",
+      "countedQty": "Counted quantity",
+      "totalQty": "Total quantity",
+      "bizDate": "Business date",
+      "partner": "Partner",
+      "docType": "Document type",
+      "document": "Document",
+      "movementType": "Type",
+      "includeEmpty": "Show empty balances",
+      "expiryDate": "Expires on",
+      "reversalOf": "Reverses"
+    },
+    "action": {
+      "createWarehouse": "New warehouse",
+      "editWarehouse": "Edit warehouse",
+      "addLocation": "Add bin",
+      "locations": "Bins",
+      "createDocument": "New document",
+      "editDocument": "Edit document",
+      "post": "Post",
+      "reverse": "Reverse",
+      "addLine": "Add line"
+    },
+    "hint": {
+      "code": "Upper-cased on save and unique within the organisation.",
+      "createWarehouse": "Create a warehouse before receiving goods.",
+      "createDocument": "A document starts as a draft; only posting moves stock.",
+      "count": "A count records what was found; the system posts the difference as a gain or a loss."
+    },
+    "confirm": {
+      "post": "A posted document cannot be edited, only reversed. Post {docNo}?",
+      "reverse": "A red-ink document will be created; the original stays on the books. Reverse {docNo}?",
+      "deactivateWarehouse": "Nothing can be received or issued in {code} once it is off. Continue?"
+    },
+    "error": {
+      "warehouseRequired": "Pick a warehouse",
+      "linesRequired": "At least one line is required"
+    },
+    "summary": {
+      "title": "Where the stock sits"
+    },
+    "trace": {
+      "title": "Batch traceability"
     }
   }
 }

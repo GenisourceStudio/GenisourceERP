@@ -10,6 +10,10 @@ import PlaceholderPage from '../pages/PlaceholderPage'
 import BomsPage from '../pages/masterdata/BomsPage'
 import ItemsPage from '../pages/masterdata/ItemsPage'
 import PartnersPage from '../pages/masterdata/PartnersPage'
+import DocumentsPage from '../pages/inventory/DocumentsPage'
+import MovementsPage from '../pages/inventory/MovementsPage'
+import StockPage from '../pages/inventory/StockPage'
+import WarehousesPage from '../pages/inventory/WarehousesPage'
 import { useAuthStore } from '../shared/auth/store'
 
 /**
@@ -20,6 +24,10 @@ const PAGES: Record<string, ReactNode> = {
   '/masterdata/items': <ItemsPage />,
   '/masterdata/bom': <BomsPage />,
   '/masterdata/partners': <PartnersPage />,
+  '/inventory/stock': <StockPage />,
+  '/inventory/documents': <DocumentsPage />,
+  '/inventory/movements': <MovementsPage />,
+  '/inventory/warehouses': <WarehousesPage />,
 }
 
 function RequireAuth() {

@@ -1,8 +1,8 @@
 package com.genisource.erp.masterdata.item;
 
 import com.genisource.erp.masterdata.category.ItemCategoryService;
-import com.genisource.erp.masterdata.shared.RecordStatus;
-import com.genisource.erp.masterdata.shared.StatusRequest;
+import com.genisource.erp.platform.common.RecordStatus;
+import com.genisource.erp.platform.common.StatusRequest;
 import com.genisource.erp.masterdata.uom.Uom;
 import com.genisource.erp.masterdata.uom.UomRepository;
 import com.genisource.erp.platform.common.PageResponse;

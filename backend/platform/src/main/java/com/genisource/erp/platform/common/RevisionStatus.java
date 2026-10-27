@@ -1,4 +1,4 @@
-package com.genisource.erp.masterdata.shared;
+package com.genisource.erp.platform.common;
 
 /**
  * Revision lifecycle shared by bills of materials and routings.

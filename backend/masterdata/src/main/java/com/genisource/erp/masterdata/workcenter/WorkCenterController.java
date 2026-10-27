@@ -1,7 +1,7 @@
 package com.genisource.erp.masterdata.workcenter;
 
-import com.genisource.erp.masterdata.shared.RecordStatus;
-import com.genisource.erp.masterdata.shared.StatusRequest;
+import com.genisource.erp.platform.common.RecordStatus;
+import com.genisource.erp.platform.common.StatusRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

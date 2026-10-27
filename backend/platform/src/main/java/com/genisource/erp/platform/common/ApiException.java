@@ -67,6 +67,21 @@ public class ApiException extends RuntimeException {
         return new ApiException(ErrorCode.BOM_CYCLE, HttpStatus.CONFLICT, message);
     }
 
+    /** Something went wrong on our side; the cause is for the log, not for the user. */
+    public static ApiException internal(String message, Throwable cause) {
+        ApiException exception = new ApiException(ErrorCode.INTERNAL_ERROR,
+                HttpStatus.INTERNAL_SERVER_ERROR, message);
+        if (cause != null) {
+            exception.initCause(cause);
+        }
+        return exception;
+    }
+
+    /** The shelf does not hold what the document asks for. */
+    public static ApiException insufficientStock(String message) {
+        return new ApiException(ErrorCode.INSUFFICIENT_STOCK, HttpStatus.CONFLICT, message);
+    }
+
     public ErrorCode code() {
         return code;
     }
