@@ -13,7 +13,9 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A stock document: one envelope for receipts, issues, transfers and counts.
@@ -70,6 +72,18 @@ public class StockDocument extends VersionedTenantEntity {
     @Column(name = "created_by", length = 64)
     private String createdBy;
 
+    /**
+     * What made this document, when it was not typed in by hand: a purchase receipt
+     * arriving against an order, a sales shipment leaving against one. Stamped onto
+     * every ledger entry it writes, so a movement can answer "which business document
+     * caused you" without a reader guessing from a remark.
+     */
+    @Column(name = "source_type", length = 32)
+    private String sourceType;
+
+    @Column(name = "source_id", length = 64)
+    private String sourceId;
+
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineNo ASC")
     private List<DocumentLine> lines = new ArrayList<>();
@@ -84,13 +98,28 @@ public class StockDocument extends VersionedTenantEntity {
         this.bizDate = bizDate;
     }
 
-    /** Replaces the lines wholesale; used when a draft is edited. */
+    /**
+     * Replaces the lines wholesale; used when a draft is edited.
+     *
+     * <p>Lines are matched by line number and updated in place instead of being deleted
+     * and re-inserted: Hibernate writes inserts before deletes, so a delete-then-insert
+     * of line 10 would collide with {@code uq_inv_document_line_no}.
+     */
     public void replaceLines(List<DocumentLine> replacement) {
-        lines.clear();
-        replacement.forEach(line -> {
+        Map<Integer, DocumentLine> incoming = new LinkedHashMap<>();
+        for (DocumentLine line : replacement) {
             line.attachTo(this);
-            lines.add(line);
-        });
+            incoming.put(line.getLineNo(), line);
+        }
+        for (DocumentLine existing : new ArrayList<>(lines)) {
+            DocumentLine next = incoming.remove(existing.getLineNo());
+            if (next == null) {
+                lines.remove(existing);
+            } else {
+                existing.copyContentFrom(next);
+            }
+        }
+        lines.addAll(incoming.values());
     }
 
     public void post(Instant at, String operator) {
@@ -197,6 +226,22 @@ public class StockDocument extends VersionedTenantEntity {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 
     public List<DocumentLine> getLines() {

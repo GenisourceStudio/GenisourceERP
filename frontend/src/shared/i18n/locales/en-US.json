@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "Plan · Buy · Sell · Stock · MRP",
-    "milestone": "M2 inventory"
+    "milestone": "M3 · trade"
   },
   "nav": {
     "group": {
@@ -28,7 +28,13 @@
     "audit": "Audit log",
     "user": "Users & roles",
     "inventoryDocument": "Stock documents",
-    "warehouse": "Warehouses & bins"
+    "warehouse": "Warehouses & bins",
+    "requisition": "Requisitions",
+    "receipt": "Goods receipts",
+    "quotation": "Quotations",
+    "shipment": "Shipments",
+    "receivable": "Receivables",
+    "payable": "Payables"
   },
   "login": {
     "title": "Sign in",
@@ -92,6 +98,24 @@
       "DRAFT": "Draft",
       "POSTED": "Posted",
       "REVERSED": "Reversed"
+    },
+    "trade": {
+      "DRAFT": "Draft",
+      "SUBMITTED": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "PARTIAL": "Partial",
+      "COMPLETED": "Completed",
+      "CLOSED": "Closed",
+      "CANCELLED": "Cancelled",
+      "POSTED": "Posted",
+      "REVERSED": "Reversed"
+    },
+    "ledger": {
+      "OPEN": "Open",
+      "PARTIAL": "Part paid",
+      "SETTLED": "Settled",
+      "VOID": "Void"
     }
   },
   "itemType": {
@@ -116,19 +140,19 @@
       "permission": "Permissions"
     },
     "delivered": {
-      "title": "M2 delivered",
-      "tenant": "Warehouses and bins: where goods are received and issued",
-      "auth": "Stock documents: receipt, issue, transfer and count; posting moves stock",
-      "schema": "Live balances and six kinds of ledger entry, traceable line by line",
-      "deploy": "Moving weighted average costing, exact red-ink reversals"
+      "title": "M3 delivered",
+      "tenant": "Procurement: requisition → order → receipt; posting is what takes stock and raises the payable",
+      "auth": "Sales: quotation → order → shipment; posting is what issues stock and raises the receivable",
+      "schema": "Confirming an order reserves stock, so two orders cannot promise the same units",
+      "deploy": "Payables and receivables fall due on the partner's terms; settling them closes the row"
     },
     "next": {
       "title": "Next",
-      "body": "M3 delivers procure-to-pay and order-to-cash, with an approval flow."
+      "body": "M4 delivers MRP and production orders, turning the BOM into purchase and works plans."
     },
     "scope": {
       "title": "Where the edge is today",
-      "body": "Stock can be recorded, but there are no upstream documents yet: purchasing and sales arrive in M3 and will drive stock, receivables and payables automatically. Entries marked as not open are still to come."
+      "body": "Trade and stock are wired together, but there is no production plan yet: MRP and works orders arrive in M4. Entries marked not available on the left are not delivered yet."
     }
   },
   "page": {
@@ -370,7 +394,13 @@
     "INBOUND": "Receipt",
     "OUTBOUND": "Issue",
     "TRANSFER": "Transfer",
-    "COUNT": "Count"
+    "COUNT": "Count",
+    "REQUISITION": "Requisition",
+    "PURCHASE_ORDER": "Purchase order",
+    "RECEIPT": "Goods receipt",
+    "QUOTATION": "Quotation",
+    "SALES_ORDER": "Sales order",
+    "SHIPMENT": "Shipment"
   },
   "movementType": {
     "RECEIPT": "Receipt",
@@ -447,9 +477,9 @@
       "count": "A count records what was found; the system posts the difference as a gain or a loss."
     },
     "confirm": {
-      "post": "A posted document cannot be edited, only reversed. Post {docNo}?",
-      "reverse": "A red-ink document will be created; the original stays on the books. Reverse {docNo}?",
-      "deactivateWarehouse": "Nothing can be received or issued in {code} once it is off. Continue?"
+      "post": "A posted document cannot be edited, only reversed. Post {{docNo}}?",
+      "reverse": "A red-ink document will be created; the original stays on the books. Reverse {{docNo}}?",
+      "deactivateWarehouse": "Nothing can be received or issued in {{code}} once it is off. Continue?"
     },
     "error": {
       "warehouseRequired": "Pick a warehouse",
@@ -460,6 +490,113 @@
     },
     "trace": {
       "title": "Batch traceability"
+    }
+  },
+  "purchase": {
+    "kind": {
+      "requisition": "requisition",
+      "order": "purchase order",
+      "receipt": "goods receipt"
+    }
+  },
+  "sales": {
+    "kind": {
+      "quotation": "quotation",
+      "order": "sales order",
+      "shipment": "shipment"
+    }
+  },
+  "trade": {
+    "searchPlaceholder": "Search document number or partner",
+    "section": {
+      "header": "Header",
+      "lines": "Lines"
+    },
+    "field": {
+      "docNo": "Document",
+      "partner": "Partner",
+      "warehouse": "Warehouse",
+      "bizDate": "Date",
+      "requiredDate": "Required",
+      "paymentTermDays": "Terms (days)",
+      "remark": "Remark",
+      "item": "Item",
+      "qty": "Qty",
+      "unitPrice": "Unit price",
+      "taxRate": "Tax rate",
+      "netAmount": "Net",
+      "taxAmount": "Tax",
+      "totalAmount": "Gross",
+      "openQty": "Open",
+      "fulfilled": "Fulfilled",
+      "reserved": "Reserved",
+      "source": "Source",
+      "approvalRemark": "Approval note",
+      "reversalOf": "Reversal of"
+    },
+    "action": {
+      "create": "New document",
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "convert": "Convert to {{kind}}",
+      "fulfil": "Create {{kind}}",
+      "post": "Post",
+      "reverse": "Reverse",
+      "close": "Close",
+      "cancel": "Cancel",
+      "addLine": "Add line"
+    },
+    "confirm": {
+      "submit": "Submit {{docNo}} for approval. Below the threshold it is approved at once.",
+      "approve": "Approve {{docNo}}? Goods can be received or shipped against it afterwards.",
+      "reject": "Reject {{docNo}}? It has to be revised and resubmitted.",
+      "post": "Posting {{docNo}} moves stock and raises the payable or receivable. It cannot be edited afterwards.",
+      "reverse": "This raises a red-ink document against {{docNo}}; the original stays on the books.",
+      "close": "Close {{docNo}}? The remaining quantity will not be executed.",
+      "cancel": "Cancel {{docNo}}? Any stock it reserved is released.",
+      "delete": "Delete {{docNo}}? This cannot be undone — cancelling is usually the better answer."
+    },
+    "error": {
+      "linesRequired": "At least one line is required",
+      "partnerRequired": "Choose a partner",
+      "warehouseRequired": "Choose a warehouse"
+    },
+    "empty": {
+      "title": "No documents yet",
+      "body": "Create one, or convert one from the step before.",
+      "nothingOpen": "Nothing is left open on this document."
+    }
+  },
+  "finance": {
+    "searchPlaceholder": "Search document number or partner",
+    "field": {
+      "source": "Source",
+      "dueDate": "Due",
+      "total": "Total",
+      "paid": "Paid",
+      "collected": "Collected",
+      "amountPaid": "Settled",
+      "balance": "Balance",
+      "overdue": "Overdue",
+      "overdueCount": "{{count}} overdue",
+      "openCount": "{{count}} open",
+      "overdueOnly": "Overdue only"
+    },
+    "action": {
+      "pay": "Record payment",
+      "collect": "Record receipt"
+    },
+    "confirm": {
+      "settle": "{{sourceNo}} still has {{balance}} outstanding. Amount to settle:"
+    },
+    "payable": {
+      "emptyTitle": "No payables yet",
+      "emptyBody": "Posting a goods receipt raises one, due on the supplier's terms."
+    },
+    "receivable": {
+      "emptyTitle": "No receivables yet",
+      "emptyBody": "Posting a shipment raises one, due on the customer's terms."
     }
   }
 }

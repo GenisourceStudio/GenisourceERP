@@ -15,6 +15,7 @@ import com.genisource.erp.masterdata.item.ItemRepository;
 import com.genisource.erp.masterdata.partner.Partner;
 import com.genisource.erp.masterdata.partner.PartnerRepository;
 import com.genisource.erp.platform.audit.AuditService;
+import com.genisource.erp.platform.numbering.DocumentNoAllocator;
 import com.genisource.erp.platform.common.ApiException;
 import com.genisource.erp.platform.common.PageResponse;
 import com.genisource.erp.platform.security.CurrentUser;
@@ -126,6 +127,48 @@ public class DocumentService {
 
     @Transactional
     public DocumentDtos.DocumentView create(DocumentDtos.DocumentRequest request) {
+        StockDocument document = build(request, null, null);
+        audit.record("inventory.document.create", CurrentUser.id().orElse(null),
+                CurrentUser.username().orElse(null),
+                "inv_document", String.valueOf(document.getId()),
+                Map.of("docNo", document.getDocNo(), "type", request.docType().name()));
+        return view(document);
+    }
+
+    /**
+     * Creates and posts a stock document on behalf of another module.
+     *
+     * <p>A purchase receipt and a sales shipment do not ask anybody to type a stock
+     * document: they bring one with them. This is the door they use, and it posts in
+     * the caller's transaction, so a purchase receipt that cannot move stock is not
+     * posted either — the two are never half done.
+     *
+     * <p>The source is stamped on every ledger entry the posting writes, which is what
+     * lets a movement say "I came from purchase receipt SL-20261028-0001" instead of
+     * leaving the reader to guess.
+     *
+     * @param sourceType what kind of document caused this, e.g. {@code PUR_RECEIPT}
+     * @param sourceId   its document number
+     * @return the id of the inventory document that was posted
+     */
+    @Transactional
+    public Long postSourced(DocumentDtos.DocumentRequest request, String sourceType, String sourceId) {
+        StockDocument document = build(request, sourceType, sourceId);
+        apply(document);
+        document.post(Instant.now(), CurrentUser.username().orElse(null));
+        documents.save(document);
+        audit.record("inventory.document.post", CurrentUser.id().orElse(null),
+                CurrentUser.username().orElse(null),
+                "inv_document", String.valueOf(document.getId()),
+                Map.of("docNo", document.getDocNo(), "type", document.getDocType().name(),
+                        "source", sourceId));
+        return document.getId();
+    }
+
+    /** Shared by {@link #create} and {@link #postSourced}: validate and persist a draft. */
+    private StockDocument build(DocumentDtos.DocumentRequest request,
+                                String sourceType,
+                                String sourceId) {
         Warehouse warehouse = warehouses.requireUsable(request.warehouseId());
         if (request.locationId() != null) {
             locations.requireUsable(request.locationId(), warehouse.getId());
@@ -146,7 +189,7 @@ public class DocumentService {
         validatePartner(request);
 
         StockDocument document = new StockDocument(
-                numbers.next(CurrentUser.tenantIdOrContext(), request.docType(), request.bizDate()),
+                numbers.next(request.docType().prefix(), request.bizDate()),
                 request.docType(),
                 warehouse.getId(),
                 request.bizDate());
@@ -155,14 +198,11 @@ public class DocumentService {
         document.setToLocationId(request.toLocationId());
         document.setPartnerId(request.partnerId());
         document.setRemark(blankToNull(request.remark()));
+        document.setSourceType(sourceType);
+        document.setSourceId(sourceId);
         document.replaceLines(buildLines(request.lines()));
         documents.save(document);
-
-        audit.record("inventory.document.create", CurrentUser.id().orElse(null),
-                CurrentUser.username().orElse(null),
-                "inv_document", String.valueOf(document.getId()),
-                Map.of("docNo", document.getDocNo(), "type", request.docType().name()));
-        return view(document);
+        return document;
     }
 
     @Transactional
@@ -223,6 +263,19 @@ public class DocumentService {
     @Transactional
     public DocumentDtos.DocumentView post(Long id) {
         StockDocument document = require(id);
+        apply(document);
+        document.post(Instant.now(), CurrentUser.username().orElse(null));
+        documents.save(document);
+
+        audit.record("inventory.document.post", CurrentUser.id().orElse(null),
+                CurrentUser.username().orElse(null),
+                "inv_document", String.valueOf(document.getId()),
+                Map.of("docNo", document.getDocNo(), "type", document.getDocType().name()));
+        return view(document);
+    }
+
+    /** The part of posting that writes stock: one ledger entry and one balance per line. */
+    private void apply(StockDocument document) {
         if (!document.getStatus().isEditable()) {
             throw ApiException.invalidState("Document " + document.getDocNo()
                     + " is already posted and cannot be posted again");
@@ -230,7 +283,6 @@ public class DocumentService {
         if (document.getLines().isEmpty()) {
             throw ApiException.badRequest("Document " + document.getDocNo() + " has no lines");
         }
-
         for (DocumentLine line : document.getLines()) {
             Item item = requireItem(line.getItemId());
             Long lotId = resolveLot(item, line);
@@ -241,15 +293,6 @@ public class DocumentService {
                 case COUNT -> postCount(document, line, item, lotId);
             }
         }
-
-        document.post(Instant.now(), CurrentUser.username().orElse(null));
-        documents.save(document);
-
-        audit.record("inventory.document.post", CurrentUser.id().orElse(null),
-                CurrentUser.username().orElse(null),
-                "inv_document", String.valueOf(document.getId()),
-                Map.of("docNo", document.getDocNo(), "type", document.getDocType().name()));
-        return view(document);
     }
 
     /**
@@ -274,7 +317,7 @@ public class DocumentService {
         }
 
         StockDocument reversal = new StockDocument(
-                numbers.next(CurrentUser.tenantIdOrContext(), original.getDocType(), LocalDate.now()),
+                numbers.next(original.getDocType().prefix(), LocalDate.now()),
                 original.getDocType(),
                 original.getWarehouseId(),
                 LocalDate.now());
@@ -318,6 +361,24 @@ public class DocumentService {
                 "inv_document", String.valueOf(original.getId()),
                 Map.of("docNo", original.getDocNo(), "reversal", reversal.getDocNo()));
         return view(reversal);
+    }
+
+    /**
+     * Undoes everything one business document brought about.
+     *
+     * <p>A purchase receipt or a sales shipment may have produced several stock
+     * documents, and reversing the business document has to undo all of them. Called
+     * from the module that owns the business document, in its transaction, so the
+     * business document and the stock it moved are never left disagreeing.
+     *
+     * @return the reversals that were written
+     */
+    @Transactional
+    public List<DocumentDtos.DocumentView> reverseSourced(String sourceType, String sourceId) {
+        return documents.findBySourceTypeAndSourceIdOrderByIdAsc(sourceType, sourceId)
+                .stream()
+                .map(source -> reverse(source.getId()))
+                .toList();
     }
 
     @Transactional
@@ -466,8 +527,8 @@ public class DocumentService {
         movement.setAmount(amount == null ? BigDecimal.ZERO : amount);
         movement.setBalanceQtyAfter(balanceQty);
         movement.setBalanceAmountAfter(balanceAmount);
-        movement.setRefType("INVENTORY");
-        movement.setRefId(document.getDocNo());
+        movement.setRefType(document.getSourceType() == null ? "INVENTORY" : document.getSourceType());
+        movement.setRefId(document.getSourceType() == null ? document.getDocNo() : document.getSourceId());
         movement.setOperator(CurrentUser.username().orElse(null));
         movement.setRemark(remark);
         movement.setMovedAt(Instant.now());

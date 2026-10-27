@@ -14,6 +14,17 @@ import DocumentsPage from '../pages/inventory/DocumentsPage'
 import MovementsPage from '../pages/inventory/MovementsPage'
 import StockPage from '../pages/inventory/StockPage'
 import WarehousesPage from '../pages/inventory/WarehousesPage'
+import PayablesPage from '../pages/finance/PayablesPage'
+import ReceivablesPage from '../pages/finance/ReceivablesPage'
+import TradeDocumentPage from '../pages/trade/TradeDocumentPage'
+import {
+  PURCHASE_ORDER,
+  QUOTATION,
+  RECEIPT,
+  REQUISITION,
+  SALES_ORDER,
+  SHIPMENT,
+} from '../pages/trade/configs'
 import { useAuthStore } from '../shared/auth/store'
 
 /**
@@ -28,6 +39,14 @@ const PAGES: Record<string, ReactNode> = {
   '/inventory/documents': <DocumentsPage />,
   '/inventory/movements': <MovementsPage />,
   '/inventory/warehouses': <WarehousesPage />,
+  '/purchase/requisitions': <TradeDocumentPage config={REQUISITION} />,
+  '/purchase/orders': <TradeDocumentPage config={PURCHASE_ORDER} />,
+  '/purchase/receipts': <TradeDocumentPage config={RECEIPT} />,
+  '/sales/quotations': <TradeDocumentPage config={QUOTATION} />,
+  '/sales/orders': <TradeDocumentPage config={SALES_ORDER} />,
+  '/sales/shipments': <TradeDocumentPage config={SHIPMENT} />,
+  '/finance/receivables': <ReceivablesPage />,
+  '/finance/payables': <PayablesPage />,
 }
 
 function RequireAuth() {

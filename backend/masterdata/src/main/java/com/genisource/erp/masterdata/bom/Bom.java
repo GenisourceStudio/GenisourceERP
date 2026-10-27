@@ -16,7 +16,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Bill of materials header: one engineering revision of how an item is built.
@@ -164,12 +166,28 @@ public class Bom extends VersionedTenantEntity {
         return lines;
     }
 
-    /** Replaces the component list in place so orphan removal cleans up dropped lines. */
+    /**
+     * Replaces the component list, matching by line number.
+     *
+     * <p>Lines are updated in place instead of being dropped and re-added: Hibernate
+     * writes inserts before deletes, so a delete-then-insert of line 10 would collide
+     * with {@code uq_md_bom_line_no}. A re-inserted line would also lose its id, which
+     * its substitutes point at.
+     */
     public void replaceLines(List<BomLine> replacement) {
-        lines.clear();
+        Map<Integer, BomLine> incoming = new LinkedHashMap<>();
         for (BomLine line : replacement) {
             line.attachTo(this);
-            lines.add(line);
+            incoming.put(line.getLineNo(), line);
         }
+        for (BomLine existing : new ArrayList<>(lines)) {
+            BomLine next = incoming.remove(existing.getLineNo());
+            if (next == null) {
+                lines.remove(existing);
+            } else {
+                existing.copyContentFrom(next);
+            }
+        }
+        lines.addAll(incoming.values());
     }
 }

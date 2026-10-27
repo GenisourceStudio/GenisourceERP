@@ -13,6 +13,10 @@ public final class MovementDtos {
     public record MovementView(
             Long id,
             String docNo,
+            /** What kind of business document caused this: SAL_SHIPMENT, PUR_RECEIPT, … */
+            String refType,
+            /** The business document's own number, or the stock document's when it stands alone. */
+            String refId,
             MovementType movementType,
             String direction,
             Long itemId,

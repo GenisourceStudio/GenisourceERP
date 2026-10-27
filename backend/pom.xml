@@ -23,6 +23,9 @@
         <module>platform</module>
         <module>masterdata</module>
         <module>inventory</module>
+        <module>finance</module>
+        <module>purchase</module>
+        <module>sales</module>
         <module>bootstrap</module>
     </modules>
 
@@ -49,6 +52,21 @@
             <dependency>
                 <groupId>com.genisource</groupId>
                 <artifactId>erp-inventory</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-finance</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-purchase</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-sales</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

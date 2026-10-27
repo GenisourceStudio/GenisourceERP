@@ -55,4 +55,19 @@ public final class StockDtos {
             int locationCount,
             List<StockView> lines) {
     }
+
+    /**
+     * A balance line that can be promised to a customer, with how much of it is free.
+     *
+     * <p>Handed out fullest first, so a caller that needs fifty takes them from the bin
+     * that holds eighty rather than from the one that holds ten.
+     */
+    public record ReservableLine(
+            Long warehouseId,
+            Long locationId,
+            Long itemId,
+            Long lotId,
+            BigDecimal onHand,
+            BigDecimal available) {
+    }
 }

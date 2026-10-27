@@ -13,7 +13,9 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * One component of a BOM: how much of which item goes into {@code baseQty} units of the
@@ -69,12 +71,39 @@ public class BomLine extends TenantScopedEntity {
         this.bom = bom;
     }
 
+    /**
+     * Replaces the substitute list, matching by item.
+     *
+     * <p>Same reason as {@link Bom#replaceLines(List)}: Hibernate writes inserts before
+     * deletes, so dropping and re-adding the same substitute would collide with
+     * {@code uq_md_bom_substitute}.
+     */
     public void replaceSubstitutes(List<BomSubstitute> replacement) {
-        substitutes.clear();
+        Map<Long, BomSubstitute> incoming = new LinkedHashMap<>();
         for (BomSubstitute substitute : replacement) {
             substitute.attachTo(this);
-            substitutes.add(substitute);
+            incoming.put(substitute.getSubstituteItemId(), substitute);
         }
+        for (BomSubstitute existing : new ArrayList<>(substitutes)) {
+            BomSubstitute next = incoming.remove(existing.getSubstituteItemId());
+            if (next == null) {
+                substitutes.remove(existing);
+            } else {
+                existing.copyContentFrom(next);
+            }
+        }
+        substitutes.addAll(incoming.values());
+    }
+
+    /** Copies what the user typed onto this row, substitutes included. */
+    void copyContentFrom(BomLine replacement) {
+        this.componentItemId = replacement.componentItemId;
+        this.qty = replacement.qty;
+        this.lossRate = replacement.lossRate;
+        this.phantom = replacement.phantom;
+        this.remark = replacement.remark;
+        replaceSubstitutes(replacement.substitutes);
+        tidy();
     }
 
     public void tidy() {

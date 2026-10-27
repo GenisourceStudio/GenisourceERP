@@ -1,5 +1,7 @@
 package com.genisource.erp.inventory.movement;
 
+import com.genisource.erp.inventory.document.DocumentRepository;
+import com.genisource.erp.inventory.document.StockDocument;
 import com.genisource.erp.inventory.lot.Lot;
 import com.genisource.erp.inventory.lot.LotRepository;
 import com.genisource.erp.inventory.stock.StockService;
@@ -44,19 +46,22 @@ public class MovementService {
     private final LocationRepository locations;
     private final LotRepository lots;
     private final StockService stock;
+    private final DocumentRepository documents;
 
     public MovementService(MovementRepository movements,
                            ItemRepository items,
                            WarehouseRepository warehouses,
                            LocationRepository locations,
                            LotRepository lots,
-                           StockService stock) {
+                           StockService stock,
+                           DocumentRepository documents) {
         this.movements = movements;
         this.items = items;
         this.warehouses = warehouses;
         this.locations = locations;
         this.lots = lots;
         this.stock = stock;
+        this.documents = documents;
     }
 
     public PageResponse<MovementDtos.MovementView> search(String keyword,
@@ -118,6 +123,9 @@ public class MovementService {
         Map<Long, Lot> lotById = lots
                 .findAllById(source.stream().map(Movement::getLotId).filter(Objects::nonNull).distinct().toList())
                 .stream().collect(Collectors.toMap(Lot::getId, Function.identity()));
+        Map<Long, String> docNoById = documents
+                .findAllById(source.stream().map(Movement::getDocumentId).filter(Objects::nonNull).distinct().toList())
+                .stream().collect(Collectors.toMap(StockDocument::getId, StockDocument::getDocNo));
 
         return source.stream().map(movement -> {
             Item item = itemById.get(movement.getItemId());
@@ -126,6 +134,8 @@ public class MovementService {
             Lot lot = lotById.get(movement.getLotId());
             return new MovementDtos.MovementView(
                     movement.getId(),
+                    docNoById.get(movement.getDocumentId()),
+                    movement.getRefType(),
                     movement.getRefId(),
                     movement.getMovementType(),
                     movement.getDirection(),

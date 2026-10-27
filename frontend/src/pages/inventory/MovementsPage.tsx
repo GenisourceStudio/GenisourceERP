@@ -14,7 +14,7 @@ import {
   type MovementView,
 } from '../../shared/api/inventory'
 import { useDebounced } from '../../shared/hooks/useDebounced'
-import { formatMoney, formatQty } from './StockPage'
+import { formatMoney, formatQty } from '../../shared/format'
 
 const PAGE_SIZE = 20
 const TYPES: MovementType[] = [

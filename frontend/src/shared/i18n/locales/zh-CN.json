@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "计划 · 采购 · 销售 · 库存 · MRP",
-    "milestone": "M2 库存"
+    "milestone": "M3 购销"
   },
   "nav": {
     "group": {
@@ -28,7 +28,13 @@
     "audit": "审计日志",
     "user": "用户与角色",
     "inventoryDocument": "出入库单",
-    "warehouse": "仓库与库位"
+    "warehouse": "仓库与库位",
+    "requisition": "采购请购",
+    "receipt": "采购收料",
+    "quotation": "销售报价",
+    "shipment": "销售发货",
+    "receivable": "应收账款",
+    "payable": "应付账款"
   },
   "login": {
     "title": "登录",
@@ -92,6 +98,24 @@
       "DRAFT": "草稿",
       "POSTED": "已过账",
       "REVERSED": "已冲销"
+    },
+    "trade": {
+      "DRAFT": "草稿",
+      "SUBMITTED": "待审批",
+      "APPROVED": "已审批",
+      "REJECTED": "已驳回",
+      "PARTIAL": "部分执行",
+      "COMPLETED": "已完成",
+      "CLOSED": "已结案",
+      "CANCELLED": "已取消",
+      "POSTED": "已过账",
+      "REVERSED": "已冲销"
+    },
+    "ledger": {
+      "OPEN": "未结",
+      "PARTIAL": "部分结清",
+      "SETTLED": "已结清",
+      "VOID": "已作废"
     }
   },
   "itemType": {
@@ -116,19 +140,19 @@
       "permission": "权限点"
     },
     "delivered": {
-      "title": "M2 已交付",
-      "tenant": "仓库与库位：收发料的地点",
-      "auth": "出入库单据：入库 / 出库 / 移库 / 盘点，过账才动库存",
-      "schema": "库存账实时结存，六种流水逐笔可查",
-      "deploy": "移动加权平均计价，红字冲销精确回退"
+      "title": "M3 已交付",
+      "tenant": "采购：请购 → 订单 → 收料，过账才入库并记应付",
+      "auth": "销售：报价 → 订单 → 发货，过账才出库并记应收",
+      "schema": "订单确认即占用库存，两张订单抢不到同一批货",
+      "deploy": "应收应付按账期自动到期，登记收付款即结清"
     },
     "next": {
       "title": "下一步",
-      "body": "M3 将交付采购到付款与销售到收款，并接入审批流。"
+      "body": "M4 将交付 MRP 运算与生产订单，把 BOM 展开成采购与生产计划。"
     },
     "scope": {
       "title": "当前能力边界",
-      "body": "库存已经能记，但还没有上游单据：采购与销售在 M3 接入，届时单据会自动驱动库存与应收应付。左侧标注「未开放」的入口尚未交付。"
+      "body": "购销与库存已打通，但还没有生产计划：MRP 与生产订单在 M4 接入。左侧标注「未开放」的入口尚未交付。"
     }
   },
   "page": {
@@ -370,7 +394,13 @@
     "INBOUND": "入库单",
     "OUTBOUND": "出库单",
     "TRANSFER": "移库单",
-    "COUNT": "盘点单"
+    "COUNT": "盘点单",
+    "REQUISITION": "请购单",
+    "PURCHASE_ORDER": "采购订单",
+    "RECEIPT": "收料单",
+    "QUOTATION": "报价单",
+    "SALES_ORDER": "销售订单",
+    "SHIPMENT": "发货单"
   },
   "movementType": {
     "RECEIPT": "入库",
@@ -447,9 +477,9 @@
       "count": "盘点只登记实盘数量，系统按账面与实盘的差额生成盘盈或盘亏。"
     },
     "confirm": {
-      "post": "过账后单据不可修改，只能用红字冲销。确定过账 {docNo} 吗？",
-      "reverse": "将生成一张红字单据，原单据保留在账上。确定冲销 {docNo} 吗？",
-      "deactivateWarehouse": "停用 {code} 后不能再往这个仓库收发库存。确定吗？"
+      "post": "过账后单据不可修改，只能用红字冲销。确定过账 {{docNo}} 吗？",
+      "reverse": "将生成一张红字单据，原单据保留在账上。确定冲销 {{docNo}} 吗？",
+      "deactivateWarehouse": "停用 {{code}} 后不能再往这个仓库收发库存。确定吗？"
     },
     "error": {
       "warehouseRequired": "请选择仓库",
@@ -460,6 +490,113 @@
     },
     "trace": {
       "title": "批次追溯"
+    }
+  },
+  "purchase": {
+    "kind": {
+      "requisition": "请购单",
+      "order": "采购订单",
+      "receipt": "收料单"
+    }
+  },
+  "sales": {
+    "kind": {
+      "quotation": "报价单",
+      "order": "销售订单",
+      "shipment": "发货单"
+    }
+  },
+  "trade": {
+    "searchPlaceholder": "搜索单据号或往来单位",
+    "section": {
+      "header": "单据头",
+      "lines": "明细"
+    },
+    "field": {
+      "docNo": "单据号",
+      "partner": "往来单位",
+      "warehouse": "仓库",
+      "bizDate": "业务日期",
+      "requiredDate": "需求日期",
+      "paymentTermDays": "账期（天）",
+      "remark": "备注",
+      "item": "物料",
+      "qty": "数量",
+      "unitPrice": "不含税单价",
+      "taxRate": "税率",
+      "netAmount": "不含税金额",
+      "taxAmount": "税额",
+      "totalAmount": "价税合计",
+      "openQty": "未执行",
+      "fulfilled": "已执行",
+      "reserved": "已占用",
+      "source": "来源单据",
+      "approvalRemark": "审批意见",
+      "reversalOf": "冲销原单"
+    },
+    "action": {
+      "create": "新建单据",
+      "submit": "提交审批",
+      "approve": "通过",
+      "reject": "驳回",
+      "convert": "转为{{kind}}",
+      "fulfil": "生成{{kind}}",
+      "post": "过账",
+      "reverse": "红字冲销",
+      "close": "结案",
+      "cancel": "取消",
+      "addLine": "添加明细"
+    },
+    "confirm": {
+      "submit": "提交 {{docNo}} 进入审批；金额在阈值内会自动通过。",
+      "approve": "通过 {{docNo}}？通过后即可据以收货或发货。",
+      "reject": "驳回 {{docNo}}？驳回后需要修改重提。",
+      "post": "过账后 {{docNo}} 会移动库存并生成应收应付，不可再修改。",
+      "reverse": "将生成红字单据冲销 {{docNo}}，原单保留在账上。",
+      "close": "结案 {{docNo}}？结案后不再执行剩余数量。",
+      "cancel": "取消 {{docNo}}？已占用的库存会被释放。",
+      "delete": "删除 {{docNo}}？删除后无法恢复，建议改为取消。"
+    },
+    "error": {
+      "linesRequired": "至少需要一行明细",
+      "partnerRequired": "请选择往来单位",
+      "warehouseRequired": "请选择仓库"
+    },
+    "empty": {
+      "title": "还没有单据",
+      "body": "新建一张，或从上一环节的单据转过来。",
+      "nothingOpen": "这张单据已经没有未执行的明细了。"
+    }
+  },
+  "finance": {
+    "searchPlaceholder": "搜索单据号或往来单位",
+    "field": {
+      "source": "来源单据",
+      "dueDate": "到期日",
+      "total": "发生额",
+      "paid": "已付款",
+      "collected": "已收款",
+      "amountPaid": "已结算",
+      "balance": "未结余额",
+      "overdue": "逾期金额",
+      "overdueCount": "{{count}} 笔逾期",
+      "openCount": "{{count}} 笔未结",
+      "overdueOnly": "只看逾期"
+    },
+    "action": {
+      "pay": "登记付款",
+      "collect": "登记收款"
+    },
+    "confirm": {
+      "settle": "{{sourceNo}} 尚有 {{balance}} 未结，本次结算金额："
+    },
+    "payable": {
+      "emptyTitle": "还没有应付",
+      "emptyBody": "收料单过账后，按供应商账期自动生成应付。"
+    },
+    "receivable": {
+      "emptyTitle": "还没有应收",
+      "emptyBody": "发货单过账后，按客户账期自动生成应收。"
     }
   }
 }

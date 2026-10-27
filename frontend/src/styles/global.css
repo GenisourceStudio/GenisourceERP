@@ -480,6 +480,12 @@ button {
   color: var(--muted);
 }
 
+/* The one place the UI is allowed to use red: a number that is past due, or a balance
+   that should not be there. Nowhere else, or red stops meaning anything. */
+.text-danger {
+  color: var(--red);
+}
+
 /* ---------------------------------------------------------------- tables */
 
 .table-wrap {
@@ -1197,6 +1203,41 @@ textarea.input {
   color: var(--amber);
 }
 
+/* Trade documents carry their own lifecycle, longer than the inventory one: a document
+   can be approved, then half delivered, then closed. The three below share the amber of
+   "somebody still has to do something", the green of "done", and the grey of "no longer
+   anyone's problem" — so the eye can read a list of fifty documents without stopping. */
+.tag--submitted {
+  border-color: rgba(168, 106, 18, 0.4);
+  background: rgba(168, 106, 18, 0.08);
+  color: var(--amber);
+}
+
+.tag--approved,
+.tag--completed {
+  border-color: rgba(29, 107, 78, 0.4);
+  background: rgba(29, 107, 78, 0.08);
+  color: var(--green);
+}
+
+.tag--rejected {
+  border-color: rgba(168, 35, 27, 0.4);
+  background: rgba(168, 35, 27, 0.08);
+  color: var(--red);
+}
+
+.tag--partial {
+  border-color: rgba(255, 75, 18, 0.4);
+  background: var(--orange-soft);
+  color: var(--orange-text);
+}
+
+.tag--closed,
+.tag--cancelled {
+  border-color: var(--line-strong);
+  color: var(--muted-2);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -1396,6 +1437,29 @@ textarea.input {
 
 .doc-line__row--count {
   grid-template-columns: minmax(0, 1fr) 96px 96px 96px 64px;
+}
+
+/* A trade line carries a price and a tax rate as well as a quantity, so it needs two
+   more columns than a stock line and a wider remark: the clerk types what the customer
+   was quoted, and that is where the discrepancy usually turns up. */
+.doc-line__head--trade {
+  grid-template-columns: minmax(0, 1fr) 88px 96px 78px minmax(0, 1.1fr) 64px;
+}
+
+.doc-line__row--trade {
+  grid-template-columns: minmax(0, 1fr) 88px 96px 78px minmax(0, 1.1fr) 64px;
+  margin-top: 9px;
+}
+
+/* Header row of the pick-lines list: same uppercase mono as the document grid, so the
+   two read as the same instrument. */
+.line-list__row--head {
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-2);
 }
 
 .doc-line .input {

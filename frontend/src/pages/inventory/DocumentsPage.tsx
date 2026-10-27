@@ -18,7 +18,7 @@ import {
 import { useAuthStore } from '../../shared/auth/store'
 import { useDebounced } from '../../shared/hooks/useDebounced'
 import DocumentEditor from './DocumentEditor'
-import { formatMoney, formatQty } from './StockPage'
+import { formatMoney, formatQty } from '../../shared/format'
 
 const PAGE_SIZE = 20
 const TYPES: DocumentType[] = ['INBOUND', 'OUTBOUND', 'TRANSFER', 'COUNT']

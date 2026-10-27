@@ -12,6 +12,7 @@ import {
   stockSummary,
   type StockView,
 } from '../../shared/api/inventory'
+import { formatMoney, formatQty } from '../../shared/format'
 import { useDebounced } from '../../shared/hooks/useDebounced'
 
 const PAGE_SIZE = 20
@@ -251,13 +252,3 @@ export default function StockPage() {
   )
 }
 
-export function formatQty(value: number): string {
-  return Number(value ?? 0).toLocaleString(undefined, { maximumFractionDigits: 6 })
-}
-
-export function formatMoney(value: number): string {
-  return Number(value ?? 0).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4,
-  })
-}

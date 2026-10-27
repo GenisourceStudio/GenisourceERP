@@ -6,12 +6,12 @@
 |---|---|---|
 | `sys_` | 系统（租户、用户、角色、权限、审计） | M0 ✅ |
 | `md_` | 主数据（物料、客户、供应商、BOM、工艺、工作中心） | M1 ✅ |
-| `inv_` | 库存（仓库、库位、批次、库存账、出入库单） | M2 |
-| `pur_` | 采购（请购、采购订单、收料、应付） | M3 |
-| `sal_` | 销售（报价、销售订单、发货、应收） | M3 |
+| `inv_` | 库存（仓库、库位、批次、库存账、出入库单） | M2 ✅ |
+| `pur_` | 采购（请购、采购订单、收料） | M3 ✅ |
+| `sal_` | 销售（报价、销售订单、发货、占用） | M3 ✅ |
 | `mrp_` | MRP（运算单、计划工单、计划采购单） | M4 |
 | `prd_` | 生产订单（计划层，区别于 MES 的执行工单） | M4 |
-| `fin_` | 财务（科目、凭证、总账） | M5 |
+| `fin_` | 财务（应收应付台账 M3，科目/凭证/总账 M5） | M3 ✅ / M5 |
 
 通用列：`id BIGSERIAL`、`tenant_id BIGINT`（业务表）、`created_at` / `updated_at TIMESTAMPTZ`。金额与数量一律 `NUMERIC`，不用浮点。
 
@@ -389,7 +389,94 @@ erDiagram
 
 M2 采用**移动加权平均**：每次入库重算 `avg_cost = (旧金额 + 入库金额) / (旧数量 + 入库数量)`。FIFO 作为企业版可选。标准成本法依赖成本核算模块（企业版）。
 
-## M3–M5 规划（示意）
+## M3 已实现
+
+```mermaid
+erDiagram
+    md_partner ||--o{ pur_document : "supplies"
+    pur_document ||--o{ pur_document_line : contains
+    pur_document ||--o| pur_document : "reversal_of"
+    pur_document_line ||--o{ inv_movement : "posted receipt creates"
+
+    md_partner ||--o{ sal_document : "buys"
+    sal_document ||--o{ sal_document_line : contains
+    sal_document ||--o| sal_document : "reversal_of"
+    sal_document_line ||--o{ sal_reservation : "order line promises"
+    sal_reservation }o--|| inv_stock : "against balance line"
+    sal_document_line ||--o{ inv_movement : "posted shipment creates"
+
+    pur_document ||--|| fin_payable : "posted receipt raises"
+    sal_document ||--|| fin_receivable : "posted shipment raises"
+    md_partner ||--o{ fin_payable : owes
+    md_partner ||--o{ fin_receivable : "is owed by"
+
+    pur_document {
+        bigint id PK
+        bigint tenant_id FK
+        varchar doc_no UK
+        varchar doc_type "REQUISITION / ORDER / RECEIPT"
+        varchar status "DocumentLifecycle"
+        bigint partner_id FK
+        bigint warehouse_id FK
+        date biz_date
+        int payment_term_days
+        numeric net_amount
+        numeric tax_amount
+        numeric total_amount
+        varchar source_type
+        varchar source_id
+        bigint reversal_of FK
+    }
+    pur_document_line {
+        bigint id PK
+        bigint document_id FK
+        int line_no UK
+        bigint item_id FK
+        numeric qty
+        numeric unit_price
+        numeric tax_rate
+        numeric qty_fulfilled
+        bigint source_line_id FK
+    }
+    sal_reservation {
+        bigint id PK
+        bigint order_line_id FK
+        bigint warehouse_id FK
+        bigint location_id FK
+        bigint item_id FK
+        bigint lot_id FK
+        numeric qty
+        numeric qty_issued
+        varchar status
+    }
+    fin_payable {
+        bigint id PK
+        bigint partner_id FK
+        varchar source_type
+        bigint source_id UK
+        date due_date
+        numeric total_amount
+        numeric amount_paid
+        numeric balance
+        varchar status "derived from balance"
+        boolean overdue
+    }
+```
+
+**采购与销售是同一张信封的两面**，所以两侧共用同一套表结构：一条单据头 + 若干明细行，`doc_type` 决定这张单据是请购、订单还是收料。差别只在允许的状态迁移，由服务层而不是表结构来表达。
+
+**链式引用靠 `source_line_id`**：订单行记住是哪一行请购行要的货，收料行记住它满足了哪一行订单。没有它，「为什么买了两百个」在数据库里没有答案。
+
+**`sal_reservation` 记的是承诺，不是数量**：它记下**哪一行库存余额承诺给了哪一行订单**，而不只是一个数字。发货过账时先按余额行释放承诺、再出库——顺序反了，出库校验会看到"可用量不足"而拒绝这笔本该成功的发货。
+
+**应收应付的唯一约束**：`UNIQUE (tenant_id, source_type, source_id)`。重复过账、双击提交、网络重试都不允许把一笔账记两遍。
+
+### 金额为什么不进库存
+
+收料按**不含税价**过账。进项税是可以抵扣的，把它摊进移动加权平均，之后每一次出库都会继承一个虚高的单价，`avg_cost` 与真实成本会越走越远。净额是会计要的，税额是税务要的，两者在单据行上同时落库、只算一次，不在出库时反推。
+
+## M4–M5 规划（示意）
+
 
 ```mermaid
 erDiagram
@@ -428,6 +515,3 @@ erDiagram
 - **`prd_production_order`**：状态机 `PLANNED → RELEASED → IN_PROGRESS → COMPLETED → CLOSED`，`mes_wo_no` 关联 MES 执行工单
 - **`fin_voucher`**：`source_type` + `source_id` 反查业务源头，保证「凭证可追溯回单据」
 
-### 库存计价
-
-M2 采用**移动加权平均**：每次入库重算 `avg_cost = (旧金额 + 入库金额) / (旧数量 + 入库数量)`。FIFO 作为企业版可选。标准成本法依赖成本核算模块（企业版）。

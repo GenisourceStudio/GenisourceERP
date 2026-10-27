@@ -257,6 +257,77 @@ public class StockService {
         }
         return new StockValuation.Result(newQty, newTotal, newAvg, deltaAmount.abs());
     }
+    // ------------------------------------------------------------ reservations
+
+    /**
+     * The balance lines of one item in one warehouse that still hold something,
+     * fullest first.
+     *
+     * <p>A caller that wants fifty takes them from the line that holds eighty rather
+     * than from the one that holds ten, which is what a picker would do: draining the
+     * small leftovers first is how a warehouse ends up with dozens of near-empty bins.
+     */
+    @Transactional(readOnly = true)
+    public List<StockDtos.ReservableLine> reservable(Long warehouseId, Long itemId) {
+        return stocks.findAll((root, query, cb) ->
+                        cb.and(
+                                cb.equal(root.get("warehouseId"), warehouseId),
+                                cb.equal(root.get("itemId"), itemId),
+                                cb.greaterThan(root.get("onHand"), BigDecimal.ZERO)),
+                        Sort.by("id").ascending())
+                .stream()
+                .map(row -> new StockDtos.ReservableLine(
+                        row.getWarehouseId(), row.getLocationId(), row.getItemId(), row.getLotId(),
+                        row.getOnHand(), row.available()))
+                .filter(line -> line.available().signum() > 0)
+                .sorted((left, right) -> right.available().compareTo(left.available()))
+                .toList();
+    }
+
+    /**
+     * Marks part of a balance line as promised.
+     *
+     * <p>A reservation is a promise, not a movement: nothing leaves the shelf and no
+     * ledger entry is written. What changes is what the balance will give away, so a
+     * second order cannot sell the same units twice.
+     */
+    @Transactional
+    public void reserve(Long warehouseId,
+                        Long locationId,
+                        Long itemId,
+                        Long lotId,
+                        BigDecimal qty,
+                        String itemLabel) {
+        Stock row = findOrCreate(warehouseId, locationId, itemId, lotId);
+        BigDecimal available = row.available();
+        if (available.compareTo(qty) < 0) {
+            throw ApiException.insufficientStock(
+                    "Not enough free stock of " + itemLabel + " to promise: free "
+                            + available.stripTrailingZeros().toPlainString()
+                            + ", requested " + qty.stripTrailingZeros().toPlainString());
+        }
+        row.setReserved(row.getReserved().add(qty));
+        stocks.save(row);
+    }
+
+    /** Gives promised stock back, because the order was cancelled or the goods shipped. */
+    @Transactional
+    public void releaseReservation(Long warehouseId,
+                                   Long locationId,
+                                   Long itemId,
+                                   Long lotId,
+                                   BigDecimal qty,
+                                   String itemLabel) {
+        Stock row = findOrCreate(warehouseId, locationId, itemId, lotId);
+        BigDecimal reserved = row.getReserved();
+        if (reserved.compareTo(qty) < 0) {
+            throw ApiException.badRequest("Only " + reserved.stripTrailingZeros().toPlainString()
+                    + " of " + itemLabel + " is promised, so "
+                    + qty.stripTrailingZeros().toPlainString() + " cannot be given back");
+        }
+        row.setReserved(reserved.subtract(qty));
+        stocks.save(row);
+    }
     private Stock findOrCreate(Long warehouseId, Long locationId, Long itemId, Long lotId) {
         return stocks.findOne(balanceSpec(warehouseId, locationId, itemId, lotId))
                 .orElseGet(() -> new Stock(warehouseId, locationId, itemId, lotId));

@@ -45,6 +45,12 @@ public class BomSubstitute extends TenantScopedEntity {
         this.line = line;
     }
 
+    /** Copies what the user typed onto this row; the item it points at is the identity. */
+    void copyContentFrom(BomSubstitute replacement) {
+        this.priority = replacement.priority;
+        this.remark = replacement.remark;
+    }
+
     public BomLine getLine() {
         return line;
     }

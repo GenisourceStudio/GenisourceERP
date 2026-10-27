@@ -21,4 +21,7 @@ public interface DocumentRepository extends JpaRepository<StockDocument, Long>,
 
     /** Documents that have already been posted, used to forbid editing a frozen header. */
     List<StockDocument> findByStatus(DocumentStatus status);
+
+    /** What one business document brought about, used when that document is reversed. */
+    List<StockDocument> findBySourceTypeAndSourceIdOrderByIdAsc(String sourceType, String sourceId);
 }

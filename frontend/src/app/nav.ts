@@ -41,8 +41,12 @@ export const NAV: NavGroup[] = [
   {
     key: 'trade',
     items: [
-      { path: '/purchase/orders', key: 'purchaseOrder', milestone: 'M3' },
-      { path: '/sales/orders', key: 'salesOrder', milestone: 'M3' },
+      { path: '/purchase/requisitions', key: 'requisition' },
+      { path: '/purchase/orders', key: 'purchaseOrder' },
+      { path: '/purchase/receipts', key: 'receipt' },
+      { path: '/sales/quotations', key: 'quotation' },
+      { path: '/sales/orders', key: 'salesOrder' },
+      { path: '/sales/shipments', key: 'shipment' },
     ],
   },
   {
@@ -54,7 +58,12 @@ export const NAV: NavGroup[] = [
   },
   {
     key: 'finance',
-    items: [{ path: '/finance/vouchers', key: 'voucher', milestone: 'M5' }],
+    items: [
+      { path: '/finance/receivables', key: 'receivable' },
+      { path: '/finance/payables', key: 'payable' },
+      // Vouchers are the general ledger, and belong to M5 with the rest of accounting.
+      { path: '/finance/vouchers', key: 'voucher', milestone: 'M5' },
+    ],
   },
   {
     key: 'system',

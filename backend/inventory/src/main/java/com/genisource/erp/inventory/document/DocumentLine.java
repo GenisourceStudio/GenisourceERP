@@ -53,6 +53,16 @@ public class DocumentLine extends TenantScopedEntity {
         this.document = document;
     }
 
+    /** Copies what the user typed onto this row; there is no chain state to keep. */
+    void copyContentFrom(DocumentLine replacement) {
+        this.itemId = replacement.itemId;
+        this.lotId = replacement.lotId;
+        this.qty = replacement.qty;
+        this.unitCost = replacement.unitCost;
+        this.countedQty = replacement.countedQty;
+        this.remark = replacement.remark;
+    }
+
     public StockDocument getDocument() {
         return document;
     }

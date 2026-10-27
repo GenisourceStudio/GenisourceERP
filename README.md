@@ -8,8 +8,8 @@
 ![React](https://img.shields.io/badge/React-19-149eca)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791)
 
-> **当前状态：M0 脚手架（进行中）。** 本阶段交付可运行的骨架、多租户基座、RBAC、Flyway 基线与部署编排。
-> 业务模块（主数据 / 库存 / 采购 / 销售 / MRP / 生产订单 / 财务）按 [项目规划](docs/PROJECT_PLAN.md) 的 M1–M5 逐片交付。
+> **当前状态：M3 购销已交付（M0–M3 完成）。** 主数据、库存、采购到付款、销售到收款已打通：单据流转驱动库存，并自动生成应收应付。
+> 剩余模块（MRP / 生产订单 / 财务总账 / 报表）按 [项目规划](docs/PROJECT_PLAN.md) 的 M4–M5 逐片交付。
 > **生产环境请勿使用当前版本。**
 
 ## 这是什么 / 不是什么
@@ -40,7 +40,7 @@
 | 前端 | React 19 · TypeScript · Vite · TanStack Query · React Router 7 · i18next |
 | 数据库 | PostgreSQL 17 |
 | 缓存 | Redis |
-| 工作流 | Flowable 7（M3 接入） |
+| 工作流 | M3 为金额阈值审批；Flowable 7 待 M5 评估后再引入 |
 | 报表 | 积木报表（M5 接入） |
 | 部署 | Docker Compose（私有化）· Helm（SaaS） |
 | 设计系统 | 「生产控制台」体系，与 Genisource MES 统一品牌 |
@@ -97,7 +97,8 @@ pnpm install
 pnpm dev
 ```
 
-前端开发服务器监听 `5173`，并把 `/api` 与 `/actuator` 代理到 `8080`；生产环境由 Nginx 完成同样的转发。
+前端开发服务器监听 `5175`，并把 `/api` 与 `/actuator` 代理到后端的 `8081`；生产环境由 Nginx 完成同样的转发。
+（后端默认 `8081`：本机 `8080` 已留给 Genisource MES。）
 
 ## 仓库结构
 
@@ -106,6 +107,9 @@ backend/
   platform/      平台基座：多租户、安全、审计、通用
   masterdata/    主数据：物料、客户/供应商、BOM、工艺路线、工作中心
   inventory/     库存：仓库库位、批次、库存余额、出入库单据、库存账
+  purchase/      采购：请购 · 订单 · 收料，与库存联动
+  sales/         销售：报价 · 订单 · 发货，占用库存
+  finance/       财务：应收 · 应付台账（M3 部分）
   bootstrap/     启动器：配置、Flyway 迁移、演示数据
 frontend/        React SPA
 deploy/          Dockerfile、Nginx、Maven 镜像、K8s Helm、运维脚本
@@ -119,8 +123,7 @@ docs/            项目规划、ADR、领域模型、集成规范
 | M0 | 脚手架 · 多租户 · RBAC · 部署编排 | ✅ |
 | M1 | 主数据 · BOM（多级/版本/替代料） · 工艺路线 | ✅ |
 | M2 | 库存（多仓/批次/序列号/盘点） | ✅ |
-| M3 | 采购到付款 · 销售到收款 · 审批流 | ⏳ |
-| M3 | 采购到付款 · 销售到收款 · 审批流 | ⏳ |
+| M3 | 采购到付款 · 销售到收款 · 审批 | ✅ |
 | M4 | MRP 运算 · 生产订单 | ⏳ |
 | M5 | 财务（凭证/总账/报表） · MES 集成 · v1.0 | ⏳ |
 
