@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "计划 · 采购 · 销售 · 库存 · MRP",
-    "milestone": "M3 购销"
+    "milestone": "M4 MRP + 生产"
   },
   "nav": {
     "group": {
@@ -116,6 +116,18 @@
       "PARTIAL": "部分结清",
       "SETTLED": "已结清",
       "VOID": "已作废"
+    },
+    "production": {
+      "PLANNED": "待下达",
+      "RELEASED": "已下达",
+      "IN_PROGRESS": "生产中",
+      "COMPLETED": "已完工",
+      "CLOSED": "已关闭",
+      "CANCELLED": "已取消"
+    },
+    "operation": {
+      "PENDING": "待加工",
+      "DONE": "已完成"
     }
   },
   "itemType": {
@@ -566,6 +578,131 @@
       "title": "还没有单据",
       "body": "新建一张，或从上一环节的单据转过来。",
       "nothingOpen": "这张单据已经没有未执行的明细了。"
+    }
+  },
+  "planning": {
+    "searchPlaceholder": "搜索运算号",
+    "field": {
+      "runNo": "运算号",
+      "runAt": "运算时间",
+      "runBy": "运算人",
+      "window": "需求窗口",
+      "horizon": "窗口(天)",
+      "shortageCount": "缺料项",
+      "shortageUnit": "项缺料",
+      "supplyCount": "建议单",
+      "itemCount": "涉及物料",
+      "item": "物料",
+      "supplyType": "供应方式",
+      "netQty": "净需求",
+      "qty": "建议数量",
+      "dueDate": "需求日期",
+      "party": "供应商 / 车间",
+      "grossQty": "毛需求",
+      "fromSales": "其中销售订单",
+      "fromComponents": "其中下层展开",
+      "onHand": "现存",
+      "reservedQty": "已预留",
+      "inTransit": "在途",
+      "safetyStock": "安全库存",
+      "withSafety": "含安全库存",
+      "withoutSafety": "不含安全库存",
+      "unitPrice": "采购单价",
+      "unitPriceHint": "留空则用物料标准成本",
+      "warehouse": "收货仓库",
+      "warehouseLater": "暂不指定，下单时再填"
+    },
+    "action": {
+      "run": "运行 MRP",
+      "toPurchase": "转采购单",
+      "toProduction": "转生产单",
+      "ignore": "忽略"
+    },
+    "section": {
+      "recommendations": "补货建议",
+      "evidence": "需求与库存证据",
+      "history": "运算历史"
+    },
+    "supply": {
+      "PURCHASE": "采购",
+      "PRODUCTION": "自制"
+    },
+    "planStatus": {
+      "PLANNED": "待处理",
+      "CONVERTED": "已转单",
+      "IGNORED": "已忽略"
+    },
+    "confirm": {
+      "convert": "把 {{item}} 的 {{qty}} 转成单据？",
+      "ignore": "忽略 {{item}} 的 {{qty}}？该建议不再出现。"
+    },
+    "emptyPlans": {
+      "title": "本次运算没有缺料",
+      "body": "需求都能被现存、在途或已预留的库存覆盖，不需要补货。"
+    },
+    "emptyDemands": {
+      "title": "没有净需求",
+      "body": "缺料项的核算明细会显示在这里。"
+    },
+    "emptyRuns": {
+      "title": "还没有运算记录",
+      "body": "运行一次 MRP，销售订单会按 BOM 逐层展开成补货建议。"
+    }
+  },
+  "production": {
+    "searchPlaceholder": "搜索生产订单号或产品",
+    "field": {
+      "docNo": "生产订单号",
+      "product": "产品",
+      "bom": "BOM 版本",
+      "source": "来源",
+      "warehouse": "领料仓库",
+      "intoWarehouse": "入库仓库",
+      "qtyPlanned": "计划数量",
+      "qtyCompleted": "已完工",
+      "issued": "已领料",
+      "locked": "已锁定",
+      "open": "待领",
+      "required": "需求量",
+      "remaining": "剩余",
+      "progress": "进度",
+      "plannedEnd": "计划完工",
+      "sequence": "工序号",
+      "operation": "工序",
+      "workCenter": "工作中心",
+      "setupMinutes": "准备(分)",
+      "runMinutes": "加工(分)"
+    },
+    "action": {
+      "create": "新建订单",
+      "release": "下达",
+      "issue": "领料",
+      "complete": "完工入库",
+      "close": "关闭",
+      "cancel": "取消"
+    },
+    "section": {
+      "components": "组件",
+      "operations": "工序"
+    },
+    "source": {
+      "mrp": "MRP 建议"
+    },
+    "error": {
+      "itemRequired": "请选择要生产的产品",
+      "warehouseRequired": "请选择领料仓库",
+      "nothingToIssue": "没有可领的组件"
+    },
+    "confirm": {
+      "issue": "按待领数量领料？库存会立即扣减。",
+      "complete": "按剩余数量完工入库？",
+      "close": "关闭后不能再领料或完工。",
+      "cancel": "取消后订单作废，已领料需另行退料。",
+      "delete": "删除这张订单？"
+    },
+    "empty": {
+      "title": "还没有生产订单",
+      "body": "可以从 MRP 建议转单，也可以在这里直接新建。"
     }
   },
   "finance": {

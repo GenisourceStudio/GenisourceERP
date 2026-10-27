@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.genisource</groupId>
+        <artifactId>genisource-erp</artifactId>
+        <version>0.1.0-alpha</version>
+    </parent>
+
+    <artifactId>erp-mrp</artifactId>
+    <name>Genisource ERP :: MRP</name>
+    <description>Material requirements planning and the plan it produces</description>
+
+    <!-- MRP sits at the top of the graph: it reads demand from sales, supply from
+         purchasing and production, and it is the only module allowed to know all of
+         them. Nothing depends on it, so the direction stays one-way. -->
+    <dependencies>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-platform</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-masterdata</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-inventory</artifactId>
+        </dependency>
+
+        <!-- Demand comes from confirmed sales orders. -->
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-sales</artifactId>
+        </dependency>
+
+        <!-- In-transit supply comes from open purchase orders, and a planned purchase
+             becomes one. -->
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-purchase</artifactId>
+        </dependency>
+
+        <!-- In-progress supply comes from open production orders, and a planned order
+             becomes one. -->
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-production</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

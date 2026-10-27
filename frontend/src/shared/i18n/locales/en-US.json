@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "Plan · Buy · Sell · Stock · MRP",
-    "milestone": "M3 · trade"
+    "milestone": "M4 MRP + production"
   },
   "nav": {
     "group": {
@@ -116,6 +116,18 @@
       "PARTIAL": "Part paid",
       "SETTLED": "Settled",
       "VOID": "Void"
+    },
+    "production": {
+      "PLANNED": "Planned",
+      "RELEASED": "Released",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "CLOSED": "Closed",
+      "CANCELLED": "Cancelled"
+    },
+    "operation": {
+      "PENDING": "Pending",
+      "DONE": "Done"
     }
   },
   "itemType": {
@@ -566,6 +578,131 @@
       "title": "No documents yet",
       "body": "Create one, or convert one from the step before.",
       "nothingOpen": "Nothing is left open on this document."
+    }
+  },
+  "planning": {
+    "searchPlaceholder": "Search run number",
+    "field": {
+      "runNo": "Run",
+      "runAt": "Run at",
+      "runBy": "Run by",
+      "window": "Demand window",
+      "horizon": "Horizon (days)",
+      "shortageCount": "Shortages",
+      "shortageUnit": "short",
+      "supplyCount": "Suggestions",
+      "itemCount": "Items",
+      "item": "Item",
+      "supplyType": "Supply",
+      "netQty": "Net",
+      "qty": "Suggested qty",
+      "dueDate": "Due date",
+      "party": "Supplier / shop",
+      "grossQty": "Gross",
+      "fromSales": "From sales orders",
+      "fromComponents": "From lower levels",
+      "onHand": "On hand",
+      "reservedQty": "Reserved",
+      "inTransit": "In transit",
+      "safetyStock": "Safety stock",
+      "withSafety": "including safety stock",
+      "withoutSafety": "excluding safety stock",
+      "unitPrice": "Purchase price",
+      "unitPriceHint": "Blank uses the item standard cost",
+      "warehouse": "Receiving warehouse",
+      "warehouseLater": "Not set, choose it on the order"
+    },
+    "action": {
+      "run": "Run MRP",
+      "toPurchase": "To purchase order",
+      "toProduction": "To production order",
+      "ignore": "Ignore"
+    },
+    "section": {
+      "recommendations": "Replenishment",
+      "evidence": "Demand and stock evidence",
+      "history": "Run history"
+    },
+    "supply": {
+      "PURCHASE": "Buy",
+      "PRODUCTION": "Make"
+    },
+    "planStatus": {
+      "PLANNED": "Open",
+      "CONVERTED": "Converted",
+      "IGNORED": "Ignored"
+    },
+    "confirm": {
+      "convert": "Convert {{item}} × {{qty}} into a document?",
+      "ignore": "Ignore {{item}} × {{qty}}? It will not be proposed again."
+    },
+    "emptyPlans": {
+      "title": "Nothing is short this run",
+      "body": "On hand, in transit and reserved stock cover every demand."
+    },
+    "emptyDemands": {
+      "title": "No net requirement",
+      "body": "The netting detail for each shortage appears here."
+    },
+    "emptyRuns": {
+      "title": "No MRP run yet",
+      "body": "Run MRP to explode sales orders through the BOM into replenishment proposals."
+    }
+  },
+  "production": {
+    "searchPlaceholder": "Search order number or product",
+    "field": {
+      "docNo": "Order",
+      "product": "Product",
+      "bom": "BOM version",
+      "source": "Source",
+      "warehouse": "Issue from",
+      "intoWarehouse": "Receive into",
+      "qtyPlanned": "Planned",
+      "qtyCompleted": "Completed",
+      "issued": "Issued",
+      "locked": "Locked",
+      "open": "Open",
+      "required": "Required",
+      "remaining": "Remaining",
+      "progress": "Progress",
+      "plannedEnd": "Planned end",
+      "sequence": "Seq",
+      "operation": "Operation",
+      "workCenter": "Work center",
+      "setupMinutes": "Setup (min)",
+      "runMinutes": "Run (min)"
+    },
+    "action": {
+      "create": "New order",
+      "release": "Release",
+      "issue": "Issue material",
+      "complete": "Complete",
+      "close": "Close",
+      "cancel": "Cancel"
+    },
+    "section": {
+      "components": "Components",
+      "operations": "Operations"
+    },
+    "source": {
+      "mrp": "MRP proposal"
+    },
+    "error": {
+      "itemRequired": "Pick the product to build",
+      "warehouseRequired": "Pick the issue warehouse",
+      "nothingToIssue": "Nothing left to issue"
+    },
+    "confirm": {
+      "issue": "Issue every open quantity? Stock drops immediately.",
+      "complete": "Receive the remaining quantity into stock?",
+      "close": "A closed order accepts no further issues or completions.",
+      "cancel": "Cancelling voids the order; issued material needs a separate return.",
+      "delete": "Delete this order?"
+    },
+    "empty": {
+      "title": "No production orders yet",
+      "body": "Convert an MRP proposal, or create one here."
     }
   },
   "finance": {

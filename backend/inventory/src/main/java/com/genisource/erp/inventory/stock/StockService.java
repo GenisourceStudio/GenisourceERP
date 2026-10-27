@@ -115,6 +115,22 @@ public class StockService {
         return sum(stocks.findByLotIdAndOnHandGreaterThan(lotId, BigDecimal.ZERO), Stock::getOnHand);
     }
 
+    /**
+     * Every item's balance in one query, keyed by item.
+     *
+     * <p>This is the shape MRP wants: it walks an item list and asks "how much is there"
+     * once per item, and calling {@link #summary} in that loop would be one query per
+     * item per BOM level. Items with no balance row at all are simply absent, which
+     * callers must read as zero rather than as missing data.
+     */
+    public Map<Long, ItemBalance> balanceByItem() {
+        Map<Long, ItemBalance> byItem = new LinkedHashMap<>();
+        for (ItemBalance balance : stocks.balanceByItem()) {
+            byItem.put(balance.itemId(), balance);
+        }
+        return byItem;
+    }
+
     /** Quantity and value of one batch, as {@code [quantity, amount]}. */
     public BigDecimal[] lotBalance(Long lotId) {
         List<Stock> rows = stocks.findByLotIdAndOnHandGreaterThan(lotId, BigDecimal.ZERO);
@@ -328,6 +344,92 @@ public class StockService {
         row.setReserved(reserved.subtract(qty));
         stocks.save(row);
     }
+
+    /**
+     * Commits stock to a production order.
+     *
+     * <p>A second promise column, next to {@code reserved}, because the two promises are
+     * broken differently. A reservation is kept for a customer who may still cancel;
+     * a lock is kept for a works order that is going to consume the material on a known
+     * day. Releasing a works order that finds nothing on the shelf would stop the line,
+     * and reporting it as a customer reservation would make the sales screen lie.
+     *
+     * @throws ApiException when the balance line cannot cover the quantity
+     */
+    @Transactional
+    public void lock(Long warehouseId,
+                     Long locationId,
+                     Long itemId,
+                     Long lotId,
+                     BigDecimal qty,
+                     String itemLabel) {
+        Stock row = findOrCreate(warehouseId, locationId, itemId, lotId);
+        BigDecimal available = row.available();
+        if (available.compareTo(qty) < 0) {
+            throw ApiException.insufficientStock(
+                    "Not enough free stock of " + itemLabel + " to reserve for production: free "
+                            + available.stripTrailingZeros().toPlainString()
+                            + ", requested " + qty.stripTrailingZeros().toPlainString());
+        }
+        row.setLocked(row.getLocked().add(qty));
+        stocks.save(row);
+    }
+
+    /** Gives locked stock back, because the material was issued or the order was cancelled. */
+    @Transactional
+    public void unlock(Long warehouseId,
+                       Long locationId,
+                       Long itemId,
+                       Long lotId,
+                       BigDecimal qty,
+                       String itemLabel) {
+        Stock row = findOrCreate(warehouseId, locationId, itemId, lotId);
+        BigDecimal locked = row.getLocked();
+        if (locked.compareTo(qty) < 0) {
+            throw ApiException.badRequest("Only " + locked.stripTrailingZeros().toPlainString()
+                    + " of " + itemLabel + " is held for production, so "
+                    + qty.stripTrailingZeros().toPlainString() + " cannot be released");
+        }
+        row.setLocked(locked.subtract(qty));
+        stocks.save(row);
+    }
+
+    /**
+     * Gives back locked stock for one item, wherever in the warehouse it is being held.
+     *
+     * <p>The order line knows how much it locked but not which shelf the lock landed on —
+     * release spread it over whichever balance lines had the room. Rather than keeping a
+     * third table to remember that, the figure is taken back off the balances that
+     * actually hold a lock, largest first, which is the inverse of how it was placed.
+     *
+     * @return how much was actually given back; below {@code qty} when the item is holding
+     *         less than asked for, which happens when release could not lock everything
+     */
+    @Transactional
+    public BigDecimal unlockAcross(Long warehouseId, Long itemId, BigDecimal qty, String itemLabel) {
+        if (qty == null || qty.signum() <= 0) {
+            return BigDecimal.ZERO;
+        }
+        List<Stock> holders = stocks.findAll((root, query, cb) -> cb.and(
+                        cb.equal(root.get("warehouseId"), warehouseId),
+                        cb.equal(root.get("itemId"), itemId),
+                        cb.greaterThan(root.get("locked"), BigDecimal.ZERO)))
+                .stream()
+                .sorted((left, right) -> right.getLocked().compareTo(left.getLocked()))
+                .toList();
+        BigDecimal remaining = qty;
+        for (Stock row : holders) {
+            if (remaining.signum() <= 0) {
+                break;
+            }
+            BigDecimal take = row.getLocked().min(remaining);
+            row.setLocked(row.getLocked().subtract(take));
+            stocks.save(row);
+            remaining = remaining.subtract(take);
+        }
+        return qty.subtract(remaining);
+    }
+
     private Stock findOrCreate(Long warehouseId, Long locationId, Long itemId, Long lotId) {
         return stocks.findOne(balanceSpec(warehouseId, locationId, itemId, lotId))
                 .orElseGet(() -> new Stock(warehouseId, locationId, itemId, lotId));

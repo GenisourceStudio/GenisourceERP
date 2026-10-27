@@ -1,8 +1,10 @@
 package com.genisource.erp.purchase;
 
+import com.genisource.erp.platform.common.DocumentLifecycle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +22,18 @@ public interface PurchaseRepository extends JpaRepository<PurchaseDocument, Long
 
     /** What a document was converted from, used when the conversion is undone. */
     List<PurchaseDocument> findBySourceTypeAndSourceId(String sourceType, String sourceId);
+
+    /**
+     * Open orders of one kind, with their lines loaded.
+     *
+     * <p>{@code distinct} because the fetch join multiplies the header across its lines;
+     * without it an order for five items comes back five times and MRP would count its
+     * supply five times over.
+     */
+    @org.springframework.data.jpa.repository.Query("""
+            select distinct d from PurchaseDocument d left join fetch d.lines
+            where d.docType = :docType and d.status in :statuses
+            """)
+    List<PurchaseDocument> findOpenWithLines(PurchaseDocType docType,
+                                             Collection<DocumentLifecycle> statuses);
 }

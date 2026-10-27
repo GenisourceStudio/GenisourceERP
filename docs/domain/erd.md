@@ -475,43 +475,145 @@ erDiagram
 
 收料按**不含税价**过账。进项税是可以抵扣的，把它摊进移动加权平均，之后每一次出库都会继承一个虚高的单价，`avg_cost` 与真实成本会越走越远。净额是会计要的，税额是税务要的，两者在单据行上同时落库、只算一次，不在出库时反推。
 
-## M4–M5 规划（示意）
-
+## M4 已实现
 
 ```mermaid
 erDiagram
-    md_item ||--o{ inv_stock : "stocked"
-    inv_location ||--o{ inv_stock : holds
-    inv_warehouse ||--o{ inv_location : contains
-    inv_stock ||--o{ inv_lot : "lot / serial"
+    sal_document ||--o{ mrp_run : "open demand feeds"
+    mrp_run ||--o{ mrp_demand : "snapshot per item"
+    mrp_run ||--o{ mrp_plan_supply : "proposals"
+    mrp_plan_supply }o--|| md_item : "what to make or buy"
+    mrp_plan_supply }o--o| md_partner : "default supplier"
 
-    md_partner ||--o{ pur_order : "supplies"
-    pur_order ||--o{ pur_order_line : contains
-    pur_order ||--|| pur_receipt : "received by"
-    pur_receipt ||--|| inv_inbound : creates
+    mrp_plan_supply ||--o| pur_document : "converted to"
+    mrp_plan_supply ||--o| prd_production_order : "converted to"
 
-    md_partner ||--o{ sal_order : places
-    sal_order ||--o{ sal_order_line : contains
-    sal_order ||--|| sal_shipment : "shipped by"
-    sal_shipment ||--|| inv_outbound : creates
+    md_item ||--o{ prd_production_order : "produced as"
+    md_bom ||--o{ prd_production_order : "exploded from"
+    prd_production_order ||--o{ prd_order_line : "components"
+    prd_production_order ||--o{ prd_order_operation : "routing steps"
+    prd_order_operation }o--|| md_work_center : "runs on"
+    prd_order_line ||--o{ inv_movement : "issue posts"
+    prd_production_order ||--o{ inv_movement : "completion posts"
 
-    sal_order ||--o{ mrp_run : triggers
-    mrp_run ||--o{ mrp_plan_order : "plan WO"
-    mrp_run ||--o{ mrp_plan_purchase : "plan PO"
-    mrp_plan_order ||--o{ prd_production_order : releases
-    prd_production_order ||--o{ prd_material_issue : issues
-    prd_production_order ||--o{ prd_receipt_inbound : completes
+    mrp_run {
+        bigint id PK
+        bigint tenant_id FK
+        varchar run_no UK
+        date demand_from
+        date demand_to
+        boolean include_safety
+        int max_levels
+        int item_count
+        int supply_count
+        int shortage_count
+        varchar run_by
+        timestamptz created_at "the run time itself"
+    }
+    mrp_demand {
+        bigint id PK
+        bigint run_id FK
+        bigint item_id FK
+        int item_level
+        numeric gross_qty
+        numeric on_hand
+        numeric reserved_qty "outside the window only"
+        numeric locked_qty
+        numeric in_transit
+        numeric safety_stock
+        numeric net_qty
+        numeric from_sales
+        numeric from_components
+        boolean shortage
+    }
+    mrp_plan_supply {
+        bigint id PK
+        bigint run_id FK
+        bigint item_id FK
+        varchar supply_type "PURCHASE / PRODUCTION"
+        numeric net_qty "the raw shortfall"
+        numeric qty "rounded up to the multiple"
+        numeric order_multiple
+        bigint supplier_id FK
+        int lead_time_days
+        date start_date
+        date due_date
+        varchar status "PLANNED / CONVERTED / IGNORED"
+        varchar converted_type
+        varchar converted_no
+    }
+    prd_production_order {
+        bigint id PK
+        bigint tenant_id FK
+        varchar doc_no UK
+        bigint item_id FK
+        bigint bom_id FK
+        varchar bom_version
+        numeric qty_planned
+        numeric qty_completed
+        varchar status "PLANNED / RELEASED / IN_PROGRESS / COMPLETED / CLOSED / CANCELLED"
+        bigint warehouse_id FK
+        date planned_start
+        date planned_end
+        varchar mes_wo_no "for the M5 hand-off"
+        varchar source_type
+        varchar source_id
+    }
+    prd_order_line {
+        bigint id PK
+        bigint order_id FK
+        int line_no
+        bigint item_id FK
+        numeric qty_required
+        numeric qty_issued
+        numeric qty_locked "mirrors inv_stock.locked"
+    }
+    prd_order_operation {
+        bigint id PK
+        bigint order_id FK
+        int sequence
+        varchar name
+        bigint work_center_id FK
+        numeric setup_minutes
+        numeric run_minutes "scaled by the order quantity"
+        varchar status "PENDING / DONE"
+    }
+```
 
-    pur_receipt ||--|| fin_voucher : "AP"
-    sal_shipment ||--|| fin_voucher : "AR"
+**MRP 是逐层结算，不是递归展开。** 每一层先把需求和库存结清，再问"它由什么构成"。递归展开会把同一物料在多层的毛需求叠在一起，而净算只能算一次——放在哪一层算，结果都不一样。逐层结算让库存抵扣发生在它该发生的深度，同一物料被多条路径触达时只取**最浅**那层记账。
+
+**预留只在窗口外才加回。** 净需求 = 毛需求 + 安全库存 + **窗口外**订单的预留 − 现存 − 已锁定 − 在途。窗口**内**订单的预留不能加：那批货还在仓库里（已计入现存），订单本身也在毛需求里，加回去就是把这批货数两遍。
+
+**建议行带两个数量。** `net_qty` 是短缺量（10 公斤），`qty` 是按最小起订量取整后的下单量（100 公斤）。只留一个数字，计划员就看不出"缺 10 却要买 100"是取整造成的还是别的原因。
+
+**生产订单复制工序，不引用工艺路线。** `prd_order_operation` 在下达前从最新的 `RELEASED` 工艺路线拷一份，加工工时按计划数量缩放。工艺路线之后改版本，已经下达的工单不受影响——车间拿到的是下单那一刻的工艺。
+
+**领料与完工都是库存单据。** `OUTBOUND` / `INBOUND`，`source_type = PRD_ORDER`，走 M2 已经验证过的过账、冲销与移动加权平均。生产模块不另建一套库存记账——库存只有一个入口，才只有一个账。
+
+**锁定是先占、后领。** 下达时按"满箱优先"从 `inv_stock` 里锁，`prd_order_line.qty_locked` 记录锁了多少；领料时**先释放锁定、再出库**。顺序反了，出库校验的可用量里还含着本单自己的锁定，就会自己拒绝自己（M3 的 `reserved` 是同一个坑）。
+
+### 净需求为什么不用一条 SQL
+
+一条递归 CTE 能展开 BOM，但展开的产出一层是"需求"，而每层的需求要先和库存、在途、锁定、窗口外预留结一次账，再决定下层该展开多少。结算是应用层的多表读写，SQL 里做等于把同一套公式写成 SQL 和应用两份，然后等它们漂移。M1 已经把展开的算术（损耗率、`base_qty`、层级截断、环路）收在 `BomExplosion` 里，MRP 复用 `directComponents` 逐层调用它。
+
+## M5 规划（示意）
+
+```mermaid
+erDiagram
+    pur_document ||--|| fin_voucher : "AP"
+    sal_document ||--|| fin_receivable : "AR invoice"
     prd_production_order ||--|| fin_voucher : "cost"
     fin_voucher ||--o{ fin_journal_line : contains
     fin_journal_line }o--|| fin_account : posts
+
+    fin_voucher {
+        bigint id PK
+        varchar voucher_no UK
+        date biz_date
+        varchar source_type "reverse lookup to the document"
+        varchar source_id
+    }
 ```
 
-### 关键设计点
-
-- **`mrp_run`**：快照式——记录运算参数与产出，便于复算对比；不覆盖历史
-- **`prd_production_order`**：状态机 `PLANNED → RELEASED → IN_PROGRESS → COMPLETED → CLOSED`，`mes_wo_no` 关联 MES 执行工单
 - **`fin_voucher`**：`source_type` + `source_id` 反查业务源头，保证「凭证可追溯回单据」
-
+- **MES 双向集成**：`prd_production_order.mes_wo_no` 已预留，完工回传走 M5

@@ -568,6 +568,76 @@ public class SalesService {
     // ---------------------------------------------------------- reservations
 
     /**
+     * Open sales demand inside a date window, one row per order line.
+     *
+     * <p>Only approved and partially shipped orders count. A draft is an intention and a
+     * rejected one is a mistake, so neither belongs in a material plan.
+     *
+     * <p>The window is applied to the required date, falling back to the document date
+     * when nobody said when it was wanted. Lines with nothing left to ship are skipped:
+     * a fully shipped order has already consumed its materials.
+     */
+    public List<OpenDemandLine> openDemand(LocalDate from, LocalDate to) {
+        List<OpenDemandLine> demand = new ArrayList<>();
+        for (SalesDocument order : documents.findOpenWithLines(SalesDocType.ORDER,
+                List.of(DocumentLifecycle.APPROVED, DocumentLifecycle.PARTIAL))) {
+            LocalDate required = requiredDateOf(order);
+            if (from != null && required.isBefore(from)) {
+                continue;
+            }
+            if (to != null && required.isAfter(to)) {
+                continue;
+            }
+            for (SalesDocumentLine line : order.getLines()) {
+                BigDecimal open = line.openQty();
+                if (open.signum() <= 0) {
+                    continue;
+                }
+                demand.add(new OpenDemandLine(line.getItemId(), open, required, order.getDocNo()));
+            }
+        }
+        return demand;
+    }
+
+    /**
+     * Stock promised to orders that fall outside the planning window, per item.
+     *
+     * <p>The one adjustment a material plan has to make on top of "demand minus stock".
+     * A reservation on an order inside the window cancels out: the units are in the stock
+     * figure and the order is in the demand figure. A reservation on an order <em>outside</em>
+     * the window has no matching demand in this run, so without this the plan would happily
+     * promise the same units to somebody else — and the first customer to call would find
+     * their goods gone.
+     */
+    public Map<Long, BigDecimal> reservedOutsideWindow(LocalDate from, LocalDate to) {
+        Map<Long, BigDecimal> byItem = new LinkedHashMap<>();
+        for (SalesDocument order : documents.findOpenWithLines(SalesDocType.ORDER,
+                List.of(DocumentLifecycle.APPROVED, DocumentLifecycle.PARTIAL))) {
+            LocalDate required = requiredDateOf(order);
+            boolean inside = (from == null || !required.isBefore(from))
+                    && (to == null || !required.isAfter(to));
+            if (inside) {
+                continue;
+            }
+            for (Reservation reservation
+                    : reservations.findByOrderIdAndStatusOrderByIdAsc(order.getId(),
+                            ReservationStatus.OPEN)) {
+                BigDecimal held = reservation.openQty();
+                if (held.signum() <= 0) {
+                    continue;
+                }
+                byItem.merge(reservation.getItemId(), held, BigDecimal::add);
+            }
+        }
+        return byItem;
+    }
+
+    /** When an order was wanted; the document date stands in when nobody said. */
+    private static LocalDate requiredDateOf(SalesDocument order) {
+        return order.getRequiredDate() == null ? order.getBizDate() : order.getRequiredDate();
+    }
+
+    /**
      * Promises stock to an order, line by line, fullest balance line first.
      *
      * <p>Draining the fullest line is what a picker does anyway; taking a little from

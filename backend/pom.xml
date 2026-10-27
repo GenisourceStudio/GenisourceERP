@@ -26,6 +26,8 @@
         <module>finance</module>
         <module>purchase</module>
         <module>sales</module>
+        <module>production</module>
+        <module>mrp</module>
         <module>bootstrap</module>
     </modules>
 
@@ -67,6 +69,16 @@
             <dependency>
                 <groupId>com.genisource</groupId>
                 <artifactId>erp-sales</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-production</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-mrp</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

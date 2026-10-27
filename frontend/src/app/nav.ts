@@ -52,8 +52,8 @@ export const NAV: NavGroup[] = [
   {
     key: 'planning',
     items: [
-      { path: '/planning/mrp', key: 'mrpRun', milestone: 'M4' },
-      { path: '/planning/production-orders', key: 'productionOrder', milestone: 'M4' },
+      { path: '/planning/mrp', key: 'mrpRun' },
+      { path: '/planning/production-orders', key: 'productionOrder' },
     ],
   },
   {

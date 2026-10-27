@@ -8,8 +8,8 @@
 ![React](https://img.shields.io/badge/React-19-149eca)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791)
 
-> **当前状态：M3 购销已交付（M0–M3 完成）。** 主数据、库存、采购到付款、销售到收款已打通：单据流转驱动库存，并自动生成应收应付。
-> 剩余模块（MRP / 生产订单 / 财务总账 / 报表）按 [项目规划](docs/PROJECT_PLAN.md) 的 M4–M5 逐片交付。
+> **当前状态：M4 MRP 与生产订单已交付（M0–M4 完成）。** 主数据、库存、采购到付款、销售到收款已打通：单据流转驱动库存，并自动生成应收应付；销售订单可经 BOM 逐层展开成采购/生产建议，生产订单支持下达、领料、完工入库。
+> 剩余模块（财务凭证与总账 / 报表 / MES 集成）按 [项目规划](docs/PROJECT_PLAN.md) 的 M5 交付。
 > **生产环境请勿使用当前版本。**
 
 ## 这是什么 / 不是什么
@@ -40,7 +40,7 @@
 | 前端 | React 19 · TypeScript · Vite · TanStack Query · React Router 7 · i18next |
 | 数据库 | PostgreSQL 17 |
 | 缓存 | Redis |
-| 工作流 | M3 为金额阈值审批；Flowable 7 待 M5 评估后再引入 |
+| 工作流 | 金额阈值审批（M3 起）；Flowable 7 待 M5 评估后再引入 |
 | 报表 | 积木报表（M5 接入） |
 | 部署 | Docker Compose（私有化）· Helm（SaaS） |
 | 设计系统 | 「生产控制台」体系，与 Genisource MES 统一品牌 |
@@ -109,6 +109,8 @@ backend/
   inventory/     库存：仓库库位、批次、库存余额、出入库单据、库存账
   purchase/      采购：请购 · 订单 · 收料，与库存联动
   sales/         销售：报价 · 订单 · 发货，占用库存
+  production/    生产：生产订单、领料、完工入库（有来源的库存单据）
+  mrp/           MRP：净需求运算、补货建议、转采购/转生产
   finance/       财务：应收 · 应付台账（M3 部分）
   bootstrap/     启动器：配置、Flyway 迁移、演示数据
 frontend/        React SPA
@@ -124,7 +126,7 @@ docs/            项目规划、ADR、领域模型、集成规范
 | M1 | 主数据 · BOM（多级/版本/替代料） · 工艺路线 | ✅ |
 | M2 | 库存（多仓/批次/序列号/盘点） | ✅ |
 | M3 | 采购到付款 · 销售到收款 · 审批 | ✅ |
-| M4 | MRP 运算 · 生产订单 | ⏳ |
+| M4 | MRP 净需求运算 · 补货建议 · 生产订单（下达/领料/完工） | ✅ |
 | M5 | 财务（凭证/总账/报表） · MES 集成 · v1.0 | ⏳ |
 
 完整规划见 [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md)。

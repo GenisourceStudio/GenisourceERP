@@ -132,8 +132,51 @@ public class BomExplosion {
         return nodes;
     }
 
-    private Optional<Bom> releasedBomOf(Long itemId) {
+    /**
+     * The released bill of materials for an item, if it has one.
+     *
+     * <p>Public because MRP has to answer two questions with the same lookup: "can this be
+     * made at all", and "which revision do I freeze onto the works order". Asking the
+     * repository directly from there would put a second copy of the "released only" rule
+     * in the codebase, and the two copies would eventually disagree.
+     */
+    public Optional<Bom> releasedBomOf(Long itemId) {
         return boms.findFirstByItemIdAndStatusOrderByVersionDesc(itemId, RevisionStatus.RELEASED);
+    }
+
+    /**
+     * One level of explosion: what the direct components of {@code itemId} consume.
+     *
+     * <p>Does not recurse, and that is the point — MRP settles each level against stock
+     * before asking what the next one needs. The loss rate and base quantity arithmetic is
+     * shared with {@link #explode} rather than rewritten, because two implementations of
+     * "how much does this eat" would drift and nobody would notice until a costing run
+     * disagreed with a plan.
+     */
+    public List<ComponentRequirement> directComponents(Long itemId, BigDecimal requiredQty) {
+        Optional<Bom> released = releasedBomOf(itemId);
+        if (released.isEmpty()) {
+            return List.of();
+        }
+        Bom bom = released.get();
+        BigDecimal parentQty = requiredQty == null ? BigDecimal.ONE : requiredQty;
+        BigDecimal base = bom.getBaseQty() == null || bom.getBaseQty().signum() == 0
+                ? BigDecimal.ONE
+                : bom.getBaseQty();
+
+        List<ComponentRequirement> requirements = new ArrayList<>();
+        for (BomLine line : bom.getLines()) {
+            BigDecimal perParent = line.getQty()
+                    .multiply(BigDecimal.ONE.add(orZero(line.getLossRate()).movePointLeft(2)))
+                    .divide(base, SCALE, RoundingMode.HALF_UP);
+            BigDecimal total = parentQty.multiply(perParent).setScale(SCALE, RoundingMode.HALF_UP);
+            if (total.signum() <= 0) {
+                continue;
+            }
+            requirements.add(new ComponentRequirement(
+                    line.getComponentItemId(), total, line.isPhantom()));
+        }
+        return requirements;
     }
 
     private Item component(Long itemId, Map<Long, Item> cache) {

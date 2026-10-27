@@ -16,6 +16,8 @@ import StockPage from '../pages/inventory/StockPage'
 import WarehousesPage from '../pages/inventory/WarehousesPage'
 import PayablesPage from '../pages/finance/PayablesPage'
 import ReceivablesPage from '../pages/finance/ReceivablesPage'
+import MrpPage from '../pages/planning/MrpPage'
+import ProductionOrdersPage from '../pages/planning/ProductionOrdersPage'
 import TradeDocumentPage from '../pages/trade/TradeDocumentPage'
 import {
   PURCHASE_ORDER,
@@ -45,6 +47,8 @@ const PAGES: Record<string, ReactNode> = {
   '/sales/quotations': <TradeDocumentPage config={QUOTATION} />,
   '/sales/orders': <TradeDocumentPage config={SALES_ORDER} />,
   '/sales/shipments': <TradeDocumentPage config={SHIPMENT} />,
+  '/planning/mrp': <MrpPage />,
+  '/planning/production-orders': <ProductionOrdersPage />,
   '/finance/receivables': <ReceivablesPage />,
   '/finance/payables': <PayablesPage />,
 }

@@ -60,6 +60,9 @@ public class PurchaseService {
     /** What a stock document says about where it came from. */
     public static final String SOURCE_TYPE = "PUR_RECEIPT";
 
+    /** What an order raised from a material plan records as its origin. */
+    public static final String SOURCE_TYPE_MRP_PLAN = "MRP_PLAN";
+
     private final PurchaseRepository documents;
     private final PurchaseLineRepository documentLines;
     private final PartnerRepository partners;
@@ -136,6 +139,60 @@ public class PurchaseService {
     }
 
     // ------------------------------------------------------------------ write
+
+    /**
+     * Material already on order, one row per open order line.
+     *
+     * <p>What MRP nets demand against besides stock. Only approved and partially received
+     * orders appear: a draft is a suggestion, and letting a suggestion reduce a shortage
+     * would hide a gap that nobody has actually committed to closing.
+     */
+    public List<OpenSupplyLine> openSupply() {
+        List<PurchaseDocument> orders = documents.findOpenWithLines(PurchaseDocType.ORDER,
+                List.of(DocumentLifecycle.APPROVED, DocumentLifecycle.PARTIAL));
+        List<OpenSupplyLine> supply = new ArrayList<>();
+        for (PurchaseDocument order : orders) {
+            LocalDate due = order.getRequiredDate() == null
+                    ? order.getBizDate() : order.getRequiredDate();
+            for (PurchaseDocumentLine line : order.getLines()) {
+                BigDecimal open = line.openQty();
+                if (open.signum() <= 0) {
+                    continue;
+                }
+                supply.add(new OpenSupplyLine(line.getItemId(), open, due, order.getDocNo()));
+            }
+        }
+        return supply;
+    }
+
+    /**
+     * Raises an order from a material plan row.
+     *
+     * <p>Delegates to {@link #create} rather than assembling a document here: supplier and
+     * warehouse validation, tax defaults and the audit entry must behave identically
+     * whether a buyer typed the order or a planner generated it. The origin is stamped
+     * afterwards, on the same transaction, so the order and its provenance are written
+     * together or not at all.
+     */
+    @Transactional
+    public PurchaseDtos.DocumentView createPlannedOrder(PlannedPurchase plan) {
+        PurchaseDtos.DocumentRequest request = new PurchaseDtos.DocumentRequest(
+                plan.supplierId(), null, null, plan.bizDate(), plan.requiredDate(), null,
+                plan.remark(),
+                List.of(new PurchaseDtos.LineRequest(plan.itemId(), plan.qty(),
+                        plan.unitPrice(), plan.taxRate(), null, null)));
+        PurchaseDtos.DocumentView created = create(PurchaseDocType.ORDER, request);
+
+        PurchaseDocument order = require(created.id());
+        order.setSourceType(SOURCE_TYPE_MRP_PLAN);
+        order.setSourceId(plan.sourceId());
+        documents.save(order);
+
+        audit.record("purchase.order.from-plan", CurrentUser.id().orElse(null),
+                CurrentUser.username().orElse(null), "pur_document", String.valueOf(order.getId()),
+                Map.of("docNo", order.getDocNo(), "plan", String.valueOf(plan.sourceId())));
+        return views(List.of(order)).get(0);
+    }
 
     @Transactional
     public PurchaseDtos.DocumentView create(PurchaseDocType type,
