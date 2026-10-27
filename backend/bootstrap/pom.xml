@@ -19,6 +19,10 @@
             <groupId>com.genisource</groupId>
             <artifactId>erp-platform</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-masterdata</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -41,6 +45,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

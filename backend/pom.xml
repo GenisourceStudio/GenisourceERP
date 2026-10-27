@@ -21,6 +21,7 @@
 
     <modules>
         <module>platform</module>
+        <module>masterdata</module>
         <module>bootstrap</module>
     </modules>
 
@@ -37,6 +38,11 @@
             <dependency>
                 <groupId>com.genisource</groupId>
                 <artifactId>erp-platform</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.genisource</groupId>
+                <artifactId>erp-masterdata</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

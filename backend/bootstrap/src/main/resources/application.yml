@@ -35,6 +35,11 @@ spring:
   jackson:
     time-zone: Asia/Shanghai
     default-property-inclusion: non_null
+    deserialization:
+      # Jackson 3 fails on null-to-primitive by default. The console sends whole forms, so
+      # an omitted boolean should mean "false", not a 500. Explicit nulls in a request are
+      # still rejected by bean validation where it matters.
+      fail-on-null-for-primitives: false
 
 server:
   port: ${SERVER_PORT:8080}

@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "Plan · Buy · Sell · Stock · MRP",
-    "milestone": "M0 skeleton"
+    "milestone": "M1 master data"
   },
   "nav": {
     "group": {
@@ -19,38 +19,85 @@
     "bom": "BOM & routing",
     "partner": "Customers & suppliers",
     "stock": "Stock ledger",
-    "movement": "Goods movement",
+    "movement": "Movements",
     "purchaseOrder": "Purchase orders",
     "salesOrder": "Sales orders",
     "mrpRun": "MRP run",
     "productionOrder": "Production orders",
-    "voucher": "Vouchers & ledger",
+    "voucher": "Vouchers",
     "audit": "Audit log",
     "user": "Users & roles"
   },
   "login": {
     "title": "Sign in",
-    "subtitle": "Use your factory account to continue",
+    "subtitle": "Use your factory account to enter the system",
     "username": "Username",
     "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "hint": "The initial password must be changed on first login; the account is set by ERP_ADMIN_USERNAME in .env.",
+    "hint": "The first sign-in asks for a new password; the initial account comes from ERP_ADMIN_USERNAME in .env.",
     "failed": "Sign-in failed, check your username and password",
-    "network": "Cannot reach the server, make sure the backend is running"
+    "network": "Cannot reach the server, make sure the API is running"
   },
   "common": {
     "loading": "Loading…",
     "logout": "Sign out",
     "language": "Language",
-    "planned": "Not open",
+    "planned": "Planned",
     "signedInAs": "Signed in as",
     "role": "Roles",
-    "permissions": "Permissions"
+    "permissions": "Permissions",
+    "save": "Save",
+    "saving": "Saving…",
+    "saveFailed": "Save failed, try again",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "remove": "Remove",
+    "deactivate": "Deactivate",
+    "none": "None",
+    "status": "Status",
+    "remark": "Remark",
+    "allStatus": "All statuses",
+    "searchPlaceholder": "Search by code or name",
+    "noMatch": "No match",
+    "loadFailed": "Could not load",
+    "emptyTitle": "Nothing here yet",
+    "emptyBody": "Change the filters, or create a record.",
+    "rangeOfTotal": "{{from}}–{{to}} of {{total}}",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "status": {
+    "record": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "revision": {
+      "DRAFT": "Draft",
+      "RELEASED": "Released",
+      "OBSOLETE": "Obsolete"
+    }
+  },
+  "itemType": {
+    "RAW": "Raw material",
+    "SEMI": "Semi-finished",
+    "FINISHED": "Finished good",
+    "CONSUMABLE": "Consumable",
+    "SERVICE": "Service"
+  },
+  "partnerType": {
+    "CUSTOMER": "Customer",
+    "SUPPLIER": "Supplier",
+    "BOTH": "Customer and supplier"
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Platform baseline status",
+    "subtitle": "Platform status",
     "card": {
       "tenant": "Tenant",
       "account": "Account",
@@ -58,29 +105,248 @@
       "permission": "Permissions"
     },
     "delivered": {
-      "title": "Delivered in M0",
-      "tenant": "Row-level multi-tenancy, tenant injected by Hibernate",
-      "auth": "JWT authentication and RBAC baseline",
-      "schema": "Flyway baseline and audit table",
-      "deploy": "Docker Compose deployment"
+      "title": "Delivered in M1",
+      "tenant": "Items with purchasing, sales, manufacturing and costing facets",
+      "auth": "Multi-level BOMs with revisions and approved substitutes",
+      "schema": "Routings and work centres with capacity, efficiency and rates",
+      "deploy": "One partner model covering customers and suppliers"
     },
     "next": {
-      "title": "Next",
-      "body": "M1 delivers items, multi-level BOMs with versions and substitutes, and routings."
+      "title": "Next up",
+      "body": "M2 delivers the stock ledger, goods movements and moving-average costing."
     },
     "scope": {
-      "title": "Current scope",
-      "body": "M0 ships only sign-in, permissions and the multi-tenant baseline. Entries marked “Not open” arrive in M1–M5."
+      "title": "Where the boundary is",
+      "body": "Master data is maintainable, but nothing downstream consumes it yet: inventory, purchasing, sales and MRP arrive in M2–M4. Entries marked \"Planned\" in the rail are not shipped."
     }
   },
   "page": {
     "placeholder": {
       "title": "This module is not open yet",
-      "body": "{{module}} is planned for {{milestone}}. This build is the M0 skeleton and only provides the platform baseline."
+      "body": "{{module}} is planned for {{milestone}}."
     }
   },
   "error": {
     "notFoundTitle": "Page not found",
-    "notFoundBody": "Pick another entry from the navigation."
+    "notFoundBody": "Pick a module from the rail on the left."
+  },
+  "item": {
+    "searchPlaceholder": "Search code, name or specification",
+    "filter": {
+      "allTypes": "All types",
+      "allCategories": "All categories"
+    },
+    "field": {
+      "code": "Item code",
+      "name": "Name",
+      "spec": "Specification",
+      "category": "Category",
+      "itemType": "Type",
+      "uom": "Stock unit",
+      "facets": "Facets",
+      "purchased": "Purchased",
+      "sold": "Sold",
+      "manufactured": "Manufactured",
+      "leadTime": "Lead time (days)",
+      "minOrderQty": "Minimum order qty",
+      "safetyStock": "Safety stock",
+      "defaultSupplier": "Default supplier",
+      "purchaseUom": "Purchasing unit",
+      "purchaseUomSame": "Same as stock unit",
+      "purchaseFactor": "Purchase factor",
+      "lotControlled": "Lot controlled",
+      "serialControlled": "Serial controlled",
+      "shelfLife": "Shelf life (days)",
+      "standardCost": "Standard cost",
+      "salePrice": "Sale price",
+      "taxRate": "Tax rate (%)",
+      "currency": "Currency"
+    },
+    "facet": {
+      "purchased": "Buy",
+      "manufactured": "Make",
+      "sold": "Sell"
+    },
+    "section": {
+      "basic": "Basics",
+      "purchasing": "Purchasing",
+      "manufacturing": "Manufacturing and traceability",
+      "costing": "Costing and sales"
+    },
+    "hint": {
+      "code": "Upper-cased on save; unique within the organisation.",
+      "purchaseFactor": "Stock units in one purchasing unit; 1 box of 100 pieces → 100.",
+      "standardCost": "Planning cost in M1; becomes a reference once M2 adds moving average.",
+      "notPurchased": "Tick \"Purchased\" to choose a supplier",
+      "status": "Inactive items disappear from pickers; history stays readable.",
+      "create": "New item; code, name, type and unit are required."
+    },
+    "placeholder": {
+      "supplier": "Search supplier code or name"
+    },
+    "action": {
+      "create": "New item",
+      "edit": "Edit item"
+    },
+    "emptyTitle": "No items",
+    "emptyBody": "Create items first — BOMs and routings reference them.",
+    "confirm": {
+      "deactivateTitle": "Deactivate item",
+      "deactivateBody": "Deactivate {{code}} · {{name}}? An item used by a released BOM will be refused."
+    }
+  },
+  "partner": {
+    "searchPlaceholder": "Search code, name or contact",
+    "filter": {
+      "allRoles": "All roles"
+    },
+    "field": {
+      "code": "Partner code",
+      "name": "Legal name",
+      "shortName": "Short name",
+      "partnerType": "Partner type",
+      "taxNo": "Tax number",
+      "contact": "Contact",
+      "contactName": "Contact name",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "currency": "Currency",
+      "paymentTerms": "Terms (days)",
+      "creditLimit": "Credit limit"
+    },
+    "section": {
+      "contact": "Contact",
+      "terms": "Payment terms"
+    },
+    "hint": {
+      "create": "New customer or supplier; one company can be both."
+    },
+    "action": {
+      "create": "New partner",
+      "edit": "Edit partner"
+    },
+    "emptyTitle": "No customers or suppliers",
+    "emptyBody": "Purchasing and sales will reference these records.",
+    "confirm": {
+      "deactivateTitle": "Deactivate partner",
+      "deactivateBody": "Deactivate {{code}} · {{name}}? It disappears from purchasing and sales pickers."
+    }
+  },
+  "bom": {
+    "searchPlaceholder": "Search parent item code or name",
+    "field": {
+      "item": "Parent item",
+      "version": "Revision",
+      "baseQty": "Base quantity",
+      "lineCount": "Lines",
+      "component": "Component",
+      "qty": "Quantity",
+      "lossRate": "Loss (%)",
+      "phantom": "Phantom",
+      "phantomShort": "Phantom",
+      "substitutes": "Substitutes",
+      "effective": "Effective window",
+      "effectiveFrom": "Effective from",
+      "effectiveTo": "Effective to",
+      "updatedAt": "Updated"
+    },
+    "section": {
+      "lines": "Components"
+    },
+    "hint": {
+      "item": "The parent item is fixed once created; copy to a new BOM to change it.",
+      "baseQty": "Output the component quantities refer to; 100 for a batch of 100.",
+      "create": "New BOM; save a draft first, then release it.",
+      "locked": "This revision is {{status}} and cannot be edited. Copy it to a new revision first."
+    },
+    "placeholder": {
+      "item": "Search item code or name",
+      "component": "Choose a component",
+      "substitute": "Add a substitute",
+      "newVersion": "New revision"
+    },
+    "action": {
+      "create": "New BOM",
+      "edit": "Edit BOM",
+      "addLine": "Add component",
+      "copy": "Copy to new revision",
+      "obsolete": "Obsolete",
+      "saveAndRelease": "Save and release",
+      "explode": "Explode"
+    },
+    "emptyTitle": "No BOMs",
+    "emptyBody": "A BOM is the input to MRP expansion; create items first.",
+    "tree": {
+      "title": "Multi-level explosion",
+      "produceQty": "Quantity to produce",
+      "hint": "Quantities are multiplied through every level with loss rates applied, following released revisions only.",
+      "total": "Accumulated requirement",
+      "perParent": "Per parent unit"
+    },
+    "tab": {
+      "routing": "Routings",
+      "workCenter": "Work centres"
+    }
+  },
+  "routing": {
+    "searchPlaceholder": "Search item code or name",
+    "field": {
+      "item": "Item",
+      "version": "Revision",
+      "workCenter": "Work centre",
+      "name": "Operation",
+      "setupMinutes": "Setup (min)",
+      "runMinutes": "Run (min/unit)",
+      "operationCount": "Operations",
+      "totalMinutes": "Run minutes/unit"
+    },
+    "section": {
+      "operations": "Operations"
+    },
+    "placeholder": {
+      "workCenter": "Choose a work centre",
+      "name": "e.g. laser cutting"
+    },
+    "hint": {
+      "sequence": "Operations are numbered 10, 20, 30 so a step can be inserted later.",
+      "create": "New routing; at least one operation is needed before release.",
+      "noWorkCenter": "Create a work centre on the work centres tab first"
+    },
+    "action": {
+      "create": "New routing",
+      "edit": "Edit routing",
+      "addOperation": "Add operation"
+    },
+    "emptyTitle": "No routings",
+    "emptyBody": "A routing defines operation order and times, the input to M4 scheduling and costing.",
+    "emptyNoWorkCenter": "There are no work centres yet — create one on the work centres tab first."
+  },
+  "workCenter": {
+    "hint": {
+      "list": "A work centre carries capacity and rate: available capacity = calendar minutes × efficiency.",
+      "capacity": "Calendar minutes per day; 960 for two shifts.",
+      "costRate": "Fully loaded cost per hour, used by M5 labour costing.",
+      "create": "New work centre; the code must be unique."
+    },
+    "field": {
+      "code": "Code",
+      "name": "Name",
+      "department": "Department",
+      "capacity": "Capacity (min/day)",
+      "efficiency": "Efficiency (%)",
+      "available": "Available",
+      "costRate": "Rate per hour"
+    },
+    "action": {
+      "create": "New work centre",
+      "edit": "Edit work centre"
+    },
+    "emptyTitle": "No work centres",
+    "emptyBody": "Every routing operation must run on a work centre.",
+    "confirm": {
+      "deactivateTitle": "Deactivate work centre",
+      "deactivateBody": "Deactivate {{code}}? It can no longer be used by new operations."
+    }
   }
 }

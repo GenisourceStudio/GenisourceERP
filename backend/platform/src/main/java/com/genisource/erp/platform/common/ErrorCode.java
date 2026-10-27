@@ -23,7 +23,13 @@ public enum ErrorCode {
     VALIDATION_FAILED("validation_failed"),
     NOT_FOUND("not_found"),
     CONFLICT("conflict"),
-    INTERNAL_ERROR("internal_error");
+    INTERNAL_ERROR("internal_error"),
+
+    // --- master data ---------------------------------------------------------
+    DUPLICATE_CODE("duplicate_code"),
+    IN_USE("in_use"),
+    INVALID_STATE("invalid_state"),
+    BOM_CYCLE("bom_cycle");
 
     private final String key;
 

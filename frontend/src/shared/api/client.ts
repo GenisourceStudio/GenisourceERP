@@ -15,11 +15,21 @@ export class ApiError extends Error {
   readonly status: number
   readonly code: string
 
-  constructor(status: number, code: string, detail: string) {
+  /** Per-field validation messages, keyed by the field name in the request payload. */
+  readonly fields: Record<string, string>
+
+  constructor(status: number, code: string, detail: string, fields: Record<string, string> = {}) {
     super(detail)
     this.name = 'ApiError'
     this.status = status
     this.code = code
+    this.fields = fields
+  }
+
+  /** First usable message, preferring field-level feedback over the generic detail. */
+  get firstMessage(): string {
+    const fieldMessages = Object.values(this.fields)
+    return fieldMessages.length > 0 ? fieldMessages[0] : this.message
   }
 }
 
@@ -27,6 +37,7 @@ interface ProblemDetail {
   detail?: string
   code?: string
   title?: string
+  fields?: Record<string, string>
 }
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -51,6 +62,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
       response.status,
       problem?.code ?? 'unknown',
       problem?.detail ?? response.statusText,
+      problem?.fields ?? {},
     )
   }
 

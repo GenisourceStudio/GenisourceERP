@@ -47,6 +47,26 @@ public class ApiException extends RuntimeException {
         return new ApiException(ErrorCode.FORBIDDEN, HttpStatus.FORBIDDEN, message);
     }
 
+    /** A business key such as an item code is already taken inside this tenant. */
+    public static ApiException duplicateCode(String message) {
+        return new ApiException(ErrorCode.DUPLICATE_CODE, HttpStatus.CONFLICT, message);
+    }
+
+    /** The row is referenced elsewhere and cannot be deactivated or removed. */
+    public static ApiException inUse(String message) {
+        return new ApiException(ErrorCode.IN_USE, HttpStatus.CONFLICT, message);
+    }
+
+    /** The requested transition is not allowed from the current state. */
+    public static ApiException invalidState(String message) {
+        return new ApiException(ErrorCode.INVALID_STATE, HttpStatus.CONFLICT, message);
+    }
+
+    /** A bill of materials would become its own ancestor. */
+    public static ApiException bomCycle(String message) {
+        return new ApiException(ErrorCode.BOM_CYCLE, HttpStatus.CONFLICT, message);
+    }
+
     public ErrorCode code() {
         return code;
     }

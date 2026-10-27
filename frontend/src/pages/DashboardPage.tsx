@@ -42,7 +42,7 @@ export default function DashboardPage() {
         <section className="panel">
           <div className="panel__header">
             <h2>{t('dashboard.delivered.title')}</h2>
-            <span className="badge badge--ok">M0</span>
+            <span className="badge badge--ok">M1</span>
           </div>
           <div className="panel__body">
             <ul style={{ margin: 0, paddingLeft: 18, lineHeight: 1.9 }}>
@@ -56,7 +56,7 @@ export default function DashboardPage() {
         <section className="panel">
           <div className="panel__header">
             <h2>{t('dashboard.next.title')}</h2>
-            <span className="badge badge--accent">M1</span>
+            <span className="badge badge--accent">M2</span>
           </div>
           <div className="panel__body">
             <p style={{ margin: 0, lineHeight: 1.75 }} className="muted">

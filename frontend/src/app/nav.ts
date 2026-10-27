@@ -24,9 +24,9 @@ export const NAV: NavGroup[] = [
   {
     key: 'masterdata',
     items: [
-      { path: '/masterdata/items', key: 'item', milestone: 'M1' },
-      { path: '/masterdata/bom', key: 'bom', milestone: 'M1' },
-      { path: '/masterdata/partners', key: 'partner', milestone: 'M1' },
+      { path: '/masterdata/items', key: 'item' },
+      { path: '/masterdata/bom', key: 'bom' },
+      { path: '/masterdata/partners', key: 'partner' },
     ],
   },
   {
@@ -57,8 +57,9 @@ export const NAV: NavGroup[] = [
   {
     key: 'system',
     items: [
-      { path: '/system/users', key: 'user', milestone: 'M1' },
-      { path: '/system/audit', key: 'audit', milestone: 'M1' },
+      // M1 shipped master data, not user management: keep the badge honest.
+      { path: '/system/users', key: 'user', milestone: 'M2' },
+      { path: '/system/audit', key: 'audit', milestone: 'M2' },
     ],
   },
 ]

@@ -78,6 +78,17 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
+> **macOS 提示**：如果 `./mvnw` 报 `The forked VM terminated without properly saying goodbye`，通常是 `JAVA_HOME` 没设、Maven 抓到了系统里的旧 JDK（例如 Oracle 的 Java 8）。显式指定即可：
+> ```bash
+> export JAVA_HOME=$(/usr/libexec/java_home -v 21)          # 系统安装的 JDK 21
+> export JAVA_HOME=$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home   # Homebrew 安装的
+> ```
+> Homebrew 装的 JDK 不会被 `/usr/libexec/java_home` 索引，除非建过软链：
+> ```bash
+> sudo ln -sfn $(brew --prefix openjdk@21)/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-21.jdk
+> ```
+> 验证：`$JAVA_HOME/bin/java -version` 输出 `21.x` 再继续。
+
 前端（Node 22.12+，pnpm 10）：
 
 ```bash
@@ -93,6 +104,7 @@ pnpm dev
 ```
 backend/
   platform/      平台基座：多租户、安全、审计、通用
+  masterdata/    主数据：物料、客户/供应商、BOM、工艺路线、工作中心
   bootstrap/     启动器：配置、Flyway 迁移、演示数据
 frontend/        React SPA
 deploy/          Dockerfile、Nginx、Maven 镜像、K8s Helm、运维脚本
@@ -103,8 +115,8 @@ docs/            项目规划、ADR、领域模型、集成规范
 
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| M0 | 脚手架 · 多租户 · RBAC · 部署编排 | 🚧 进行中 |
-| M1 | 主数据 · BOM（多级/版本/替代料） · 工艺路线 | ⏳ |
+| M0 | 脚手架 · 多租户 · RBAC · 部署编排 | ✅ |
+| M1 | 主数据 · BOM（多级/版本/替代料） · 工艺路线 | ✅ |
 | M2 | 库存（多仓/批次/序列号/盘点） | ⏳ |
 | M3 | 采购到付款 · 销售到收款 · 审批流 | ⏳ |
 | M4 | MRP 运算 · 生产订单 | ⏳ |

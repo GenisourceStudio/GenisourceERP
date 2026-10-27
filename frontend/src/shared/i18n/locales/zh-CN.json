@@ -2,7 +2,7 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "计划 · 采购 · 销售 · 库存 · MRP",
-    "milestone": "M0 脚手架"
+    "milestone": "M1 主数据"
   },
   "nav": {
     "group": {
@@ -46,7 +46,54 @@
     "planned": "未开放",
     "signedInAs": "当前账号",
     "role": "角色",
-    "permissions": "权限点"
+    "permissions": "权限点",
+    "save": "保存",
+    "saving": "保存中…",
+    "saveFailed": "保存失败，请稍后重试",
+    "cancel": "取消",
+    "confirm": "确定",
+    "close": "关闭",
+    "edit": "编辑",
+    "delete": "删除",
+    "remove": "移除",
+    "deactivate": "停用",
+    "none": "无",
+    "status": "状态",
+    "remark": "备注",
+    "allStatus": "全部状态",
+    "searchPlaceholder": "输入编码或名称搜索",
+    "noMatch": "没有匹配项",
+    "loadFailed": "加载失败",
+    "emptyTitle": "暂无数据",
+    "emptyBody": "调整筛选条件，或新建一条记录。",
+    "rangeOfTotal": "第 {{from}}–{{to}} 条 · 共 {{total}} 条",
+    "firstPage": "第一页",
+    "lastPage": "最后一页",
+    "prev": "上一页",
+    "next": "下一页"
+  },
+  "status": {
+    "record": {
+      "ACTIVE": "启用",
+      "INACTIVE": "停用"
+    },
+    "revision": {
+      "DRAFT": "草稿",
+      "RELEASED": "已发布",
+      "OBSOLETE": "已作废"
+    }
+  },
+  "itemType": {
+    "RAW": "原材料",
+    "SEMI": "半成品",
+    "FINISHED": "成品",
+    "CONSUMABLE": "辅料",
+    "SERVICE": "服务"
+  },
+  "partnerType": {
+    "CUSTOMER": "客户",
+    "SUPPLIER": "供应商",
+    "BOTH": "客户兼供应商"
   },
   "dashboard": {
     "title": "工作台",
@@ -58,29 +105,248 @@
       "permission": "权限点"
     },
     "delivered": {
-      "title": "M0 已交付",
-      "tenant": "多租户行级隔离，Hibernate 自动注入租户条件",
-      "auth": "JWT 认证与 RBAC 权限基座",
-      "schema": "Flyway 基线与审计表",
-      "deploy": "Docker Compose 部署编排"
+      "title": "M1 已交付",
+      "tenant": "物料主数据：采购 / 销售 / 制造 / 成本四类属性",
+      "auth": "BOM 多级展开、版本状态机与替代料",
+      "schema": "工艺路线与工作中心（产能 / 效率 / 费率）",
+      "deploy": "客户与供应商统一伙伴模型"
     },
     "next": {
       "title": "下一步",
-      "body": "M1 将交付物料、BOM（多级 / 版本 / 替代料）与工艺路线。"
+      "body": "M2 将交付库存台账、出入库单据与移动加权平均成本。"
     },
     "scope": {
       "title": "当前能力边界",
-      "body": "M0 只提供登录、权限与多租户基座，业务单据尚未开放。左侧标注「未开放」的入口会在 M1–M5 逐片交付。"
+      "body": "主数据已可维护，但它还没有下游单据：库存、采购、销售与 MRP 会在 M2–M4 接入。左侧标注「未开放」的入口尚未交付。"
     }
   },
   "page": {
     "placeholder": {
       "title": "该模块尚未开放",
-      "body": "{{module}} 计划在 {{milestone}} 交付。当前版本为 M0 脚手架，只提供平台基座。"
+      "body": "{{module}} 计划在 {{milestone}} 交付。"
     }
   },
   "error": {
     "notFoundTitle": "页面不存在",
     "notFoundBody": "请从左侧导航重新选择。"
+  },
+  "item": {
+    "searchPlaceholder": "搜索物料编码、名称或规格",
+    "filter": {
+      "allTypes": "全部类型",
+      "allCategories": "全部分类"
+    },
+    "field": {
+      "code": "物料编码",
+      "name": "物料名称",
+      "spec": "规格型号",
+      "category": "分类",
+      "itemType": "物料类型",
+      "uom": "库存单位",
+      "facets": "属性",
+      "purchased": "采购件",
+      "sold": "销售件",
+      "manufactured": "制造件",
+      "leadTime": "采购提前期（天）",
+      "minOrderQty": "最小订货量",
+      "safetyStock": "安全库存",
+      "defaultSupplier": "默认供应商",
+      "purchaseUom": "采购单位",
+      "purchaseUomSame": "与库存单位相同",
+      "purchaseFactor": "采购换算系数",
+      "lotControlled": "批次管理",
+      "serialControlled": "序列号管理",
+      "shelfLife": "保质期（天）",
+      "standardCost": "标准成本",
+      "salePrice": "销售单价",
+      "taxRate": "税率（%）",
+      "currency": "币种"
+    },
+    "facet": {
+      "purchased": "采购",
+      "manufactured": "制造",
+      "sold": "销售"
+    },
+    "section": {
+      "basic": "基本信息",
+      "purchasing": "采购属性",
+      "manufacturing": "制造与追溯",
+      "costing": "成本与销售"
+    },
+    "hint": {
+      "code": "保存时自动转为大写；同一组织内唯一。",
+      "purchaseFactor": "1 个采购单位 = 多少个库存单位，例如 1 箱 = 100 个填 100。",
+      "standardCost": "M1 用于计划成本；M2 接入移动加权平均后改为参考值。",
+      "notPurchased": "先勾选「采购件」才能指定供应商",
+      "status": "停用后不再出现在选择器中，历史单据仍可追溯。",
+      "create": "新建物料；编码、名称、类型、单位为必填。"
+    },
+    "placeholder": {
+      "supplier": "输入供应商编码或名称"
+    },
+    "action": {
+      "create": "新建物料",
+      "edit": "编辑物料"
+    },
+    "emptyTitle": "没有物料",
+    "emptyBody": "先建物料，BOM 与工艺路线才有可引用的主数据。",
+    "confirm": {
+      "deactivateTitle": "停用物料",
+      "deactivateBody": "停用 {{code}} · {{name}}？被已发布 BOM 引用的物料会被系统拒绝停用。"
+    }
+  },
+  "partner": {
+    "searchPlaceholder": "搜索伙伴编码、名称或联系人",
+    "filter": {
+      "allRoles": "全部角色"
+    },
+    "field": {
+      "code": "伙伴编码",
+      "name": "单位名称",
+      "shortName": "简称",
+      "partnerType": "伙伴类型",
+      "taxNo": "税号",
+      "contact": "联系人",
+      "contactName": "联系人姓名",
+      "phone": "电话",
+      "email": "邮箱",
+      "address": "地址",
+      "currency": "结算币种",
+      "paymentTerms": "账期（天）",
+      "creditLimit": "信用额度"
+    },
+    "section": {
+      "contact": "联系方式",
+      "terms": "结算条件"
+    },
+    "hint": {
+      "create": "新建客户或供应商；同一家单位可同时是两者。"
+    },
+    "action": {
+      "create": "新建伙伴",
+      "edit": "编辑伙伴"
+    },
+    "emptyTitle": "没有客户或供应商",
+    "emptyBody": "采购与销售模块会引用这里的记录。",
+    "confirm": {
+      "deactivateTitle": "停用伙伴",
+      "deactivateBody": "停用 {{code}} · {{name}}？停用后不再出现在采购与销售的选择器中。"
+    }
+  },
+  "bom": {
+    "searchPlaceholder": "搜索父项物料编码或名称",
+    "field": {
+      "item": "父项物料",
+      "version": "版本",
+      "baseQty": "基础数量",
+      "lineCount": "行数",
+      "component": "组件物料",
+      "qty": "数量",
+      "lossRate": "损耗率（%）",
+      "phantom": "虚拟件",
+      "phantomShort": "虚拟",
+      "substitutes": "替代料",
+      "effective": "生效区间",
+      "effectiveFrom": "生效日期",
+      "effectiveTo": "失效日期",
+      "updatedAt": "更新时间"
+    },
+    "section": {
+      "lines": "组件明细"
+    },
+    "hint": {
+      "item": "父项建单后不可更改；需要换父项请新建 BOM。",
+      "baseQty": "组件用量对应的产出数量；按 100 套记料时填 100。",
+      "create": "新建 BOM；先存草稿，再发布。",
+      "locked": "该版本为{{status}}状态，不可编辑。请复制为新版本后再改。"
+    },
+    "placeholder": {
+      "item": "输入物料编码或名称",
+      "component": "选择组件物料",
+      "substitute": "添加替代料",
+      "newVersion": "新版本号"
+    },
+    "action": {
+      "create": "新建 BOM",
+      "edit": "编辑 BOM",
+      "addLine": "添加组件",
+      "copy": "复制为新版本",
+      "obsolete": "作废",
+      "saveAndRelease": "保存并发布",
+      "explode": "展开"
+    },
+    "emptyTitle": "没有 BOM",
+    "emptyBody": "BOM 是 MRP 展开的输入；先建物料，再建 BOM。",
+    "tree": {
+      "title": "多级展开",
+      "produceQty": "计划产出数量",
+      "hint": "数量已按各级用量与损耗率逐层放大；只沿已发布版本展开。",
+      "total": "累计需求量",
+      "perParent": "单件用量"
+    },
+    "tab": {
+      "routing": "工艺路线",
+      "workCenter": "工作中心"
+    }
+  },
+  "routing": {
+    "searchPlaceholder": "搜索物料编码或名称",
+    "field": {
+      "item": "物料",
+      "version": "版本",
+      "workCenter": "工作中心",
+      "name": "工序名称",
+      "setupMinutes": "准备工时",
+      "runMinutes": "单件工时",
+      "operationCount": "工序数",
+      "totalMinutes": "单件总工时"
+    },
+    "section": {
+      "operations": "工序明细"
+    },
+    "placeholder": {
+      "workCenter": "选择工作中心",
+      "name": "如 激光下料"
+    },
+    "hint": {
+      "sequence": "工序号按 10 / 20 / 30 自动编排，方便日后插入中间工序。",
+      "create": "新建工艺路线；至少一道工序才能发布。",
+      "noWorkCenter": "请先在工作中心页签建立至少一个工作中心"
+    },
+    "action": {
+      "create": "新建工艺路线",
+      "edit": "编辑工艺路线",
+      "addOperation": "添加工序"
+    },
+    "emptyTitle": "没有工艺路线",
+    "emptyBody": "工艺路线决定工序顺序与工时，是 M4 排产与成本核算的输入。",
+    "emptyNoWorkCenter": "还没有工作中心；先切到「工作中心」页签建一个，再来编工艺路线。"
+  },
+  "workCenter": {
+    "hint": {
+      "list": "工作中心是产能与费率的载体：可用产能 = 日历分钟 × 效率。",
+      "capacity": "每日日历分钟数；两班制填 960。",
+      "costRate": "该资源每小时的全成本，用于 M5 工时成本。",
+      "create": "新建工作中心；编码不可重复。"
+    },
+    "field": {
+      "code": "编码",
+      "name": "名称",
+      "department": "所属部门",
+      "capacity": "日产能（分钟）",
+      "efficiency": "效率（%）",
+      "available": "可用产能",
+      "costRate": "小时费率"
+    },
+    "action": {
+      "create": "新建工作中心",
+      "edit": "编辑工作中心"
+    },
+    "emptyTitle": "没有工作中心",
+    "emptyBody": "工艺路线的每道工序都要挂到工作中心上。",
+    "confirm": {
+      "deactivateTitle": "停用工作中心",
+      "deactivateBody": "停用 {{code}}？停用后不能再被新的工序引用。"
+    }
   }
 }
