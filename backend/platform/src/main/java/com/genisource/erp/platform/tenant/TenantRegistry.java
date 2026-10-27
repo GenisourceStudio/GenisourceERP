@@ -32,6 +32,7 @@ public class TenantRegistry implements ApplicationRunner {
     public static final long UNRESOLVED = -1L;
 
     private final Map<String, Long> idsByCode = new ConcurrentHashMap<>();
+    private final Map<Long, String> codesById = new ConcurrentHashMap<>();
     private final SystemTenantRepository tenants;
     private final TenantProperties properties;
 
@@ -50,8 +51,10 @@ public class TenantRegistry implements ApplicationRunner {
     public void reload() {
         List<SystemTenant> all = tenants.findAll();
         idsByCode.clear();
+        codesById.clear();
         for (SystemTenant tenant : all) {
             idsByCode.put(tenant.getCode(), tenant.getId());
+            codesById.put(tenant.getId(), tenant.getCode());
         }
 
         Long resolved = idsByCode.get(properties.defaultCode());
@@ -85,8 +88,14 @@ public class TenantRegistry implements ApplicationRunner {
         return Optional.ofNullable(idsByCode.get(code));
     }
 
+    /** Reverse lookup, used to describe a caller's tenant from a token claim. */
+    public Optional<String> findCode(long id) {
+        return Optional.ofNullable(codesById.get(id));
+    }
+
     public void register(SystemTenant tenant) {
         idsByCode.put(tenant.getCode(), tenant.getId());
+        codesById.put(tenant.getId(), tenant.getCode());
         if (tenant.getCode().equals(properties.defaultCode())) {
             defaultTenantId = tenant.getId();
         }

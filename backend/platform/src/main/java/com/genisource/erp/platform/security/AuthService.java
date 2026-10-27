@@ -8,6 +8,7 @@ import com.genisource.erp.platform.tenant.TenantProperties;
 import com.genisource.erp.platform.tenant.TenantRegistry;
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,6 +112,31 @@ public class AuthService {
                 principal.roles(),
                 principal.permissions(),
                 principal.forcePasswordChange());
+    }
+
+    /**
+     * Profile rebuilt from the token of an already-authenticated caller.
+     *
+     * <p>Keeps {@code GET /api/auth/me} shape-identical to the {@code user} object returned by
+     * login: the tenant code is resolved from the {@code tid} claim instead of being left null,
+     * so a page reload does not lose the tenant label the console displays.
+     */
+    public AuthDtos.UserView toView(Jwt jwt) {
+        String tenantCode = null;
+        Object tenantId = jwt.getClaim(JwtService.CLAIM_TENANT);
+        if (tenantId instanceof Number number) {
+            tenantCode = tenantRegistry.findCode(number.longValue()).orElse(null);
+        }
+        List<String> roles = jwt.getClaimAsStringList(JwtService.CLAIM_ROLES);
+        List<String> permissions = jwt.getClaimAsStringList(JwtService.CLAIM_PERMISSIONS);
+        return new AuthDtos.UserView(
+                Long.valueOf(jwt.getSubject()),
+                jwt.getClaimAsString(JwtService.CLAIM_USERNAME),
+                jwt.getClaimAsString(JwtService.CLAIM_DISPLAY_NAME),
+                tenantCode,
+                roles == null ? List.of() : roles,
+                permissions == null ? List.of() : permissions,
+                Boolean.TRUE.equals(jwt.getClaim(JwtService.CLAIM_FORCE_PASSWORD_CHANGE)));
     }
 
     public AuthenticatedUser toPrincipal(UserAccount user) {
