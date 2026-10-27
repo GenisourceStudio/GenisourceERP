@@ -41,3 +41,6 @@ dist/
 
 # Helm
 deploy/k8s/**/charts/*.tgz
+
+# Assistant working notes (kept locally, never published with the open-source repo)
+.workbuddy/
