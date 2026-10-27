@@ -1,0 +1,86 @@
+{
+  "app": {
+    "name": "Genisource ERP",
+    "tagline": "Plan · Buy · Sell · Stock · MRP",
+    "milestone": "M0 skeleton"
+  },
+  "nav": {
+    "group": {
+      "overview": "Overview",
+      "masterdata": "Master data",
+      "inventory": "Inventory",
+      "trade": "Trade",
+      "planning": "Planning",
+      "finance": "Finance",
+      "system": "System"
+    },
+    "dashboard": "Dashboard",
+    "item": "Items",
+    "bom": "BOM & routing",
+    "partner": "Customers & suppliers",
+    "stock": "Stock ledger",
+    "movement": "Goods movement",
+    "purchaseOrder": "Purchase orders",
+    "salesOrder": "Sales orders",
+    "mrpRun": "MRP run",
+    "productionOrder": "Production orders",
+    "voucher": "Vouchers & ledger",
+    "audit": "Audit log",
+    "user": "Users & roles"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use your factory account to continue",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "hint": "The initial password must be changed on first login; the account is set by ERP_ADMIN_USERNAME in .env.",
+    "failed": "Sign-in failed, check your username and password",
+    "network": "Cannot reach the server, make sure the backend is running"
+  },
+  "common": {
+    "loading": "Loading…",
+    "logout": "Sign out",
+    "language": "Language",
+    "planned": "Not open",
+    "signedInAs": "Signed in as",
+    "role": "Roles",
+    "permissions": "Permissions"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Platform baseline status",
+    "card": {
+      "tenant": "Tenant",
+      "account": "Account",
+      "role": "Roles",
+      "permission": "Permissions"
+    },
+    "delivered": {
+      "title": "Delivered in M0",
+      "tenant": "Row-level multi-tenancy, tenant injected by Hibernate",
+      "auth": "JWT authentication and RBAC baseline",
+      "schema": "Flyway baseline and audit table",
+      "deploy": "Docker Compose deployment"
+    },
+    "next": {
+      "title": "Next",
+      "body": "M1 delivers items, multi-level BOMs with versions and substitutes, and routings."
+    },
+    "scope": {
+      "title": "Current scope",
+      "body": "M0 ships only sign-in, permissions and the multi-tenant baseline. Entries marked “Not open” arrive in M1–M5."
+    }
+  },
+  "page": {
+    "placeholder": {
+      "title": "This module is not open yet",
+      "body": "{{module}} is planned for {{milestone}}. This build is the M0 skeleton and only provides the platform baseline."
+    }
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "Pick another entry from the navigation."
+  }
+}

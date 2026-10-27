@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: genisource-erp
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/genisource_erp}
+    username: ${DB_USERNAME:erp}
+    password: ${DB_PASSWORD:erp_dev_password}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+  web:
+    locale: zh_CN
+
+  jackson:
+    time-zone: Asia/Shanghai
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+
+erp:
+  version: "@project.version@"
+  tenant:
+    mode: ${ERP_TENANT_MODE:single}
+    default-code: ${ERP_DEFAULT_TENANT:default}
+  security:
+    admin-username: ${ERP_ADMIN_USERNAME:admin}
+    admin-password: ${ERP_ADMIN_PASSWORD:admin123}
+    admin-force-password-change: ${ERP_FORCE_PASSWORD_CHANGE:true}
+    jwt:
+      secret: ${ERP_JWT_SECRET:dev-only-jwt-secret-change-me-32-bytes-minimum}
+      access-ttl: ${ERP_ACCESS_TTL:15m}
+      refresh-ttl: ${ERP_REFRESH_TTL:7d}
+  mes:
+    base-url: ${MES_BASE_URL:}
+    client-id: ${MES_CLIENT_ID:}
+    client-secret: ${MES_CLIENT_SECRET:}
+    sync-enabled: ${MES_SYNC_ENABLED:false}
+
+logging:
+  level:
+    com.genisource.erp: INFO
+    org.flywaydb: INFO

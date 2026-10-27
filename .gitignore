@@ -1,0 +1,43 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Backend
+backend/target/
+backend/*/target/
+backend/*.log
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.tsbuildinfo
+
+# Runtime artifacts
+backups/
+logs/
+.buildx/
+
+# Test / coverage
+coverage/
+
+# pnpm local store (only present when store-dir is overridden)
+.pnpm-store/
+
+# Local scratch (browser profiles, temporary build contexts)
+.tmp/
+
+# Offline release artifacts
+dist/
+
+# Helm
+deploy/k8s/**/charts/*.tgz

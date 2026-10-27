@@ -1,0 +1,86 @@
+{
+  "app": {
+    "name": "Genisource ERP",
+    "tagline": "计划 · 采购 · 销售 · 库存 · MRP",
+    "milestone": "M0 脚手架"
+  },
+  "nav": {
+    "group": {
+      "overview": "总览",
+      "masterdata": "主数据",
+      "inventory": "库存",
+      "trade": "购销",
+      "planning": "计划",
+      "finance": "财务",
+      "system": "系统"
+    },
+    "dashboard": "工作台",
+    "item": "物料",
+    "bom": "BOM 与工艺",
+    "partner": "客户与供应商",
+    "stock": "库存台账",
+    "movement": "出入库",
+    "purchaseOrder": "采购订单",
+    "salesOrder": "销售订单",
+    "mrpRun": "MRP 运算",
+    "productionOrder": "生产订单",
+    "voucher": "凭证与总账",
+    "audit": "审计日志",
+    "user": "用户与角色"
+  },
+  "login": {
+    "title": "登录",
+    "subtitle": "使用你的工厂账号进入系统",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "登 录",
+    "submitting": "正在登录…",
+    "hint": "首次登录需修改初始密码；初始账号见 .env 中的 ERP_ADMIN_USERNAME。",
+    "failed": "登录失败，请检查用户名与密码",
+    "network": "无法连接服务器，请确认后端已启动"
+  },
+  "common": {
+    "loading": "加载中…",
+    "logout": "退出登录",
+    "language": "语言",
+    "planned": "未开放",
+    "signedInAs": "当前账号",
+    "role": "角色",
+    "permissions": "权限点"
+  },
+  "dashboard": {
+    "title": "工作台",
+    "subtitle": "平台基座状态",
+    "card": {
+      "tenant": "租户",
+      "account": "账号",
+      "role": "角色",
+      "permission": "权限点"
+    },
+    "delivered": {
+      "title": "M0 已交付",
+      "tenant": "多租户行级隔离，Hibernate 自动注入租户条件",
+      "auth": "JWT 认证与 RBAC 权限基座",
+      "schema": "Flyway 基线与审计表",
+      "deploy": "Docker Compose 部署编排"
+    },
+    "next": {
+      "title": "下一步",
+      "body": "M1 将交付物料、BOM（多级 / 版本 / 替代料）与工艺路线。"
+    },
+    "scope": {
+      "title": "当前能力边界",
+      "body": "M0 只提供登录、权限与多租户基座，业务单据尚未开放。左侧标注「未开放」的入口会在 M1–M5 逐片交付。"
+    }
+  },
+  "page": {
+    "placeholder": {
+      "title": "该模块尚未开放",
+      "body": "{{module}} 计划在 {{milestone}} 交付。当前版本为 M0 脚手架，只提供平台基座。"
+    }
+  },
+  "error": {
+    "notFoundTitle": "页面不存在",
+    "notFoundBody": "请从左侧导航重新选择。"
+  }
+}

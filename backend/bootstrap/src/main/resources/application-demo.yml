@@ -1,0 +1,6 @@
+# Demo profile: sample master data is loaded from db/demo by a later milestone.
+# For now it only relaxes logging so a first run is easy to follow.
+logging:
+  level:
+    com.genisource.erp: DEBUG
+    org.hibernate.SQL: INFO

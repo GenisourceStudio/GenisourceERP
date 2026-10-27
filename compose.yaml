@@ -1,0 +1,97 @@
+name: genisource-erp
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-genisource_erp}
+      POSTGRES_USER: ${DB_USER:-erp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-erp_dev_password}
+      TZ: Asia/Shanghai
+    volumes:
+      - erp-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-erp} -d ${DB_NAME:-genisource_erp}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Reserved for caching and distributed locks (MRP runs, daily job coordination).
+  # The application starts fine without it; M1 begins using it.
+  cache:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  app:
+    build:
+      context: .
+      dockerfile: deploy/docker/backend.Dockerfile
+      args:
+        MAVEN_MIRROR: ${MAVEN_MIRROR:-central}
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-demo}
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-genisource_erp}
+      DB_USERNAME: ${DB_USER:-erp}
+      DB_PASSWORD: ${DB_PASSWORD:-erp_dev_password}
+      ERP_ADMIN_USERNAME: ${ERP_ADMIN_USERNAME:-admin}
+      ERP_ADMIN_PASSWORD: ${ERP_ADMIN_PASSWORD:-admin123}
+      ERP_FORCE_PASSWORD_CHANGE: ${ERP_FORCE_PASSWORD_CHANGE:-true}
+      ERP_JWT_SECRET: ${ERP_JWT_SECRET:-dev-only-jwt-secret-change-me-32-bytes-minimum}
+      ERP_TENANT_MODE: ${ERP_TENANT_MODE:-single}
+      ERP_DEFAULT_TENANT: ${ERP_DEFAULT_TENANT:-default}
+      MES_BASE_URL: ${MES_BASE_URL:-}
+      MES_CLIENT_ID: ${MES_CLIENT_ID:-}
+      MES_CLIENT_SECRET: ${MES_CLIENT_SECRET:-}
+      MES_SYNC_ENABLED: ${MES_SYNC_ENABLED:-false}
+      TZ: Asia/Shanghai
+      JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Shanghai
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "http_proxy= https_proxy= wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/docker/frontend.Dockerfile
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmjs.org}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  erp-db-data:
+    name: genisource-erp-db

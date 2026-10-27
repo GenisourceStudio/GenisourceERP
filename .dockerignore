@@ -1,0 +1,11 @@
+.git
+.gitignore
+.github
+**/target
+**/node_modules
+frontend/dist
+docs/images
+backups
+logs
+.tmp
+.env
