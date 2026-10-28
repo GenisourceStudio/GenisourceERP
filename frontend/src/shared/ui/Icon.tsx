@@ -1,0 +1,312 @@
+import type { ReactNode } from 'react'
+
+/**
+ * Line icons, drawn on the 24px grid with a 1.6 stroke.
+ *
+ * <p>The ERP is read eight hours a day by planners and accountants, so icons
+ * carry meaning and never decoration: every glyph either names the module in
+ * the rail or marks an action in a toolbar. No emoji — they change shape
+ * between platforms and cannot be coloured by the token set.
+ */
+export type IconName =
+  // shell
+  | 'grid'
+  | 'cube'
+  | 'clipboard'
+  | 'play'
+  | 'route'
+  | 'chart'
+  | 'sliders'
+  | 'scan'
+  | 'arrow-right'
+  | 'arrow-down-left'
+  | 'arrow-up-right'
+  | 'copy'
+  | 'check'
+  | 'refresh'
+  | 'menu'
+  | 'close'
+  | 'alert'
+  | 'bolt'
+  | 'chevron-down'
+  | 'search'
+  | 'plus'
+  | 'edit'
+  | 'key'
+  | 'shield'
+  | 'clock'
+  | 'users'
+  | 'upload'
+  | 'download'
+  // ERP-specific
+  | 'warehouse'
+  | 'truck'
+  | 'receipt'
+  | 'ledger'
+  | 'calculator'
+  | 'factory'
+  | 'link'
+  | 'file-text'
+  | 'layers'
+  | 'swap'
+  | 'wallet'
+  | 'package'
+  | 'history'
+  | 'eye'
+  | 'tag'
+
+const glyphs: Record<IconName, ReactNode> = {
+  grid: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </>
+  ),
+  cube: (
+    <>
+      <path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z" />
+      <path d="M4 7.5 12 12l8-4.5M12 12v9" />
+    </>
+  ),
+  clipboard: (
+    <>
+      <rect x="5" y="4" width="14" height="17" rx="2" />
+      <path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3" />
+    </>
+  ),
+  play: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m10 8.5 5 3.5-5 3.5v-7Z" />
+    </>
+  ),
+  route: (
+    <>
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="18" cy="18" r="2.5" />
+      <path d="M8.5 6H14a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h5.5" />
+    </>
+  ),
+  chart: (
+    <>
+      <path d="M4 20V4M4 20h16" />
+      <path d="M8 16v-5M12 16V7M16 16v-8M20 16v-3" />
+    </>
+  ),
+  sliders: (
+    <>
+      <path d="M4 7h7M15 7h5M4 17h4M12 17h8" />
+      <circle cx="13" cy="7" r="2" />
+      <circle cx="10" cy="17" r="2" />
+    </>
+  ),
+  scan: <path d="M4 5v14M7 5v14M10 5v10M13 5v14M16 5v14M20 5v14" />,
+  'arrow-right': <path d="M4 12h15M13 6l6 6-6 6" />,
+  'arrow-down-left': <path d="M20 4v8h-8M20 12 5 19" />,
+  'arrow-up-right': <path d="M7 17 17 7M8 7h9v9" />,
+  copy: (
+    <>
+      <rect x="9" y="9" width="11" height="11" rx="1.5" />
+      <path d="M15 9V5.5A1.5 1.5 0 0 0 13.5 4h-8A1.5 1.5 0 0 0 4 5.5v8A1.5 1.5 0 0 0 5.5 15H9" />
+    </>
+  ),
+  check: <path d="m5 13 4.5 4L19 6" />,
+  refresh: (
+    <>
+      <path d="M20 11a8 8 0 1 0-2.3 5.7" />
+      <path d="M20 5v6h-6" />
+    </>
+  ),
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  close: <path d="m6 6 12 12M18 6 6 18" />,
+  alert: (
+    <>
+      <path d="M12 4 3 20h18L12 4Z" />
+      <path d="M12 10v4M12 17v.5" />
+    </>
+  ),
+  bolt: <path d="M13 2 5 13h6l-1 9 8-11h-6l1-9Z" />,
+  'chevron-down': <path d="m6 9 6 6 6-6" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m16 16 4.5 4.5" />
+    </>
+  ),
+  plus: <path d="M12 5v14M5 12h14" />,
+  edit: (
+    <>
+      <path d="M4 20h4l10-10a2.1 2.1 0 0 0-3-3L5 17v3Z" />
+      <path d="m14.5 6.5 3 3" />
+    </>
+  ),
+  key: (
+    <>
+      <circle cx="8" cy="8" r="4" />
+      <path d="m11 11 9 9M17 17l2-2M14 14l2-2" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3 5 6v5c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7v5l3.5 2" />
+    </>
+  ),
+  users: (
+    <>
+      <circle cx="9.5" cy="8" r="3.2" />
+      <path d="M3.5 19v-1.4a3.6 3.6 0 0 1 3.6-3.6h4.8a3.6 3.6 0 0 1 3.6 3.6V19" />
+      <path d="M16 5.5a3 3 0 0 1 0 5.6M20.5 19v-1.3a3.6 3.6 0 0 0-2.7-3.5" />
+    </>
+  ),
+  upload: (
+    <>
+      <path d="M12 20V9" />
+      <path d="m7.5 13.5 4.5-4.5 4.5 4.5" />
+      <path d="M5 4h14" />
+    </>
+  ),
+  download: (
+    <>
+      <path d="M12 4v11" />
+      <path d="m7.5 10.5 4.5 4.5 4.5-4.5" />
+      <path d="M5 20h14" />
+    </>
+  ),
+
+  // --- ERP-specific -------------------------------------------------------
+  warehouse: (
+    <>
+      <path d="M3 20V9.5L12 4l9 5.5V20" />
+      <path d="M3 20h18" />
+      <path d="M8 20v-6h8v6M8 17h8" />
+    </>
+  ),
+  truck: (
+    <>
+      <path d="M2 16V7h11v9" />
+      <path d="M13 10h4l3 3v3h-7" />
+      <circle cx="6" cy="17.5" r="1.8" />
+      <circle cx="17" cy="17.5" r="1.8" />
+    </>
+  ),
+  receipt: (
+    <>
+      <path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" />
+      <path d="M9 8h6M9 12h6" />
+    </>
+  ),
+  ledger: (
+    <>
+      <path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z" />
+      <path d="M9 8h6M9 12h6M9 16h3" />
+      <path d="M17 6v14" />
+    </>
+  ),
+  calculator: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="1.5" />
+      <path d="M8 7h8" />
+      <path d="M9 11h.5M14 11h.5M9 15h.5M14 15h.5M11.5 18h1" />
+    </>
+  ),
+  factory: (
+    <>
+      <path d="M3 20V11l5 3V11l5 3V8l5 3v9" />
+      <path d="M3 20h18" />
+    </>
+  ),
+  link: (
+    <>
+      <path d="M10 13a4 4 0 0 0 5.7 0l2.8-2.8a4 4 0 1 0-5.7-5.7L11.5 5.8" />
+      <path d="M14 11a4 4 0 0 0-5.7 0L5.5 13.8a4 4 0 1 0 5.7 5.7l1.3-1.3" />
+    </>
+  ),
+  'file-text': (
+    <>
+      <path d="M13 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9l-6-6Z" />
+      <path d="M13 3v6h6" />
+      <path d="M9 13h6M9 17h4" />
+    </>
+  ),
+  layers: (
+    <>
+      <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z" />
+      <path d="m4 12 8 4.5 8-4.5" />
+      <path d="m4 16.5 8 4.5 8-4.5" />
+    </>
+  ),
+  swap: (
+    <>
+      <path d="M4 8h13M14 5l3 3-3 3" />
+      <path d="M20 16H7M10 13l-3 3 3 3" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M3 7h15a3 3 0 0 1 3 3v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+      <path d="M3 7V6a2 2 0 0 1 2-2h11" />
+      <path d="M17 13h.5" />
+    </>
+  ),
+  package: (
+    <>
+      <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z" />
+      <path d="M4 7.5 12 12l8-4.5M12 12v9" />
+      <path d="M8 5.3 16 9.8" />
+    </>
+  ),
+  history: (
+    <>
+      <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
+      <path d="M3.5 5v4h4" />
+      <path d="M12 8v4.5l3.5 2" />
+    </>
+  ),
+  eye: (
+    <>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12S18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  tag: (
+    <>
+      <path d="M11 3H5a2 2 0 0 0-2 2v6l10 10 8-8L11 3Z" />
+      <path d="M7.5 7.5h.01" />
+    </>
+  ),
+}
+
+interface IconProps {
+  name: IconName
+  size?: number
+  className?: string
+}
+
+export function Icon({ name, size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {glyphs[name]}
+    </svg>
+  )
+}

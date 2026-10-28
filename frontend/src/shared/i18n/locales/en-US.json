@@ -2,7 +2,11 @@
   "app": {
     "name": "Genisource ERP",
     "tagline": "Plan · Buy · Sell · Stock · MRP",
-    "milestone": "M4 MRP + production"
+    "milestone": "M5 Finance + MES integration"
+  },
+  "shell": {
+    "modules": "Modules",
+    "moduleCount": "{{count}} modules"
   },
   "nav": {
     "group": {
@@ -146,28 +150,45 @@
     "BOTH": "Customer and supplier"
   },
   "dashboard": {
-    "title": "Workspace",
-    "subtitle": "Platform status",
+    "title": "Workbench",
+    "subtitle": "Plan · Buy · Sell · Stock · MRP · Finance",
     "card": {
       "tenant": "Tenant",
       "account": "Account",
       "role": "Roles",
       "permission": "Permissions"
     },
+    "hero": {
+      "title": "Operations console",
+      "pitch": "Master data to BOM, stock, trade, MRP and the general ledger — one chain, and every step leaves a traceable entry."
+    },
+    "metric": {
+      "items": "Items",
+      "itemsHint": "Master data · make / buy / sell",
+      "stock": "Stock rows",
+      "stockHint": "Item × warehouse × lot",
+      "orders": "Production orders",
+      "ordersHint": "planned / released / in progress",
+      "receivable": "Receivables",
+      "receivableHint": "{{count}} open",
+      "payable": "Payables",
+      "payableHint": "{{count}} open"
+    },
     "delivered": {
-      "title": "M3 delivered",
-      "tenant": "Procurement: requisition → order → receipt; posting is what takes stock and raises the payable",
-      "auth": "Sales: quotation → order → shipment; posting is what issues stock and raises the receivable",
-      "schema": "Confirming an order reserves stock, so two orders cannot promise the same units",
-      "deploy": "Payables and receivables fall due on the partner's terms; settling them closes the row"
+      "title": "Shipped chain",
+      "tenant": "Master data: items, BOM and routings, with engineering revisions",
+      "auth": "Inventory: posting moves the books; reversal undoes at original values",
+      "schema": "Trade: requisition to order to receipt, reserve-then-issue, ageing ledgers",
+      "deploy": "Planning and finance: MRP net demand becomes real orders, receipts post vouchers"
     },
     "next": {
       "title": "Next",
-      "body": "M4 delivers MRP and production orders, turning the BOM into purchase and works plans."
+      "badge": "Enterprise",
+      "body": "Cost roll-up (labour, overhead, variance), period close and cash-flow notes are left to the enterprise edition."
     },
     "scope": {
-      "title": "Where the edge is today",
-      "body": "Trade and stock are wired together, but there is no production plan yet: MRP and works orders arrive in M4. Entries marked not available on the left are not delivered yet."
+      "title": "Scope of this build",
+      "body": "The open-source edition runs the chain from master data to the ledger. Cost accounting, APS scheduling and multi-entity multi-currency are out of scope here. Entries marked \"not shipped\" in the rail are not delivered."
     }
   },
   "page": {

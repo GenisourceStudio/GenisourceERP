@@ -124,104 +124,263 @@ button {
   width: var(--rail);
   height: 100vh;
   flex-shrink: 0;
-  border-right: 1px solid var(--line-strong);
-  background: var(--paper-2);
-}
-
-.rail__brand {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 22px 20px 18px;
-  border-bottom: 1px solid var(--line);
-}
-
-.rail__brand strong {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.rail__brand span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--orange-text);
-}
-
-.rail__nav {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 10px 20px;
-}
-
-.rail__group {
-  margin-top: 18px;
-}
-
-.rail__group:first-child {
-  margin-top: 4px;
-}
-
-.rail__group-label {
-  padding: 0 10px 6px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted-2);
-}
-
-.rail__link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 3px;
-  color: var(--ink-2);
-  text-decoration: none;
-  font-size: 13.5px;
-  transition: background 140ms var(--ease), color 140ms var(--ease);
-}
-
-.rail__link:hover {
-  background: rgba(16, 18, 20, 0.055);
-}
-
-.rail__link--active {
+  border-right: 1px solid var(--ink);
   background: var(--ink);
   color: var(--paper-2);
 }
 
-.rail__link--active:hover {
-  background: var(--ink-2);
+/* --------------------------------------------------------------- rail head */
+
+.rail__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 16px 16px;
+  border-bottom: 1px solid rgba(246, 243, 236, 0.12);
+}
+
+.rail__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--orange);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rail__wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rail__wordmark strong {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--paper);
+}
+
+.rail__wordmark span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--orange);
+}
+
+.rail__section {
+  padding: 14px 16px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.45);
+}
+
+/* ---------------------------------------------------------------- rail nav */
+
+.rail__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(246, 243, 236, 0.25) transparent;
+}
+
+.rail__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rail__nav::-webkit-scrollbar-thumb {
+  background: rgba(246, 243, 236, 0.22);
+}
+
+.rail__group {
+  margin-top: 12px;
+}
+
+.rail__group-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.38);
+}
+
+.rail__group-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(246, 243, 236, 0.12);
+}
+
+.rail__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 9px;
+  color: rgba(246, 243, 236, 0.78);
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 140ms var(--ease), color 140ms var(--ease);
+}
+
+.rail__link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 2px;
+  height: 0;
+  transform: translateY(-50%);
+  background: var(--orange);
+  transition: height 160ms var(--ease);
+}
+
+.rail__link:hover {
+  background: rgba(246, 243, 236, 0.07);
+  color: var(--paper);
+}
+
+.rail__num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: rgba(246, 243, 236, 0.35);
+  flex-shrink: 0;
+}
+
+.rail__icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.rail__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail__link--active {
+  background: rgba(246, 243, 236, 0.09);
+  color: var(--paper);
+  font-weight: 600;
+}
+
+.rail__link--active::before {
+  height: 18px;
+}
+
+.rail__link--active .rail__num,
+.rail__link--active .rail__icon {
+  color: var(--orange);
+  opacity: 1;
 }
 
 .rail__link--muted {
-  color: var(--muted);
+  color: rgba(246, 243, 236, 0.4);
 }
 
 .rail__pending {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.08em;
-  padding: 1px 5px;
-  border: 1px solid var(--line-strong);
-  border-radius: 2px;
-  color: var(--muted-2);
+  letter-spacing: 0.06em;
+  padding: 1px 4px;
+  border: 1px solid rgba(246, 243, 236, 0.3);
+  color: rgba(246, 243, 236, 0.55);
+  flex-shrink: 0;
 }
 
 .rail__link--active .rail__pending {
-  border-color: rgba(246, 243, 236, 0.4);
-  color: rgba(246, 243, 236, 0.75);
+  border-color: var(--orange);
+  background: var(--orange-soft);
+  color: var(--orange);
 }
 
+/* ------------------------------------------------------------- rail footer */
+
 .rail__footer {
-  border-top: 1px solid var(--line);
-  padding: 12px 14px;
+  position: relative;
+  border-top: 1px solid rgba(246, 243, 236, 0.12);
+  padding: 12px 16px 16px;
 }
+
+.rail__stage {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rail__stage-no {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+}
+
+.rail__stage-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(246, 243, 236, 0.5);
+}
+
+.rail__who {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(246, 243, 236, 0.8);
+}
+
+.rail__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+.rail__legal {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(246, 243, 236, 0.35);
+}
+
+/* Hazard stripes: borrowed from the MES rail, the one flourish the shell allows. */
+.rail__hazard {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--orange) 0 6px,
+    transparent 6px 12px
+  );
+  opacity: 0.85;
+}
+
+/* ------------------------------------------------------------------- main */
 
 .main {
   flex: 1;
@@ -238,43 +397,91 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 58px;
-  padding: 0 24px;
+  min-height: 64px;
+  padding: 10px 24px;
   border-bottom: 1px solid var(--line-strong);
   background: rgba(236, 232, 223, 0.92);
   backdrop-filter: blur(8px);
 }
 
-.topbar__title {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
+.topbar__lead {
   min-width: 0;
 }
 
-.topbar__title h1 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.topbar__title span {
+.topbar__crumb {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted-2);
+}
+
+.topbar__crumb-sep {
+  transform: rotate(-90deg);
+  opacity: 0.6;
+}
+
+.topbar__lead h1 {
+  margin: 2px 0 0;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar__actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.topbar__meta {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+}
+
+.topbar__clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.topbar__clock em {
+  font-style: normal;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted-2);
+}
+
+.topbar__user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.topbar__user-name {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.topbar__user .mono {
+  font-size: 10px;
+  color: var(--muted-2);
 }
 
 .content {
@@ -282,6 +489,7 @@ button {
   padding: 24px;
   max-width: 1560px;
   width: 100%;
+  animation: rise 260ms var(--ease) both;
 }
 
 /* ------------------------------------------------------------- primitives */
@@ -373,9 +581,53 @@ button {
 }
 
 .panel {
+  position: relative;
   border: 1px solid var(--line-strong);
   background: var(--paper-2);
-  border-radius: 3px;
+  border-radius: 0;
+}
+
+/*
+ * Registration marks, as on the MES console: two L-shaped ticks pinning the
+ * panel to the page grid. Purely structural — they say "this is one record
+ * block", which a plain bordered box leaves to the reader to work out.
+ */
+.panel::before,
+.panel::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--ink);
+  pointer-events: none;
+}
+
+.panel::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.panel::after {
+  right: -1px;
+  bottom: -1px;
+  border-left: 0;
+  border-top: 0;
+}
+
+/*
+ * A page that is one panel should fill the viewport. Otherwise a three-row
+ * table floats in the top third and the rest reads as an unfinished screen.
+ */
+.content > .panel:only-child {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 148px);
+}
+
+.content > .panel:only-child > .table-wrap {
+  flex: 1;
 }
 
 .panel__header {
@@ -388,9 +640,20 @@ button {
 }
 
 .panel__header h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
   margin: 0;
   font-size: 14px;
   font-weight: 650;
+}
+
+.panel__header h2::before {
+  content: "";
+  width: 3px;
+  height: 13px;
+  background: var(--orange);
+  flex-shrink: 0;
 }
 
 .panel__body {
@@ -499,14 +762,15 @@ table.data {
 }
 
 table.data th {
-  padding: 9px 14px;
+  padding: 10px 14px;
   text-align: left;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted-2);
+  background: var(--paper-3);
   border-bottom: 1px solid var(--line-strong);
   white-space: nowrap;
 }
@@ -517,14 +781,145 @@ table.data td {
   vertical-align: middle;
 }
 
+table.data tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/*
+ * Hover is orange, not grey. Grey says "the pointer is here"; orange says
+ * "this row is the one you are reading", which is what a hover is for when
+ * the row is eight columns wide.
+ */
 table.data tbody tr:hover {
-  background: rgba(16, 18, 20, 0.028);
+  background: var(--orange-soft);
 }
 
 table.data td.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-family: var(--font-mono);
+}
+
+/* ------------------------------------------------------------------ hero */
+
+/*
+ * One dark band per page that has a story to tell. It carries the same
+ * information the rail already implies — which build, which tenant — but
+ * states it where a screenshot will show it.
+ */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 20px;
+  padding: 22px 24px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper-2);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(246, 243, 236, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(246, 243, 236, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.hero > * {
+  position: relative;
+}
+
+.hero__lead {
+  min-width: 0;
+}
+
+.hero__crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.55);
+}
+
+.hero__bullet {
+  width: 6px;
+  height: 6px;
+  background: var(--orange);
+}
+
+.hero__lead h2 {
+  margin: 10px 0 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+}
+
+.hero__pitch {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(246, 243, 236, 0.62);
+}
+
+/* Rotated stamp, the way a drawing is approved. */
+.hero__stamp {
+  align-self: start;
+  padding: 5px 10px;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+
+.hero__spec {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(246, 243, 236, 0.12);
+}
+
+.hero__spec dt {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(246, 243, 236, 0.42);
+}
+
+.hero__spec dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--paper);
+}
+
+/* ------------------------------------------------------------------- stat */
+
+.stat__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat__label svg {
+  color: var(--orange-text);
 }
 
 /* ------------------------------------------------------------------ forms */
@@ -1024,6 +1419,34 @@ table.data td.num {
   from {
     transform: translateX(24px);
     opacity: 0.4;
+  }
+}
+
+/*
+ * The pulse on the rail's presence dot: the only thing in the shell that
+ * moves on its own, and therefore the only one worth animating.
+ */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  }
+  50% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 5px rgba(74, 222, 128, 0.06);
+  }
+}
+
+/* Pages settle rather than snap in. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -1591,8 +2014,13 @@ textarea.input {
   }
   .rail__brand {
     border-bottom: 0;
-    border-right: 1px solid var(--line);
+    border-right: 1px solid rgba(246, 243, 236, 0.12);
     white-space: nowrap;
+  }
+  .rail__section,
+  .rail__legal,
+  .rail__hazard {
+    display: none;
   }
   .rail__nav {
     display: flex;
@@ -1608,10 +2036,21 @@ textarea.input {
   .rail__group-label {
     display: none;
   }
+  .rail__link::before {
+    display: none;
+  }
+  .rail__num,
+  .rail__pending {
+    display: none;
+  }
   .rail__footer {
     border-top: 0;
-    border-left: 1px solid var(--line);
+    border-left: 1px solid rgba(246, 243, 236, 0.12);
     white-space: nowrap;
+  }
+  .rail__stage-meta,
+  .rail__who {
+    display: none;
   }
   .content {
     padding: 16px;
@@ -1637,5 +2076,21 @@ textarea.input {
   }
   .tree__level {
     display: none;
+  }
+}
+
+/* --------------------------------------------------------------- motion */
+
+/*
+ * Motion here is decoration on top of a static layout: nothing is hidden
+ * behind an animation. So when the OS asks for less, we simply stop.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

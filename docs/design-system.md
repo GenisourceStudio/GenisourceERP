@@ -47,14 +47,28 @@
 | 类名 | 用途 |
 |---|---|
 | `.shell` / `.rail` / `.main` / `.topbar` / `.content` | 应用骨架 |
-| `.panel` + `.panel__header` + `.panel__body` | 内容区块 |
-| `.stat` + `.stat__label` + `.stat__value` | 指标卡 |
-| `table.data` | 数据表格（表头大写小字、行悬停浅色） |
+| `.rail__mark` / `.rail__num` / `.rail__icon` / `.rail__pending` / `.rail__hazard` | 侧轨：品牌块、两位序号、图标、里程碑角标、底部危险条纹 |
+| `.hero` + `.hero__crumb` / `.hero__stamp` / `.hero__spec` | 页面顶部墨黑横幅（网格纹理 + 旋转印章 + 规格列） |
+| `.panel` + `.panel__header` + `.panel__body` | 内容区块（**四角 L 形角标**、标题左侧橙色竖条） |
+| `.stat` + `.stat__label` + `.stat__value` | 指标卡（标签带图标） |
+| `table.data` | 数据表格（表头 9px 大写等宽 + 纸色底、行悬停**橙色 4%**） |
 | `.btn` / `.btn--primary` / `.btn--ghost` / `.btn--sm` | 按钮 |
 | `.badge` / `.badge--ok` / `.badge--warn` / `.badge--accent` | 状态标签 |
 | `.field` + `.input` + `.form-error` | 表单 |
 | `.empty` | 空状态 / 占位页 |
 | `.login` 系列 | 登录页（左品牌右表单） |
+
+## 图标
+
+`frontend/src/shared/ui/Icon.tsx`：24px 网格、1.6 描边的线性图标，**不用 emoji**（跨平台形状不一致，也无法跟随 token 变色）。侧轨每个条目一枚，工具栏按钮与指标卡标签也用。新增图标要同时补进 `IconName` 与 `glyphs`。
+
+## 与 MES 的对齐
+
+ERP 与 MES 共用品牌语言，但**不是同一套页面**：MES 是车间控制台（看板、工位、节拍条），ERP 是计划与账务工具（表格、单据、账）。对齐的是骨架与装饰语汇——深色侧轨 + 序号 + 里程碑角标 + 危险条纹、面板角标、墨黑 hero + 旋转印章、橙色行悬停；**不对齐**的是信息密度：ERP 的表格比 MES 的看板密得多，且不为了好看牺牲一屏能看多少行。
+
+## 动效
+
+只有两处会自己动：侧轨在线点的 `pulse-dot`，页面切换的 `rise`。其余（抽屉、对话框、提示）沿用既有的 `fade-in` / `slide-in` / `pop-in`。全部在 `prefers-reduced-motion: reduce` 下停掉——动效是加在静态布局上的装饰，没有内容藏在动效后面。
 
 ## 无障碍
 
