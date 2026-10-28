@@ -35,6 +35,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     public ProblemDetail handleApi(ApiException ex, HttpServletRequest request) {
+        // A server-side failure is ours, not the caller's: log it with its cause so
+        // the log holds the reason instead of only the request that failed.
+        if (ex.status().is5xxServerError()) {
+            log.error("Server-side failure on {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        }
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.status(), localize(ex.code(), ex.getMessage()));
         problem.setType(URI.create("urn:genisource:erp:error:" + ex.code().key()));
         problem.setTitle(ex.status().getReasonPhrase());

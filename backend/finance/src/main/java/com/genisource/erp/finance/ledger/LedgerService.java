@@ -34,10 +34,14 @@ abstract class LedgerService<T extends LedgerRow> {
 
     private final LedgerReader reader;
     private final AuditService audit;
+    /** Writes the accounting sentence that goes with each ledger event. */
+    protected final com.genisource.erp.finance.voucher.VoucherService vouchers;
 
-    protected LedgerService(LedgerReader reader, AuditService audit) {
+    protected LedgerService(LedgerReader reader, AuditService audit,
+                            com.genisource.erp.finance.voucher.VoucherService vouchers) {
         this.reader = reader;
         this.audit = audit;
+        this.vouchers = vouchers;
     }
 
     /** The repository of the concrete side. */
@@ -99,6 +103,10 @@ abstract class LedgerService<T extends LedgerRow> {
                     T row = newRow(partnerId, sourceType, sourceId, sourceNo, bizDate, dueDate,
                             netAmount, taxAmount, totalAmount, remark);
                     repository().save(row);
+                    // The ledger row and its voucher are born together, in this
+                    // transaction: stock moved and money was owed in the same breath,
+                    // so the books cannot lag the warehouse.
+                    postVoucherFor(row);
                     return row.getId();
                 });
     }
@@ -119,6 +127,9 @@ abstract class LedgerService<T extends LedgerRow> {
         }
         settle(row, amount);
         repository().save(row);
+        // Money moved, so the books move with it: the settlement and its voucher are
+        // one event seen from the ledger and from the general ledger.
+        vouchers.recordSettlement(payable(), row, amount);
         audit.record(settleAction(), CurrentUser.id().orElse(null), CurrentUser.username().orElse(null),
                 tableName(), String.valueOf(id),
                 Map.of("amount", amount.toPlainString(), "sourceNo", row.getSourceNo()));
@@ -135,6 +146,10 @@ abstract class LedgerService<T extends LedgerRow> {
             if (row.getStatus() != LedgerStatus.VOID) {
                 voidOut(row);
                 repository().save(row);
+                // The voucher the posting wrote stops counting the same way every
+                // correction does: a red-letter reversal beside it, not an edit.
+                vouchers.reverseForSource(sourceType, sourceId, java.time.LocalDate.now());
+                onLedgerVoided(row);
                 audit.record(voidAction(), CurrentUser.id().orElse(null),
                         CurrentUser.username().orElse(null),
                         tableName(), String.valueOf(row.getId()),
@@ -144,6 +159,16 @@ abstract class LedgerService<T extends LedgerRow> {
     }
 
     protected abstract void voidOut(T row);
+
+    /** Writes the voucher this ledger row implies, called once when the row is born. */
+    protected abstract void postVoucherFor(T row);
+
+    /** Which side of the trade this ledger is on; decides the settlement voucher. */
+    protected abstract boolean payable();
+
+    /** Extra vouchers beyond the trade one — e.g. a cost transfer — reversed too. */
+    protected void onLedgerVoided(T row) {
+    }
 
     protected abstract String tableName();
 

@@ -14,6 +14,7 @@ import com.genisource.erp.inventory.warehouse.Warehouse;
 import com.genisource.erp.inventory.warehouse.WarehouseRepository;
 import com.genisource.erp.masterdata.item.Item;
 import com.genisource.erp.masterdata.item.ItemRepository;
+import com.genisource.erp.masterdata.item.ItemType;
 import com.genisource.erp.masterdata.partner.Partner;
 import com.genisource.erp.masterdata.partner.PartnerRepository;
 import com.genisource.erp.platform.audit.AuditService;
@@ -71,6 +72,8 @@ public class SalesService {
     private final StockService stock;
     private final DocumentService stockDocuments;
     private final ReceivableService receivables;
+    private final com.genisource.erp.finance.voucher.VoucherService vouchers;
+    private final com.genisource.erp.inventory.movement.MovementRepository movements;
     private final DocumentNoAllocator numbers;
     private final AuditService audit;
 
@@ -87,6 +90,8 @@ public class SalesService {
                         StockService stock,
                         DocumentService stockDocuments,
                         ReceivableService receivables,
+                        com.genisource.erp.finance.voucher.VoucherService vouchers,
+                        com.genisource.erp.inventory.movement.MovementRepository movements,
                         DocumentNoAllocator numbers,
                         AuditService audit,
                         @Value("${erp.sales.approval-threshold:5000}") BigDecimal approvalThreshold,
@@ -101,6 +106,8 @@ public class SalesService {
         this.stock = stock;
         this.stockDocuments = stockDocuments;
         this.receivables = receivables;
+        this.vouchers = vouchers;
+        this.movements = movements;
         this.numbers = numbers;
         this.audit = audit;
         this.approvalThreshold = approvalThreshold;
@@ -520,6 +527,7 @@ public class SalesService {
                 shipment.getPartnerId(), shipment.getBizDate(), dueDate,
                 shipment.getNetAmount(), shipment.getTaxAmount(), shipment.getTotalAmount(),
                 "Sales shipment " + shipment.getDocNo());
+        postCostOfSales(shipment);
 
         applyFulfilment(shipment, true);
         shipment.post(CurrentUser.username().orElse("system"));
@@ -536,6 +544,51 @@ public class SalesService {
      * Undoes a posted shipment: the goods come back, the claim is voided, and the order
      * is promised the stock again so it can be shipped a second time.
      */
+    /**
+     * Carries the shipped value out of inventory into cost of sales.
+     *
+     * <p>The amounts come from the movement ledger the stock posting wrote, so this
+     * voucher and inventory can never disagree about what left the warehouse. Items are
+     * grouped by type: raw material and consumables leave the raw-material account,
+     * semi-finished and finished goods leave finished goods.
+     */
+    private void postCostOfSales(SalesDocument shipment) {
+        Map<Long, BigDecimal> costByItem = new LinkedHashMap<>();
+        for (Object[] row : movements.amountsByItem(SOURCE_TYPE, shipment.getDocNo(),
+                com.genisource.erp.inventory.movement.MovementType.ISSUE)) {
+            costByItem.merge((Long) row[0], (BigDecimal) row[1], BigDecimal::add);
+        }
+        if (costByItem.isEmpty()) {
+            return;
+        }
+        Map<com.genisource.erp.finance.account.AccountRole, BigDecimal> credits =
+                new LinkedHashMap<>();
+        BigDecimal total = BigDecimal.ZERO;
+        for (Map.Entry<Long, BigDecimal> entry : costByItem.entrySet()) {
+            Item item = items.findById(entry.getKey()).orElse(null);
+            com.genisource.erp.finance.account.AccountRole role =
+                    item != null && (item.getItemType() == ItemType.SEMI
+                            || item.getItemType() == ItemType.FINISHED)
+                            ? com.genisource.erp.finance.account.AccountRole.INVENTORY_FINISHED
+                            : com.genisource.erp.finance.account.AccountRole.INVENTORY_RAW;
+            credits.merge(role, entry.getValue(), BigDecimal::add);
+            total = total.add(entry.getValue());
+        }
+        List<com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount> creditLines =
+                credits.entrySet().stream()
+                        .map(entry -> new com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount(
+                                entry.getKey(), entry.getValue()))
+                        .toList();
+        vouchers.postFromDocument(new com.genisource.erp.finance.voucher.VoucherDtos.DocumentPosting(
+                com.genisource.erp.finance.voucher.VoucherType.SALES,
+                SOURCE_TYPE + "_COST", shipment.getId(), shipment.getDocNo(),
+                shipment.getBizDate(), shipment.getPartnerId(),
+                "结转销售成本 " + shipment.getDocNo(),
+                List.of(new com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount(
+                        com.genisource.erp.finance.account.AccountRole.COST_OF_SALES, total)),
+                creditLines));
+    }
+
     @Transactional
     public SalesDtos.DocumentView reverse(Long shipmentId) {
         SalesDocument shipment = require(shipmentId);
@@ -548,6 +601,9 @@ public class SalesService {
         }
         stockDocuments.reverseSourced(SOURCE_TYPE, shipment.getDocNo());
         receivables.voidSource(SOURCE_TYPE, shipmentId);
+        // The receivable hook reverses the revenue voucher; the cost entry was written
+        // under its own source, so it is reversed here, the same way.
+        vouchers.reverseForSource(SOURCE_TYPE + "_COST", shipmentId, LocalDate.now());
         applyFulfilment(shipment, false);
         shipment.markReversed();
         documents.save(shipment);

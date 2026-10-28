@@ -61,8 +61,9 @@ export const NAV: NavGroup[] = [
     items: [
       { path: '/finance/receivables', key: 'receivable' },
       { path: '/finance/payables', key: 'payable' },
-      // Vouchers are the general ledger, and belong to M5 with the rest of accounting.
-      { path: '/finance/vouchers', key: 'voucher', milestone: 'M5' },
+      { path: '/finance/accounts', key: 'account' },
+      { path: '/finance/vouchers', key: 'voucher' },
+      { path: '/finance/reports', key: 'report' },
     ],
   },
   {
@@ -71,6 +72,7 @@ export const NAV: NavGroup[] = [
       // M1 shipped master data, not user management: keep the badge honest.
       { path: '/system/users', key: 'user', milestone: 'M2' },
       { path: '/system/audit', key: 'audit', milestone: 'M2' },
+      { path: '/system/integration', key: 'integration' },
     ],
   },
 ]

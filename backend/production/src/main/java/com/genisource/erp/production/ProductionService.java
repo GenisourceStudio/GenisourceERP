@@ -87,6 +87,14 @@ public class ProductionService {
     private final DocumentService stockDocuments;
     private final DocumentNoAllocator numbers;
     private final AuditService audit;
+    /** Reads what a stock posting was worth, straight from the movement ledger. */
+    private final com.genisource.erp.inventory.movement.MovementRepository movements;
+    /** Everyone who needs to hear that the order is ready for the shop floor. */
+    private final List<com.genisource.erp.platform.production.ProductionReleaseListener>
+            releaseListeners;
+    /** Everyone who needs to hear that value moved inside the factory. */
+    private final List<com.genisource.erp.platform.production.ProductionCostListener>
+            costListeners;
 
     public ProductionService(ProductionOrderRepository orders,
                              ProductionOperationRepository operationRows,
@@ -99,7 +107,12 @@ public class ProductionService {
                              StockService stock,
                              DocumentService stockDocuments,
                              DocumentNoAllocator numbers,
-                             AuditService audit) {
+                             AuditService audit,
+                             com.genisource.erp.inventory.movement.MovementRepository movements,
+                             List<com.genisource.erp.platform.production.ProductionReleaseListener>
+                                     releaseListeners,
+                             List<com.genisource.erp.platform.production.ProductionCostListener>
+                                     costListeners) {
         this.orders = orders;
         this.operationRows = operationRows;
         this.items = items;
@@ -112,6 +125,9 @@ public class ProductionService {
         this.stockDocuments = stockDocuments;
         this.numbers = numbers;
         this.audit = audit;
+        this.movements = movements;
+        this.releaseListeners = releaseListeners;
+        this.costListeners = costListeners;
     }
 
     // ------------------------------------------------------------------- read
@@ -281,6 +297,7 @@ public class ProductionService {
 
         order.release();
         orders.save(order);
+        announceRelease(order);
         audit.record("production.order.release", CurrentUser.id().orElse(null),
                 CurrentUser.username().orElse(null), "prd_production_order", String.valueOf(id),
                 Map.of("docNo", order.getDocNo()));
@@ -359,16 +376,30 @@ public class ProductionService {
             line.issue(pick.qty());
         }
 
+        Long firstOutbound = null;
         for (Map.Entry<BalanceKey, List<DocumentDtos.LineRequest>> entry : byBalance.entrySet()) {
             DocumentDtos.DocumentRequest stockRequest = new DocumentDtos.DocumentRequest(
                     DocumentType.OUTBOUND, entry.getKey().warehouseId(), entry.getKey().locationId(),
                     null, null, null, request.bizDate(),
                     "Issued to production order " + order.getDocNo(), entry.getValue());
-            stockDocuments.postSourced(stockRequest, SOURCE_TYPE, order.getDocNo());
+            Long outbound = stockDocuments.postSourced(stockRequest, SOURCE_TYPE, order.getDocNo());
+            if (firstOutbound == null) {
+                firstOutbound = outbound;
+            }
+        }
+        // The value comes from the movements the postings wrote, so the books carry the
+        // same number the warehouse does — not a standard we assumed. Read once, after
+        // every document is posted: an order may draw from several bins, and summing
+        // per document would count the same movement twice.
+        java.util.Map<Long, BigDecimal> issuedByItem = new java.util.LinkedHashMap<>();
+        for (Object[] row : movements.amountsByItem(SOURCE_TYPE, order.getDocNo(),
+                com.genisource.erp.inventory.movement.MovementType.ISSUE)) {
+            issuedByItem.merge((Long) row[0], (BigDecimal) row[1], BigDecimal::add);
         }
 
         order.markStarted();
         orders.save(order);
+        announceIssue(order, request.bizDate(), issuedByItem, firstOutbound);
         audit.record("production.order.issue", CurrentUser.id().orElse(null),
                 CurrentUser.username().orElse(null), "prd_production_order", String.valueOf(id),
                 Map.of("docNo", order.getDocNo(), "lines", String.valueOf(request.lines().size())));
@@ -410,7 +441,8 @@ public class ProductionService {
                 request.bizDate(), "Completed from production order " + order.getDocNo(),
                 List.of(new DocumentDtos.LineRequest(order.getItemId(), null, request.qty(),
                         unitCost, null, blankToNull(request.remark()))));
-        stockDocuments.postSourced(stockRequest, SOURCE_TYPE, order.getDocNo());
+        Long inboundDocument = stockDocuments.postSourced(stockRequest, SOURCE_TYPE,
+                order.getDocNo());
 
         order.markStarted();
         order.registerCompletion(request.qty());
@@ -418,10 +450,64 @@ public class ProductionService {
             order.getOperations().forEach(ProductionOrderOperation::markDone);
         }
         orders.save(order);
+        announceCompletion(order, request, unitCost.multiply(request.qty()), inboundDocument);
         audit.record("production.order.complete", CurrentUser.id().orElse(null),
                 CurrentUser.username().orElse(null), "prd_production_order", String.valueOf(id),
                 Map.of("docNo", order.getDocNo(), "qty", request.qty().toPlainString()));
         return views(List.of(order)).get(0);
+    }
+
+    /**
+     * Tells the listeners that value moved from work in process to finished goods.
+     *
+     * <p>Called inside the completion's transaction, after the stock was posted: the
+     * accounting sentence and the inventory movement commit together or not at all. A
+     * build without accounting has no listeners and this is simply nothing.
+     */
+    private void announceCompletion(ProductionOrder order, ProductionDtos.CompleteRequest request,
+                                    BigDecimal amount, Long inboundDocument) {
+        for (com.genisource.erp.platform.production.ProductionCostListener listener
+                : costListeners) {
+            listener.onCompletion(order.getId(), order.getDocNo(), request.bizDate(), amount,
+                    inboundDocument);
+        }
+    }
+
+    /**
+     * Tells the listeners that the order is ready for the shop floor.
+     *
+     * <p>Called inside the release's transaction, so a listener that writes to the
+     * database commits with the release or not at all. A listener that talks to
+     * another system does not: it leaves the message in the outbox, where a retry can
+     * pick it up.
+     */
+    private void announceRelease(ProductionOrder order) {
+        Item item = items.findById(order.getItemId()).orElse(null);
+        for (com.genisource.erp.platform.production.ProductionReleaseListener listener
+                : releaseListeners) {
+            listener.onReleased(order.getId(), order.getDocNo(),
+                    item == null ? null : item.getCode(),
+                    item == null ? null : item.getName(),
+                    order.getQtyPlanned(),
+                    item == null || item.getUomCode() == null ? null : item.getUomCode(),
+                    order.getPlannedStart(), order.getPlannedEnd(), order.getBomVersion());
+        }
+    }
+
+    /**
+     * Tells the listeners that material left the store for the line.
+     *
+     * <p>The amount comes from the movement ledger the stock posting wrote, so the
+     * books carry the same value the warehouse does.
+     */
+    private void announceIssue(ProductionOrder order, LocalDate bizDate,
+                               java.util.Map<Long, BigDecimal> amountByItem,
+                               Long outboundDocument) {
+        for (com.genisource.erp.platform.production.ProductionCostListener listener
+                : costListeners) {
+            listener.onMaterialIssued(order.getId(), order.getDocNo(), bizDate, amountByItem,
+                    outboundDocument);
+        }
     }
 
     /** Wraps up an order that will not be finished; the material it held goes back. */
@@ -741,6 +827,7 @@ public class ProductionService {
                     order.getActualStart(),
                     order.getActualEnd(),
                     order.getMesWoNo(),
+                    order.getMesProgressQty(),
                     order.getSourceType(),
                     order.getSourceId(),
                     order.getRemark(),

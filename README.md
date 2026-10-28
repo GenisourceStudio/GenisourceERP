@@ -8,8 +8,8 @@
 ![React](https://img.shields.io/badge/React-19-149eca)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791)
 
-> **当前状态：M4 MRP 与生产订单已交付（M0–M4 完成）。** 主数据、库存、采购到付款、销售到收款已打通：单据流转驱动库存，并自动生成应收应付；销售订单可经 BOM 逐层展开成采购/生产建议，生产订单支持下达、领料、完工入库。
-> 剩余模块（财务凭证与总账 / 报表 / MES 集成）按 [项目规划](docs/PROJECT_PLAN.md) 的 M5 交付。
+> **当前状态：M5 财务与 MES 集成已交付（M0–M5 完成）。** 业务单据过账时自动写下会计凭证，总账、试算平衡表与三大报表都能取到数；生产订单可下达 MES，完工回传自动入库。
+> 企业版能力（成本核算、APS 排产、QMS、多组织、多币种）见 [项目规划](docs/PROJECT_PLAN.md)；开源版到 v1.0 为止。
 > **生产环境请勿使用当前版本。**
 
 ## 这是什么 / 不是什么
@@ -111,7 +111,8 @@ backend/
   sales/         销售：报价 · 订单 · 发货，占用库存
   production/    生产：生产订单、领料、完工入库（有来源的库存单据）
   mrp/           MRP：净需求运算、补货建议、转采购/转生产
-  finance/       财务：应收 · 应付台账（M3 部分）
+  finance/       财务：应收应付台账 · 会计科目 · 记账凭证 · 总账与三大报表
+  integration/   集成：与 Genisource MES 的双向接口（可关闭）
   bootstrap/     启动器：配置、Flyway 迁移、演示数据
 frontend/        React SPA
 deploy/          Dockerfile、Nginx、Maven 镜像、K8s Helm、运维脚本
@@ -127,7 +128,7 @@ docs/            项目规划、ADR、领域模型、集成规范
 | M2 | 库存（多仓/批次/序列号/盘点） | ✅ |
 | M3 | 采购到付款 · 销售到收款 · 审批 | ✅ |
 | M4 | MRP 净需求运算 · 补货建议 · 生产订单（下达/领料/完工） | ✅ |
-| M5 | 财务（凭证/总账/报表） · MES 集成 · v1.0 | ⏳ |
+| M5 | 财务（科目/凭证/总账/三大报表） · MES 双向集成 · v1.0 | ✅ |
 
 完整规划见 [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md)。
 

@@ -42,7 +42,8 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.purchase..",
                         "com.genisource.erp.sales..",
                         "com.genisource.erp.production..",
-                        "com.genisource.erp.mrp..")
+                        "com.genisource.erp.mrp..",
+                        "com.genisource.erp.integration..")
                 .because("the platform is the shared kernel every other module builds on")
                 .allowEmptyShould(true);
         rule.check(classes);
@@ -72,6 +73,7 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.sales..",
                         "com.genisource.erp.mrp..",
                         "com.genisource.erp.production..",
+                        "com.genisource.erp.integration..",
                         "com.genisource.erp.finance..")
                 .because("master data is the base of the dependency graph, not a consumer of it")
                 .allowEmptyShould(true);
@@ -89,6 +91,7 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.sales..",
                         "com.genisource.erp.mrp..",
                         "com.genisource.erp.production..",
+                        "com.genisource.erp.integration..",
                         "com.genisource.erp.finance..")
                 .because("purchasing and sales post to stock; stock must not know them yet")
                 .allowEmptyShould(true);
@@ -162,12 +165,46 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.purchase..",
                         "com.genisource.erp.sales..",
                         "com.genisource.erp.finance..",
-                        "com.genisource.erp.production..")
+                        "com.genisource.erp.production..",
+                        "com.genisource.erp.integration..")
                 .should().dependOnClassesThat()
                 .resideInAPackage("com.genisource.erp.mrp..")
                 .because("MRP reads demand from sales, supply from purchasing and capacity from "
                         + "production, so it must stay the outermost module — anything depending "
                         + "on it would close a cycle")
+                .allowEmptyShould(true);
+        rule.check(classes);
+    }
+
+    @Test
+    @DisplayName("only the integration module talks to MES")
+    void integrationStaysAtTheEdge() {
+        ArchRule rule = noClasses()
+                .that().resideInAnyPackage(
+                        "com.genisource.erp.masterdata..",
+                        "com.genisource.erp.inventory..",
+                        "com.genisource.erp.finance..",
+                        "com.genisource.erp.purchase..",
+                        "com.genisource.erp.sales..",
+                        "com.genisource.erp.production..",
+                        "com.genisource.erp.mrp..")
+                .should().dependOnClassesThat()
+                .resideInAPackage("com.genisource.erp.integration..")
+                .because("the ERP talks to MES through the integration module, not through every "
+                        + "module growing an MES client of its own")
+                .allowEmptyShould(true);
+        rule.check(classes);
+    }
+
+    @Test
+    @DisplayName("production announces what it did; finance decides what it means")
+    void productionDoesNotDependOnFinance() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.genisource.erp.production..")
+                .should().dependOnClassesThat()
+                .resideInAPackage("com.genisource.erp.finance..")
+                .because("production announces that material moved and finance writes the "
+                        + "sentence; the arrow points one way")
                 .allowEmptyShould(true);
         rule.check(classes);
     }
@@ -183,7 +220,8 @@ class ModuleBoundaryTest {
                         "com.genisource.erp.purchase..",
                         "com.genisource.erp.sales..",
                         "com.genisource.erp.production..",
-                        "com.genisource.erp.mrp..")
+                        "com.genisource.erp.mrp..",
+                        "com.genisource.erp.integration..")
                 .should().dependOnClassesThat()
                 .haveFullyQualifiedName("com.genisource.erp.ErpApplication")
                 .because("a module must be usable without the application that assembles it")

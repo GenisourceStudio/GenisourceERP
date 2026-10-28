@@ -10,12 +10,16 @@ import PlaceholderPage from '../pages/PlaceholderPage'
 import BomsPage from '../pages/masterdata/BomsPage'
 import ItemsPage from '../pages/masterdata/ItemsPage'
 import PartnersPage from '../pages/masterdata/PartnersPage'
+import IntegrationPage from '../pages/integration/IntegrationPage'
 import DocumentsPage from '../pages/inventory/DocumentsPage'
 import MovementsPage from '../pages/inventory/MovementsPage'
 import StockPage from '../pages/inventory/StockPage'
 import WarehousesPage from '../pages/inventory/WarehousesPage'
+import AccountsPage from '../pages/finance/AccountsPage'
 import PayablesPage from '../pages/finance/PayablesPage'
 import ReceivablesPage from '../pages/finance/ReceivablesPage'
+import ReportsPage from '../pages/finance/ReportsPage'
+import VouchersPage from '../pages/finance/VouchersPage'
 import MrpPage from '../pages/planning/MrpPage'
 import ProductionOrdersPage from '../pages/planning/ProductionOrdersPage'
 import TradeDocumentPage from '../pages/trade/TradeDocumentPage'
@@ -51,6 +55,10 @@ const PAGES: Record<string, ReactNode> = {
   '/planning/production-orders': <ProductionOrdersPage />,
   '/finance/receivables': <ReceivablesPage />,
   '/finance/payables': <PayablesPage />,
+  '/finance/accounts': <AccountsPage />,
+  '/finance/vouchers': <VouchersPage />,
+  '/finance/reports': <ReportsPage />,
+  '/system/integration': <IntegrationPage />,
 }
 
 function RequireAuth() {

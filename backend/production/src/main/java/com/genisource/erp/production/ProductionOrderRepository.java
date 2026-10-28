@@ -13,6 +13,9 @@ public interface ProductionOrderRepository extends JpaRepository<ProductionOrder
 
     Optional<ProductionOrder> findByDocNo(String docNo);
 
+    /** The order MES knows by its own number, for a completion that came back. */
+    Optional<ProductionOrder> findByMesWoNo(String mesWoNo);
+
     /**
      * One order with its components loaded.
      *

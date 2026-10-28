@@ -77,6 +77,10 @@ public class ProductionOrder extends VersionedTenantEntity {
     @Column(name = "mes_wo_no", length = 64)
     private String mesWoNo;
 
+    /** How far MES says the order has got. Written only by MES progress reports. */
+    @Column(name = "mes_progress_qty", nullable = false, precision = 18, scale = 6)
+    private BigDecimal mesProgressQty = BigDecimal.ZERO;
+
     @Column(name = "source_type", length = 32)
     private String sourceType;
 
@@ -266,6 +270,14 @@ public class ProductionOrder extends VersionedTenantEntity {
 
     public String getMesWoNo() {
         return mesWoNo;
+    }
+
+    public BigDecimal getMesProgressQty() {
+        return mesProgressQty;
+    }
+
+    public void setMesProgressQty(BigDecimal mesProgressQty) {
+        this.mesProgressQty = mesProgressQty == null ? BigDecimal.ZERO : mesProgressQty;
     }
 
     public void setMesWoNo(String mesWoNo) {

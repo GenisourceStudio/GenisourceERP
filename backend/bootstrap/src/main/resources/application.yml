@@ -82,6 +82,11 @@ erp:
     client-id: ${MES_CLIENT_ID:}
     client-secret: ${MES_CLIENT_SECRET:}
     sync-enabled: ${MES_SYNC_ENABLED:false}
+    # How often the outbox worker looks for messages to deliver. Short in
+    # development, long in production: hammering MES with retries is how an
+    # integration turns a small outage into an outage for both sides.
+    dispatch-interval-seconds: ${MES_DISPATCH_INTERVAL_SECONDS:30}
+    max-attempts: ${MES_MAX_ATTEMPTS:4}
 
 logging:
   level:

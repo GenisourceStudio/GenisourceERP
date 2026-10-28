@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import java.util.List;
+
 /**
  * The payable side: what we owe suppliers.
  *
@@ -19,8 +21,9 @@ public class PayableService extends LedgerService<Payable> {
 
     private final PayableRepository payables;
 
-    public PayableService(PayableRepository payables, LedgerReader reader, AuditService audit) {
-        super(reader, audit);
+    public PayableService(PayableRepository payables, LedgerReader reader, AuditService audit,
+                          com.genisource.erp.finance.voucher.VoucherService vouchers) {
+        super(reader, audit, vouchers);
         this.payables = payables;
     }
 
@@ -77,5 +80,36 @@ public class PayableService extends LedgerService<Payable> {
     @Override
     protected String tableName() {
         return "fin_payable";
+    }
+
+    /**
+     * The receipt's sentence: goods and deductible tax in, supplier debt up.
+     *
+     * <p>The inventory debit goes to the account playing {@code INVENTORY_RAW}. A
+     * receipt that mixes raw material and resale goods books the whole net amount to
+     * one account — splitting per item type is costing's job, and it needs the same
+     * per-line valuation the cost module will own.
+     */
+    @Override
+    protected void postVoucherFor(Payable row) {
+        vouchers.postFromDocument(new com.genisource.erp.finance.voucher.VoucherDtos.DocumentPosting(
+                com.genisource.erp.finance.voucher.VoucherType.PURCHASE,
+                row.getSourceType(), row.getSourceId(), row.getSourceNo(), row.getBizDate(),
+                row.getPartnerId(), "收料 " + row.getSourceNo(),
+                List.of(
+                        new com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount(
+                                com.genisource.erp.finance.account.AccountRole.INVENTORY_RAW,
+                                row.getNetAmount()),
+                        new com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount(
+                                com.genisource.erp.finance.account.AccountRole.TAX_INPUT,
+                                row.getTaxAmount())),
+                List.of(new com.genisource.erp.finance.voucher.VoucherDtos.RoleAmount(
+                        com.genisource.erp.finance.account.AccountRole.AP,
+                        row.getTotalAmount()))));
+    }
+
+    @Override
+    protected boolean payable() {
+        return true;
     }
 }

@@ -147,6 +147,8 @@ public final class ProductionDtos {
             Instant actualStart,
             Instant actualEnd,
             String mesWoNo,
+            /** How far MES says the order has got. Zero when nobody has reported. */
+            BigDecimal mesProgressQty,
             String sourceType,
             String sourceId,
             String remark,

@@ -34,7 +34,10 @@
     "quotation": "Quotations",
     "shipment": "Shipments",
     "receivable": "Receivables",
-    "payable": "Payables"
+    "payable": "Payables",
+    "account": "Chart of accounts",
+    "report": "Reports",
+    "integration": "MES integration"
   },
   "login": {
     "title": "Sign in",
@@ -734,6 +737,153 @@
     "receivable": {
       "emptyTitle": "No receivables yet",
       "emptyBody": "Posting a shipment raises one, due on the customer's terms."
+    }
+  },
+  "integration": {
+    "field": {
+      "subject": "Subject",
+      "type": "Kind",
+      "attempts": "Attempts",
+      "nextAttempt": "Next attempt",
+      "lastError": "Failure"
+    },
+    "type": {
+      "WORK_ORDER": "Work order",
+      "ITEM": "Item"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "SENT": "Delivered",
+      "DEAD": "Given up"
+    },
+    "action": {
+      "retry": "Retry now"
+    },
+    "hint": {
+      "standby": "Messages waiting to reach MES. An empty list means ERP and MES agree."
+    },
+    "empty": {
+      "title": "Nothing waiting",
+      "body": "When MES is down the messages wait here and are retried with a growing gap; one that keeps failing is given up on."
+    }
+  },
+  "ledger": {
+    "searchPlaceholder": "Search voucher number or summary",
+    "inactive": "inactive",
+    "debit": "Debit",
+    "credit": "Credit",
+    "field": {
+      "code": "Code",
+      "name": "Name",
+      "accountType": "Type",
+      "direction": "Direction",
+      "role": "System role",
+      "voucherNo": "Voucher",
+      "bizDate": "Date",
+      "voucherType": "Kind",
+      "amount": "Amount",
+      "account": "Account",
+      "total": "Total",
+      "opening": "Opening",
+      "closing": "Closing",
+      "from": "From",
+      "to": "To",
+      "totalAssets": "Total assets",
+      "totalLiabilities": "Total liabilities",
+      "undistributed": "Undistributed profit",
+      "profit": "Profit",
+      "section": "Section",
+      "inflow": "Inflow",
+      "outflow": "Outflow",
+      "net": "Net",
+      "cashChange": "Cash movement"
+    },
+    "accountType": {
+      "ASSET": "Asset",
+      "LIABILITY": "Liability",
+      "EQUITY": "Equity",
+      "REVENUE": "Revenue",
+      "EXPENSE": "Expense",
+      "COST": "Cost"
+    },
+    "role": {
+      "CASH": "Cash on hand",
+      "BANK": "Bank",
+      "AR": "Receivables",
+      "AP": "Payables",
+      "INVENTORY_RAW": "Raw material",
+      "INVENTORY_FINISHED": "Finished goods",
+      "WIP": "Work in process",
+      "TAX_INPUT": "Input VAT",
+      "TAX_OUTPUT": "Output VAT",
+      "REVENUE": "Revenue",
+      "COST_OF_SALES": "Cost of sales",
+      "PROFIT_CURRENT_YEAR": "Profit for the year"
+    },
+    "voucherType": {
+      "MANUAL": "Manual",
+      "OPENING": "Opening",
+      "PURCHASE": "Purchase",
+      "SALES": "Sale",
+      "PAYMENT": "Payment",
+      "RECEIPT": "Receipt",
+      "PRODUCTION": "Production",
+      "REVERSAL": "Reversal"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "POSTED": "Posted",
+      "REVERSED": "Reversed"
+    },
+    "statement": {
+      "balance": "Balance sheet",
+      "income": "Income statement",
+      "cash": "Cash flow"
+    },
+    "section": {
+      "assets": "Assets",
+      "claims": "Claims and equity",
+      "revenue": "Revenue",
+      "cost": "Cost",
+      "expense": "Expense",
+      "cashFlow": "Cash movement",
+      "trialBalance": "Trial balance"
+    },
+    "cashSection": {
+      "operating": "Operating",
+      "investing": "Investing",
+      "financing": "Financing",
+      "other": "Other"
+    },
+    "action": {
+      "addAccount": "Add account",
+      "editAccount": "Edit account",
+      "newVoucher": "New voucher",
+      "editVoucher": "Edit voucher",
+      "post": "Post",
+      "reverse": "Reverse",
+      "addLine": "Add a line"
+    },
+    "confirm": {
+      "post": "Once posted, this voucher counts towards the books.",
+      "reverse": "A red-letter voucher will cancel it; the original stays as evidence."
+    },
+    "hint": {
+      "balanced": "Debit and credit agree.",
+      "difference": "Debit and credit differ by {{difference}}.",
+      "reversed": "Cancelled by voucher #{{no}}."
+    },
+    "emptyAccounts": {
+      "title": "No accounts yet",
+      "body": "The standard small-business chart is seeded the first time this screen opens."
+    },
+    "emptyVouchers": {
+      "title": "No vouchers yet",
+      "body": "Posting a document writes one, and you can also type one by hand."
+    },
+    "emptyReports": {
+      "title": "Nothing in this period",
+      "body": "Try another period, or post a document first."
     }
   }
 }

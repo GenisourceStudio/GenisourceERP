@@ -24,7 +24,7 @@
     "salesOrder": "销售订单",
     "mrpRun": "MRP 运算",
     "productionOrder": "生产订单",
-    "voucher": "凭证与总账",
+    "voucher": "记账凭证",
     "audit": "审计日志",
     "user": "用户与角色",
     "inventoryDocument": "出入库单",
@@ -34,7 +34,10 @@
     "quotation": "销售报价",
     "shipment": "销售发货",
     "receivable": "应收账款",
-    "payable": "应付账款"
+    "payable": "应付账款",
+    "account": "会计科目",
+    "report": "财务报表",
+    "integration": "MES 集成"
   },
   "login": {
     "title": "登录",
@@ -734,6 +737,153 @@
     "receivable": {
       "emptyTitle": "还没有应收",
       "emptyBody": "发货单过账后，按客户账期自动生成应收。"
+    }
+  },
+  "integration": {
+    "field": {
+      "subject": "对象",
+      "type": "消息类型",
+      "attempts": "尝试次数",
+      "nextAttempt": "下次投递",
+      "lastError": "失败原因"
+    },
+    "type": {
+      "WORK_ORDER": "生产工单",
+      "ITEM": "物料"
+    },
+    "status": {
+      "PENDING": "待投递",
+      "SENT": "已送达",
+      "DEAD": "已放弃"
+    },
+    "action": {
+      "retry": "立即重试"
+    },
+    "hint": {
+      "standby": "这里列的是等待送达 MES 的消息。列表为空，说明 ERP 与 MES 的说法一致。"
+    },
+    "empty": {
+      "title": "没有待投递的消息",
+      "body": "MES 停机时，消息会留在这里按退避节奏重试；连续失败会被标记为放弃。"
+    }
+  },
+  "ledger": {
+    "searchPlaceholder": "搜索凭证号或摘要",
+    "inactive": "已停用",
+    "debit": "借方",
+    "credit": "贷方",
+    "field": {
+      "code": "科目代码",
+      "name": "名称",
+      "accountType": "科目类别",
+      "direction": "余额方向",
+      "role": "系统角色",
+      "voucherNo": "凭证号",
+      "bizDate": "业务日期",
+      "voucherType": "凭证类别",
+      "amount": "金额",
+      "account": "会计科目",
+      "total": "合计",
+      "opening": "期初余额",
+      "closing": "期末余额",
+      "from": "起始日期",
+      "to": "截止日期",
+      "totalAssets": "资产合计",
+      "totalLiabilities": "负债合计",
+      "undistributed": "未分配利润",
+      "profit": "本年利润",
+      "section": "类别",
+      "inflow": "流入",
+      "outflow": "流出",
+      "net": "净额",
+      "cashChange": "现金变化"
+    },
+    "accountType": {
+      "ASSET": "资产",
+      "LIABILITY": "负债",
+      "EQUITY": "所有者权益",
+      "REVENUE": "收入",
+      "EXPENSE": "费用",
+      "COST": "成本"
+    },
+    "role": {
+      "CASH": "库存现金",
+      "BANK": "银行存款",
+      "AR": "应收账款",
+      "AP": "应付账款",
+      "INVENTORY_RAW": "原材料",
+      "INVENTORY_FINISHED": "库存商品",
+      "WIP": "生产成本",
+      "TAX_INPUT": "进项税额",
+      "TAX_OUTPUT": "销项税额",
+      "REVENUE": "主营业务收入",
+      "COST_OF_SALES": "主营业务成本",
+      "PROFIT_CURRENT_YEAR": "本年利润"
+    },
+    "voucherType": {
+      "MANUAL": "手工凭证",
+      "OPENING": "期初余额",
+      "PURCHASE": "采购入库",
+      "SALES": "销售收入",
+      "PAYMENT": "付款",
+      "RECEIPT": "收款",
+      "PRODUCTION": "生产",
+      "REVERSAL": "红字冲销"
+    },
+    "status": {
+      "DRAFT": "草稿",
+      "POSTED": "已过账",
+      "REVERSED": "已冲销"
+    },
+    "statement": {
+      "balance": "资产负债表",
+      "income": "利润表",
+      "cash": "现金流量表"
+    },
+    "section": {
+      "assets": "资产",
+      "claims": "负债与所有者权益",
+      "revenue": "收入",
+      "cost": "成本",
+      "expense": "费用",
+      "cashFlow": "现金流量",
+      "trialBalance": "试算平衡表"
+    },
+    "cashSection": {
+      "operating": "经营活动",
+      "investing": "投资活动",
+      "financing": "筹资活动",
+      "other": "其他"
+    },
+    "action": {
+      "addAccount": "新增科目",
+      "editAccount": "修改科目",
+      "newVoucher": "新建凭证",
+      "editVoucher": "修改凭证",
+      "post": "过账",
+      "reverse": "红字冲销",
+      "addLine": "增加一行"
+    },
+    "confirm": {
+      "post": "过账后这张凭证将计入账簿。",
+      "reverse": "将生成一张红字凭证冲销它，原凭证保留留痕。"
+    },
+    "hint": {
+      "balanced": "借贷平衡。",
+      "difference": "借贷相差 {{difference}}。",
+      "reversed": "已被凭证 #{{no}} 冲销。"
+    },
+    "emptyAccounts": {
+      "title": "还没有科目",
+      "body": "第一次打开科目表时会自动生成一套小企业常用科目。"
+    },
+    "emptyVouchers": {
+      "title": "还没有凭证",
+      "body": "业务单据过账时会自动生成凭证，也可以手工录入。"
+    },
+    "emptyReports": {
+      "title": "这个期间没有数据",
+      "body": "换一个期间，或先过几张单据。"
     }
   }
 }

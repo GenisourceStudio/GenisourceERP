@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.genisource</groupId>
+        <artifactId>genisource-erp</artifactId>
+        <version>0.1.0-alpha</version>
+    </parent>
+
+    <artifactId>erp-integration</artifactId>
+    <name>Genisource ERP :: Integration</name>
+    <description>
+        The seam to Genisource MES. Nothing in here is required to run the ERP: with
+        MES_SYNC_ENABLED off, the adapter sleeps and the ERP is a standalone product.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-platform</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-masterdata</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-production</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.genisource</groupId>
+            <artifactId>erp-inventory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

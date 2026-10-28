@@ -153,8 +153,31 @@ MES_SYNC_ENABLED=true
 
 ## 6. 里程碑
 
-| 里程碑 | 集成范围 |
-|---|---|
-| M0 | 模块骨架、配置项、健康检查（不发起实际调用） |
-| M4 | 生产订单下达 MES（3.1）、`mes_wo_no` 回写 |
-| M5 | 完工回传（3.2）、进度同步（3.3）、物料同步（3.4）、重试队列 |
+| 里程碑 | 集成范围 | 状态 |
+|---|---|---|
+| M0 | 模块骨架、配置项、健康检查（不发起实际调用） | ✅ |
+| M4 | 生产订单下达 MES（3.1）、`mes_wo_no` 回写 | ✅ |
+| M5 | 完工回传（3.2）、进度同步（3.3）、重试队列 | ✅ |
+| M5 之后 | 物料同步（3.4）、重试告警通道 | 未做 |
+
+## 7. 落地实况（M5）
+
+**已实现的接口**
+
+| 方向 | 端点 | 说明 |
+|---|---|---|
+| ERP → MES | `POST {MES_BASE_URL}/api/integration/work-orders` | 下达生产订单，带 `Idempotency-Key: erp-po-{productionOrderId}` |
+| MES → ERP | `POST /api/integration/mes/completions` | 完工回传，按 `mesCompletionId` 幂等；超量完工返回 422 |
+| MES → ERP | `POST /api/integration/mes/progress` | 进度回传，只记进度不入账 |
+| ERP → ERP | `GET /api/integration/mes/outbox` | 集成屏：等待投递的消息与失败原因 |
+| ERP → ERP | `POST /api/integration/mes/outbox/{id}/retry` | 手工重投一条消息 |
+
+**几个与草案不同的地方，如实记录**
+
+1. **下达不是直接调用 MES，而是走发件箱**。生产订单发布时消息写进 `int_mes_outbox`（同一事务），后台任务再投递。直接调用会让「MES 停机」变成「生产订单发不出去」；发件箱让发布成功而消息排队。`dedupe_key` 保证重试不会变成第二张工单。
+2. **完工回传按 `warehouseCode` 入库**，不认识或没写就用生产订单自己的仓库；MES 报了不认识的仓库代码，返回 422 而不是猜一个。
+3. **完工回传复用生产模块的完工入口**，不另开一条入库路径——车间手工报工与 MES 回传走同一段代码，才有一致的账。
+4. **MES 报的领料明细（`materials`）暂不扣减原料**。原料的扣减以 ERP 的领料单为准（`prd_order_line.qty_issued` 与库存流水）；MES 报的是车间实耗，两者的差异属于企业版成本模块的范围，开源版不猜。
+5. **现金流量表是直接法**，与准则的间接法口径不同，见 [PROJECT_PLAN.md](PROJECT_PLAN.md) 的 M5 偏差表。
+
+**验证**：`/tmp/m5_mes_e2e.py` 用一个假 MES 跑完整条链路，23 项断言——下达投递、MES 工单号回写、完工入账、重复回传只入一次、未知工单 404、超量完工 422、未知仓库 422、进度只记不入账。

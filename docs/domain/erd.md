@@ -596,24 +596,93 @@ erDiagram
 
 一条递归 CTE 能展开 BOM，但展开的产出一层是"需求"，而每层的需求要先和库存、在途、锁定、窗口外预留结一次账，再决定下层该展开多少。结算是应用层的多表读写，SQL 里做等于把同一套公式写成 SQL 和应用两份，然后等它们漂移。M1 已经把展开的算术（损耗率、`base_qty`、层级截断、环路）收在 `BomExplosion` 里，MRP 复用 `directComponents` 逐层调用它。
 
-## M5 规划（示意）
+## M5 已实现
 
 ```mermaid
 erDiagram
-    pur_document ||--|| fin_voucher : "AP"
-    sal_document ||--|| fin_receivable : "AR invoice"
-    prd_production_order ||--|| fin_voucher : "cost"
-    fin_voucher ||--o{ fin_journal_line : contains
-    fin_journal_line }o--|| fin_account : posts
+    fin_account ||--o{ fin_voucher_line : "posted to"
+    fin_voucher ||--o{ fin_voucher_line : contains
+    fin_voucher ||--o| fin_voucher : "reversed by"
+    fin_partner ||--o{ fin_voucher_line : "sub-ledger"
+    fin_settlement }o--|| fin_payable : "settles"
+    fin_settlement }o--|| fin_receivable : "settles"
 
+    pur_document ||--o| fin_voucher : "raised"
+    sal_document ||--o| fin_voucher : "raised"
+    prd_production_order ||--o| fin_voucher : "raised"
+
+    int_mes_outbox }o--|| prd_production_order : "delivers"
+    int_mes_completion }o--|| prd_production_order : "books"
+
+    fin_account {
+        bigint id PK
+        bigint tenant_id FK
+        varchar code UK
+        varchar name
+        varchar account_type "ASSET / LIABILITY / EQUITY / REVENUE / EXPENSE / COST"
+        varchar balance_direction "DEBIT / CREDIT"
+        bigint parent_id FK
+        boolean is_leaf
+        boolean active
+        varchar system_role "which job this account plays"
+    }
     fin_voucher {
         bigint id PK
+        bigint tenant_id FK
         varchar voucher_no UK
+        varchar voucher_type "MANUAL / PURCHASE / SALES / PAYMENT / RECEIPT / PRODUCTION / REVERSAL"
         date biz_date
+        varchar status "DRAFT / POSTED / REVERSED"
         varchar source_type "reverse lookup to the document"
-        varchar source_id
+        bigint source_id
+        bigint reversal_of FK
+        numeric total_debit
+        numeric total_credit
+    }
+    fin_voucher_line {
+        bigint id PK
+        bigint voucher_id FK
+        int line_no
+        bigint account_id FK
+        numeric debit "one side or the other, never both"
+        numeric credit
+        bigint partner_id FK
+    }
+    fin_settlement {
+        bigint id PK
+        varchar side "PAYABLE / RECEIVABLE"
+        bigint ledger_id FK
+        numeric amount
+        date biz_date
+    }
+    int_mes_outbox {
+        bigint id PK
+        varchar message_type "WORK_ORDER / ITEM"
+        varchar subject
+        varchar dedupe_key UK "one message per subject"
+        text payload
+        varchar status "PENDING / SENT / DEAD"
+        int attempts
+        timestamptz next_attempt_at
+    }
+    int_mes_completion {
+        bigint id PK
+        varchar mes_completion_id UK "MES retries; we book once"
+        varchar mes_work_order_no
+        bigint production_order_id FK
+        numeric completed_qty
+        numeric scrap_qty
     }
 ```
 
-- **`fin_voucher`**：`source_type` + `source_id` 反查业务源头，保证「凭证可追溯回单据」
-- **MES 双向集成**：`prd_production_order.mes_wo_no` 已预留，完工回传走 M5
+**总账的记账规则只有一句：除草稿外都算。** 一张已过账的凭证被红字冲销后，它的状态变成 `REVERSED`，旁边的红字凭证（借贷对调）是 `POSTED`——两者都进账簿，相抵为零。把原凭证排除、只留红字是错的：红字的借贷是对调的，只算红字等于把发生过的事反过来记了一遍。
+
+**科目靠「角色」与自动凭证相连。** 凭证规则写的是 `INVENTORY_RAW`、`AP`、`TAX_INPUT` 这样的角色，不是科目代码。工厂把 `1403` 改成 `140301` 是数据改动，不是代码改动；一个角色在同一个租户里只能由一个科目承担。
+
+**金额三存**：借方与贷方分列两栏，方向记在科目上。报告若按「净额」呈现，就得先跟科目表确认哪边是正——所以试算平衡表沿用纸质报表的样子，两栏并排。
+
+**结算是一张独立的流水表**。应收应付行只记「已付多少」这一个累计数；「这 565 是分 200 和 365 两次付的」需要事件级的行，`fin_settlement` 就是那张表，它同时是付款凭证的幂等锚点。
+
+**MES 用发件箱，不在事务里直接调用另一个系统。** 下达生产订单时，消息写进 `int_mes_outbox`，与订单的发布同生共死；投递由后台任务做，失败按 1m→5m→30m→2h 退避重试，超过次数标记 `DEAD`。`dedupe_key` 保证重试不会变成第二张工单。
+
+**完工回传按 `mes_completion_id` 幂等**。MES 会重试，网络会重试，而同一批成品入账两次是一个没人能相信的库存数字。
