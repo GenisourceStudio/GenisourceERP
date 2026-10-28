@@ -219,7 +219,7 @@ export default function PartnersPage() {
   const result = partnersQuery.data
 
   return (
-    <section className="panel">
+    <>
       <div className="toolbar">
         <div className="toolbar__search">
           <input
@@ -491,6 +491,6 @@ export default function PartnersPage() {
         onCancel={() => setDeactivating(null)}
         onConfirm={() => deactivating && statusMutation.mutate(deactivating)}
       />
-    </section>
+    </>
   )
 }

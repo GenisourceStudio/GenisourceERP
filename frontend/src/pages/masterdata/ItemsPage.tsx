@@ -174,7 +174,7 @@ export default function ItemsPage() {
   const result = itemsQuery.data
 
   return (
-    <section className="panel">
+    <>
       <div className="toolbar">
         <div className="toolbar__search">
           <input
@@ -298,6 +298,6 @@ export default function ItemsPage() {
         onCancel={() => setDeactivating(null)}
         onConfirm={() => deactivating && statusMutation.mutate(deactivating)}
       />
-    </section>
+    </>
   )
 }

@@ -35,8 +35,8 @@ export default function BomsPage() {
   }
 
   return (
-    <section className="panel">
-      <div className="tabs" style={{ padding: '0 14px', marginBottom: 0, borderBottom: 0 }}>
+    <>
+      <div className="tabs">
         <button
           type="button"
           className={tab === 'bom' ? 'tabs__btn tabs__btn--active' : 'tabs__btn'}
@@ -63,6 +63,6 @@ export default function BomsPage() {
       {tab === 'bom' ? <BomsPanel /> : null}
       {tab === 'routing' ? <RoutingsPanel /> : null}
       {tab === 'workCenter' ? <WorkCentersPanel /> : null}
-    </section>
+    </>
   )
 }
