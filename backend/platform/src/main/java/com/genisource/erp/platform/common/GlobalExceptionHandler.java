@@ -75,6 +75,25 @@ public class GlobalExceptionHandler {
         return securityProblem(ErrorCode.UNAUTHORIZED, HttpStatus.UNAUTHORIZED, request);
     }
 
+    /**
+     * A path no controller claimed.
+     *
+     * <p>Spring reports this as "no static resource", which the catch-all would turn
+     * into a 500 with a stack trace in the log. For an API it is simply a 404: the
+     * caller asked for something that does not exist, and that is not our fault.
+     */
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ProblemDetail handleNoResource(org.springframework.web.servlet.resource.NoResourceFoundException ex,
+                                          HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, localize(ErrorCode.NOT_FOUND, "Not found"));
+        problem.setType(URI.create("urn:genisource:erp:error:not_found"));
+        problem.setTitle("Not Found");
+        problem.setProperty("code", ErrorCode.NOT_FOUND.key());
+        problem.setProperty("path", request.getRequestURI());
+        return problem;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception on {}", request.getRequestURI(), ex);

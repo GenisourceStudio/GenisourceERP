@@ -4,9 +4,28 @@
 # Generates .env with random secrets, builds the images and waits for the API to turn
 # healthy. Safe to re-run: an existing .env is never overwritten, so upgrades keep their
 # database password and JWT secret.
+#
+# Two layouts are supported:
+#
+#   * the repository (deploy/scripts/install.sh) — builds the images from source;
+#   * an offline package (scripts/install.sh next to a compose.yaml and an images/
+#     directory) — loads the images that were built elsewhere and never touches the
+#     network.
+#
+# The layout is detected, not asked for: the offline package has a compose.yaml next to
+# its scripts and no source tree, and the repository has the opposite.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [ -f "$PACKAGE_DIR/compose.yaml" ] && [ -d "$PACKAGE_DIR/images" ]; then
+  ROOT="$PACKAGE_DIR"
+  OFFLINE="true"
+else
+  ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+  OFFLINE="false"
+fi
 cd "$ROOT"
 
 CN_MIRROR="false"
@@ -93,8 +112,23 @@ EOF
   echo "    Change it on first login; the password above is printed only once."
 fi
 
-echo "==> Building and starting containers (first run takes 3-10 minutes)"
-docker compose up -d --build
+if [ "$OFFLINE" = "true" ]; then
+  echo "==> Loading the images from the offline package"
+  for archive in images/*.tar; do
+    [ -e "$archive" ] || continue
+    echo "    loading $(basename "$archive")"
+    gzip -dc "$archive" | docker load
+  done
+
+  # The compose file points at the images the package carries, so nothing is built here.
+  # Overriding the build context is what keeps `docker compose up` from trying to
+  # compile a source tree this machine does not have.
+  echo "==> Starting containers (first run takes 2-5 minutes)"
+  docker compose up -d
+else
+  echo "==> Building and starting containers (first run takes 3-10 minutes)"
+  docker compose up -d --build
+fi
 
 echo "==> Waiting for the API to become healthy"
 WEB_PORT_VALUE="$(grep -E '^WEB_PORT=' .env | cut -d= -f2)"

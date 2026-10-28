@@ -8,13 +8,32 @@ WORKDIR /build
 COPY deploy/maven/settings-central.xml deploy/maven/settings-aliyun.xml /build/
 
 # POMs first so the dependency layer is cached until a dependency actually changes.
+# Every module needs its own line: the parent POM lists them as children, and Maven
+# refuses to read the reactor at all if one of them is missing.
 COPY backend/pom.xml /build/pom.xml
 COPY backend/platform/pom.xml /build/platform/pom.xml
+COPY backend/masterdata/pom.xml /build/masterdata/pom.xml
+COPY backend/inventory/pom.xml /build/inventory/pom.xml
+COPY backend/finance/pom.xml /build/finance/pom.xml
+COPY backend/purchase/pom.xml /build/purchase/pom.xml
+COPY backend/sales/pom.xml /build/sales/pom.xml
+COPY backend/production/pom.xml /build/production/pom.xml
+COPY backend/mrp/pom.xml /build/mrp/pom.xml
+COPY backend/integration/pom.xml /build/integration/pom.xml
 COPY backend/bootstrap/pom.xml /build/bootstrap/pom.xml
 RUN mvn -B -q -s /build/settings-${MAVEN_MIRROR}.xml -DskipTests \
-        -pl platform,bootstrap -am dependency:resolve || true
+        -pl bootstrap -am dependency:resolve || true
 
+# Sources second: changing a Java file must not re-download the world.
 COPY backend/platform/src /build/platform/src
+COPY backend/masterdata/src /build/masterdata/src
+COPY backend/inventory/src /build/inventory/src
+COPY backend/finance/src /build/finance/src
+COPY backend/purchase/src /build/purchase/src
+COPY backend/sales/src /build/sales/src
+COPY backend/production/src /build/production/src
+COPY backend/mrp/src /build/mrp/src
+COPY backend/integration/src /build/integration/src
 COPY backend/bootstrap/src /build/bootstrap/src
 RUN mvn -B -q -s /build/settings-${MAVEN_MIRROR}.xml -DskipTests package
 

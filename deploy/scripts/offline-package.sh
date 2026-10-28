@@ -41,7 +41,24 @@ for image in genisource/erp-backend genisource/erp-frontend; do
 done
 
 echo "==> Copying the scripts and the compose file"
-cp compose.yaml "$OUT/"
+# The package ships pre-built images, so its compose file must use `image:` rather
+# than `build:` — a machine with no source tree cannot compile anything.
+awk -v ver="${VERSION:-latest}" '
+  /^    build:$/ { pending = 1; next }
+  # Remember which image the service wanted before skipping the block.
+  pending && /^      dockerfile: / { last_docker = $2; next }
+  pending && /^      / { next }
+  pending {
+    if (last_docker ~ /backend/) {
+      print "    image: genisource/erp-backend:" ver
+    } else {
+      print "    image: genisource/erp-frontend:" ver
+    }
+    pending = 0
+  }
+  { print }
+' compose.yaml > "$OUT/compose.yaml"
+
 cp deploy/scripts/install.sh deploy/scripts/backup.sh deploy/scripts/restore.sh \
    deploy/scripts/upgrade.sh "$OUT/scripts/"
 cp -R deploy/nginx "$OUT/" 2>/dev/null || true
