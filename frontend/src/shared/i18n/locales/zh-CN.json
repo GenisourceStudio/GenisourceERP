@@ -89,7 +89,8 @@
     "allWarehouses": "全部仓库",
     "allTypes": "全部类型",
     "pleaseSelect": "请选择",
-    "activate": "启用"
+    "activate": "启用",
+    "reset": "重置"
   },
   "status": {
     "record": {
@@ -905,6 +906,72 @@
     "emptyReports": {
       "title": "这个期间没有数据",
       "body": "换一个期间，或先过几张单据。"
+    }
+  },
+  "system": {
+    "tab": {
+      "users": "用户",
+      "roles": "角色"
+    },
+    "user": {
+      "username": "用户名",
+      "displayName": "姓名",
+      "email": "邮箱",
+      "phone": "电话",
+      "status": {
+        "ACTIVE": "启用",
+        "DISABLED": "停用",
+        "LOCKED": "锁定"
+      },
+      "roles": "角色",
+      "lastLogin": "最近登录",
+      "searchPlaceholder": "搜索用户名、姓名或邮箱",
+      "create": "新建用户",
+      "createTitle": "新建用户",
+      "editTitle": "编辑用户",
+      "password": "初始密码",
+      "passwordHint": "至少 8 位。重置后该账号下次登录必须改密。",
+      "newPassword": "新密码",
+      "resetPassword": "重置密码",
+      "selfStatusHint": "不能修改自己的账号状态，否则会把自己锁在系统外面。",
+      "emptyTitle": "还没有用户",
+      "emptyBody": "除内置管理员外没有账号。给需要登录的人各建一个。"
+    },
+    "role": {
+      "code": "角色编码",
+      "name": "角色名称",
+      "description": "说明",
+      "permissions": "权限",
+      "holders": "授予人数",
+      "builtin": "内置",
+      "create": "新建角色",
+      "createTitle": "新建角色",
+      "editTitle": "编辑角色",
+      "deleteTitle": "删除角色",
+      "deleteBody": "确认删除角色 {{code}}？已授予该角色的用户会一并失去这些权限。",
+      "emptyTitle": "还没有角色",
+      "emptyBody": "角色是一组权限的打包，建好之后才能授予用户。"
+    },
+    "audit": {
+      "time": "时间",
+      "username": "操作人",
+      "action": "动作",
+      "resource": "对象",
+      "ip": "来源 IP",
+      "detail": "明细",
+      "detailTitle": "审计明细",
+      "viewDetail": "查看",
+      "searchPlaceholder": "按操作人搜索",
+      "allActions": "全部动作",
+      "allResources": "全部对象",
+      "emptyTitle": "没有匹配的记录",
+      "emptyBody": "调整上面的过滤条件，或者换一个时间范围。",
+      "target": {
+        "USER": "用户",
+        "ROLE": "角色",
+        "ITEM": "物料",
+        "VOUCHER": "凭证"
+      }
     }
   }
 }

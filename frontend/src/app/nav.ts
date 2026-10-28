@@ -73,9 +73,8 @@ export const NAV: NavGroup[] = [
   {
     key: 'system',
     items: [
-      // M1 shipped master data, not user management: keep the badge honest.
-      { path: '/system/users', key: 'user', icon: 'shield', milestone: 'M2' },
-      { path: '/system/audit', key: 'audit', icon: 'history', milestone: 'M2' },
+      { path: '/system/users', key: 'user', icon: 'shield' },
+      { path: '/system/audit', key: 'audit', icon: 'history' },
       { path: '/system/integration', key: 'integration', icon: 'link' },
     ],
   },

@@ -125,6 +125,10 @@ public class UserAccount extends TenantScopedEntity {
         return lastLoginAt;
     }
 
+    public long getVersion() {
+        return version;
+    }
+
     public void markLoggedIn() {
         this.lastLoginAt = Instant.now();
     }

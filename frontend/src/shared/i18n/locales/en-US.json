@@ -89,7 +89,8 @@
     "allWarehouses": "All warehouses",
     "allTypes": "All types",
     "pleaseSelect": "Select",
-    "activate": "Activate"
+    "activate": "Activate",
+    "reset": "Reset"
   },
   "status": {
     "record": {
@@ -905,6 +906,72 @@
     "emptyReports": {
       "title": "Nothing in this period",
       "body": "Try another period, or post a document first."
+    }
+  },
+  "system": {
+    "tab": {
+      "users": "Users",
+      "roles": "Roles"
+    },
+    "user": {
+      "username": "Username",
+      "displayName": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "status": {
+        "ACTIVE": "Active",
+        "DISABLED": "Disabled",
+        "LOCKED": "Locked"
+      },
+      "roles": "Roles",
+      "lastLogin": "Last sign-in",
+      "searchPlaceholder": "Search username, name or email",
+      "create": "New user",
+      "createTitle": "New user",
+      "editTitle": "Edit user",
+      "password": "Initial password",
+      "passwordHint": "At least 8 characters. The account must change it at the next sign-in.",
+      "newPassword": "New password",
+      "resetPassword": "Reset password",
+      "selfStatusHint": "You cannot change the status of your own account — that is how people lock themselves out.",
+      "emptyTitle": "No users yet",
+      "emptyBody": "Only the built-in administrator exists. Create one account per person who signs in."
+    },
+    "role": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "permissions": "Permissions",
+      "holders": "Holders",
+      "builtin": "Built-in",
+      "create": "New role",
+      "createTitle": "New role",
+      "editTitle": "Edit role",
+      "deleteTitle": "Delete role",
+      "deleteBody": "Delete role {{code}}? Everyone granted it loses those permissions.",
+      "emptyTitle": "No roles yet",
+      "emptyBody": "A role bundles permissions; create one before it can be granted to anyone."
+    },
+    "audit": {
+      "time": "Time",
+      "username": "Actor",
+      "action": "Action",
+      "resource": "Target",
+      "ip": "Source IP",
+      "detail": "Detail",
+      "detailTitle": "Audit detail",
+      "viewDetail": "View",
+      "searchPlaceholder": "Search by actor",
+      "allActions": "All actions",
+      "allResources": "All targets",
+      "emptyTitle": "Nothing matches",
+      "emptyBody": "Widen the filters above, or try a different date range.",
+      "target": {
+        "USER": "User",
+        "ROLE": "Role",
+        "ITEM": "Item",
+        "VOUCHER": "Voucher"
+      }
     }
   }
 }

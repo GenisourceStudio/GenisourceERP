@@ -1509,6 +1509,27 @@ table.data td.num {
   accent-color: var(--orange);
 }
 
+/*
+ * Checkbox lists need to wrap. `.row-actions` is built for buttons — it pins them
+ * right and forbids wrapping, which clips a permission label to nothing.
+ */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px 16px;
+}
+
+.check-grid .check {
+  align-items: flex-start;
+  font-size: 12.5px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
 textarea.input {
   height: auto;
   min-height: 64px;

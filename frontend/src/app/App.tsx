@@ -11,6 +11,8 @@ import BomsPage from '../pages/masterdata/BomsPage'
 import ItemsPage from '../pages/masterdata/ItemsPage'
 import PartnersPage from '../pages/masterdata/PartnersPage'
 import IntegrationPage from '../pages/integration/IntegrationPage'
+import AuditPage from '../pages/system/AuditPage'
+import UsersPage from '../pages/system/UsersPage'
 import DocumentsPage from '../pages/inventory/DocumentsPage'
 import MovementsPage from '../pages/inventory/MovementsPage'
 import StockPage from '../pages/inventory/StockPage'
@@ -58,6 +60,8 @@ const PAGES: Record<string, ReactNode> = {
   '/finance/accounts': <AccountsPage />,
   '/finance/vouchers': <VouchersPage />,
   '/finance/reports': <ReportsPage />,
+  '/system/users': <UsersPage />,
+  '/system/audit': <AuditPage />,
   '/system/integration': <IntegrationPage />,
 }
 
