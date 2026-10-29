@@ -1,0 +1,11 @@
+{
+  "name": "genisource-erp-promo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "shots": "node tools/capture.mjs",
+    "stills": "node tools/render.mjs stills",
+    "audit": "node tools/render.mjs audit",
+    "frames": "node tools/render.mjs frames"
+  }
+}

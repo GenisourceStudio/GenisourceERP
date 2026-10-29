@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Genisource ERP — Product Reel</title>
+<style>
+@font-face{
+  font-family:'ArchivoVF';
+  src:url('assets/fonts/archivo-latin-wdth-normal.woff2') format('woff2'),
+      url('assets/fonts/archivo-latin-ext-wdth-normal.woff2') format('woff2');
+  font-weight:100 900; font-stretch:62% 125%; font-style:normal; font-display:block;
+}
+@font-face{font-family:'DMMono';src:url('assets/fonts/dm-mono-latin-400-normal.woff2') format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:'DMMono';src:url('assets/fonts/dm-mono-latin-500-normal.woff2') format('woff2');font-weight:500;font-display:block}
+
+:root{
+  --paper:#ece8df; --paper2:#f6f3ec; --paper3:#e4dfd4;
+  --ink:#101214; --ink2:#191c1e; --muted:#6d6a61; --muted2:#7d786c;
+  --line:rgba(16,18,20,.13); --line2:rgba(16,18,20,.26);
+  --orange:#ff4b12; --orangeText:#bd3a07; --green:#1d6b4e; --red:#a8231b;
+  --sans:'ArchivoVF','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  --mono:'DMMono','SFMono-Regular',Menlo,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:1920px;height:1080px;overflow:hidden;background:#000;}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);
+  font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;}
+
+/* ---------- primitives ---------- */
+.anim{animation-fill-mode:both;animation-delay:var(--d,0s);}
+.rise{animation-name:rise;animation-duration:var(--dur,.9s);animation-timing-function:var(--ease)}
+.rise-s{animation-name:riseS;animation-duration:var(--dur,.75s);animation-timing-function:var(--ease)}
+.fade{animation-name:fadeIn;animation-duration:var(--dur,.9s);animation-timing-function:ease}
+.wipe{animation-name:wipeX;animation-duration:var(--dur,.9s);animation-timing-function:cubic-bezier(.34,.66,.2,1)}
+.wipe-up{animation-name:wipeUp;animation-duration:var(--dur,1s);animation-timing-function:cubic-bezier(.65,0,.35,1)}
+.grow{animation-name:growX;animation-duration:var(--dur,.7s);animation-timing-function:var(--ease);transform-origin:left center}
+.growY{animation-name:growY;animation-duration:var(--dur,.7s);animation-timing-function:var(--ease);transform-origin:top center}
+.stamp{animation-name:stampIn;animation-duration:.9s;animation-timing-function:cubic-bezier(.2,1.2,.4,1)}
+
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@keyframes riseS{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes wipeX{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes wipeUp{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes growX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes growY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes stampIn{0%{opacity:0;transform:rotate(-16deg) scale(1.7)}55%{opacity:1;transform:rotate(-5deg) scale(.95)}100%{opacity:1;transform:rotate(-6deg) scale(1)}}
+@keyframes scaleIn{from{transform:scale(1)}to{transform:scale(1.055)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes propress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes type{from{width:0}to{width:var(--w)}}
+@keyframes swapIn{from{opacity:0;transform:scale(1.03)}to{opacity:1;transform:scale(1)}}
+@keyframes dashX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.cutX{position:absolute;inset:0;z-index:60;transform-origin:right center;
+  animation-name:scaleXOut;animation-duration:var(--dur,.55s);animation-timing-function:cubic-bezier(.7,0,.22,1);pointer-events:none}
+@keyframes scaleXOut{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+.micro{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+
+/* ---------- stage chrome ---------- */
+.grid{position:absolute;inset:-32px;background-image:
+  linear-gradient(to right,rgba(16,18,20,.055) 1px,transparent 1px),
+  linear-gradient(to bottom,rgba(16,18,20,.055) 1px,transparent 1px);
+  background-size:32px 32px;}
+.grid-dark{position:absolute;inset:-32px;background-image:
+  linear-gradient(to right,rgba(255,255,255,.045) 1px,transparent 1px),
+  linear-gradient(to bottom,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:32px 32px;}
+
+#progress{position:absolute;left:0;bottom:0;width:1920px;height:2px;background:rgba(16,18,20,.10);z-index:99}
+#progress i{display:block;height:100%;background:var(--orange);transform-origin:left center;
+  animation:propress 104.4s linear both}
+
+.scene{position:absolute;inset:0;visibility:hidden;overflow:hidden}
+.scene .bg{position:absolute;inset:0}
+
+/* corner marks */
+.cm{position:absolute;width:18px;height:18px;border:0 solid var(--line2);pointer-events:none}
+.cm.tl{top:-1px;left:-1px;border-top-width:2px;border-left-width:2px}
+.cm.br{bottom:-1px;right:-1px;border-bottom-width:2px;border-right-width:2px}
+
+/* screenshot frame */
+.shot{position:absolute;background:var(--paper2);border:1px solid var(--line2);overflow:hidden;margin:0}
+.shot .offset{position:absolute;inset:0;background:var(--ink);opacity:.9;z-index:-1;transform:translate(16px,16px)}
+.shot .chrome{position:absolute;top:0;left:0;right:0;height:38px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:var(--paper3);z-index:3}
+.shot .chrome .url{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:66%}
+.shot .chrome .live{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--green);display:flex;align-items:center;gap:6px}
+.shot .chrome .live b{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2.6s ease-in-out infinite}
+.shot .chrome .tagL{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--orangeText)}
+.shot .vp{position:absolute;top:38px;left:0;right:0;bottom:0;overflow:hidden;background:#0e1012}
+.shot .vp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.shot .vp img.k1{animation:scaleIn 8s linear both}
+
+.strip{position:absolute;background:var(--paper2);border:1px solid var(--line2);overflow:hidden}
+.strip .offset{position:absolute;inset:0;background:var(--ink);opacity:.9;z-index:-1;transform:translate(14px,14px)}
+.strip img{width:100%;display:block}
+
+/* full-bleed screenshot */
+.bleed{position:absolute;inset:0;overflow:hidden}
+.bleed img{position:absolute;left:0;top:0;width:1920px;height:1200px;object-fit:cover;object-position:top center;
+  animation-name:scaleIn;animation-duration:9s;animation-timing-function:linear;animation-fill-mode:both}
+.scrim{position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(9,11,12,.975) 0%,rgba(9,11,12,.96) 28%,rgba(9,11,12,.80) 42%,rgba(9,11,12,.30) 57%,rgba(9,11,12,0) 70%)}
+
+/* scene heading block */
+.head{position:absolute;left:112px;width:600px}
+.head .idx{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.head .idx .num{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--orangeText);letter-spacing:.06em}
+.head .idx .rule{width:44px;height:1px;background:var(--line2);transform-origin:left center;display:block}
+.head .idx .lab{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.head h2{margin:0;font-size:64px;line-height:1.18;font-weight:800;letter-spacing:-.025em;font-variation-settings:'wdth' 108,'wght' 800}
+.head h2 em{font-style:normal;color:var(--orangeText)}
+.lede{font-size:22px;line-height:1.62;color:#2b2e31;font-weight:400;margin:24px 0 0}
+
+.bullets{position:absolute;left:112px;width:566px;display:flex;flex-direction:column;gap:24px}
+.bullets .b{display:flex;gap:16px;align-items:flex-start}
+.bullets .b i{flex:0 0 auto;width:9px;height:9px;background:var(--orange);margin-top:9px}
+.bullets .b span{font-size:21px;line-height:1.5;color:#26292c}
+.bullets .b span b{font-weight:600;color:var(--ink)}
+
+.apiline{position:absolute;left:112px;font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.02em;
+  display:flex;align-items:center;gap:10px}
+.apiline em{font-style:normal;color:var(--orangeText)}
+.apiline .ln{width:26px;height:1px;background:var(--line2)}
+
+.caption{position:absolute;display:flex;align-items:center;gap:16px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.caption .dot{width:6px;height:6px;background:var(--orange);flex:0 0 auto}
+.caption b{color:var(--ink);font-weight:500}
+
+/* flow node */
+.node{background:var(--paper2);border:1px solid var(--line2);padding:20px 22px;position:relative}
+.node .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;color:var(--orangeText)}
+.node .t{font-size:23px;font-weight:700;margin-top:9px;letter-spacing:-.01em}
+.node .s{font-family:var(--mono);font-size:12.5px;color:var(--muted);margin-top:8px;letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="progress"><i></i></div>
+
+  <!-- ============ S1  0.0 – 4.7  现状 ============ -->
+  <section class="scene" data-start="0" data-end="4.7">
+    <div class="bg" style="background:var(--ink)"></div>
+    <div class="grid-dark anim fade" style="--d:0s;--dur:.8s;opacity:.7"></div>
+
+    <div class="anim fade" style="--d:0.05s;--dur:.7s;position:absolute;left:112px;top:78px;display:flex;align-items:center;gap:14px">
+      <span style="width:8px;height:8px;background:var(--orange)"></span>
+      <span class="micro" style="color:#8b8f93">现状 · STATUS QUO</span>
+    </div>
+
+    <div style="position:absolute;left:112px;top:206px;display:flex;gap:32px">
+      <div class="anim rise" style="--d:0.25s;width:520px;height:300px;background:var(--paper2);padding:34px 34px 0;position:relative">
+        <div class="mono" style="font-size:12px;color:var(--muted);letter-spacing:.16em">01</div>
+        <div style="font-size:34px;font-weight:800;margin-top:16px;letter-spacing:-.01em">Excel 排产</div>
+        <div style="font-size:18px;line-height:1.6;color:var(--muted);margin-top:14px">BOM 散在三个文件里，<br>改一处忘两处，谁也说不准</div>
+        <div class="anim fade" style="--d:2.15s;--dur:.35s;position:absolute;right:26px;bottom:22px;font-family:var(--mono);font-size:26px;color:var(--red);border:2px solid var(--red);width:48px;height:48px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg)">✕</div>
+      </div>
+      <div class="anim rise" style="--d:0.45s;width:520px;height:300px;background:var(--paper2);padding:34px 34px 0;position:relative">
+        <div class="mono" style="font-size:12px;color:var(--muted);letter-spacing:.16em">02</div>
+        <div style="font-size:34px;font-weight:800;margin-top:16px;letter-spacing:-.01em">微信催料</div>
+        <div style="font-size:18px;line-height:1.6;color:var(--muted);margin-top:14px">哪批到了、哪批在路上，<br>全靠问人，答案还在别人脑子里</div>
+        <div class="anim fade" style="--d:2.25s;--dur:.35s;position:absolute;right:26px;bottom:22px;font-family:var(--mono);font-size:26px;color:var(--red);border:2px solid var(--red);width:48px;height:48px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg)">✕</div>
+      </div>
+      <div class="anim rise" style="--d:0.65s;width:520px;height:300px;background:var(--paper2);padding:34px 34px 0;position:relative">
+        <div class="mono" style="font-size:12px;color:var(--muted);letter-spacing:.16em">03</div>
+        <div style="font-size:34px;font-weight:800;margin-top:16px;letter-spacing:-.01em">月底凑账</div>
+        <div style="font-size:18px;line-height:1.6;color:var(--muted);margin-top:14px">出入库和金额对不上，<br>会计只能倒推，倒推出来的账不敢看</div>
+        <div class="anim fade" style="--d:2.35s;--dur:.35s;position:absolute;right:26px;bottom:22px;font-family:var(--mono);font-size:26px;color:var(--red);border:2px solid var(--red);width:48px;height:48px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg)">✕</div>
+      </div>
+    </div>
+
+    <div style="position:absolute;left:112px;top:596px;width:1700px">
+      <div class="anim rise" style="--d:2.7s;--dur:.9s;font-size:76px;font-weight:800;letter-spacing:-.03em;color:#fff;line-height:1.14;font-variation-settings:'wdth' 106,'wght' 800">
+        这批料，<span style="color:var(--orange)">到底还缺多少</span>？
+      </div>
+      <div class="anim rise" style="--d:3.15s;--dur:.8s;margin-top:30px;display:flex;align-items:center;gap:18px">
+        <span style="width:64px;height:2px;background:var(--orange);display:block"></span>
+        <span class="mono" style="font-size:16px;color:#9a9ea2;letter-spacing:.06em">买多了压库存，买少了停线 · 两头都是钱</span>
+      </div>
+    </div>
+
+    <div class="anim fade" style="--d:4.05s;--dur:.5s;position:absolute;inset:0;background:var(--ink)"></div>
+  </section>
+
+  <!-- ============ S2  4.7 – 10.7  品牌与一条链 ============ -->
+  <section class="scene" data-start="4.7" data-end="10.7">
+    <i class="anim cutX" style="--d:4.7s;--dur:.55s;background:var(--ink)"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:4.5s;--dur:1s"></div>
+
+    <div style="position:absolute;left:112px;top:118px;width:1000px">
+      <div class="anim fade" style="--d:4.75s;--dur:.7s;display:flex;align-items:center;gap:14px">
+        <span style="width:8px;height:8px;background:var(--orange)"></span>
+        <span class="micro">Open source · modular monolith · self-hosted</span>
+      </div>
+
+      <div class="anim wipe" style="--d:4.95s;--dur:.85s;margin-top:34px">
+        <div style="font-size:130px;font-weight:800;line-height:.94;letter-spacing:-.045em;font-variation-settings:'wdth' 100,'wght' 800">Genisource</div>
+      </div>
+      <div class="anim wipe" style="--d:5.15s;--dur:.85s;margin-top:6px;display:flex;align-items:baseline;gap:26px">
+        <div style="font-size:130px;font-weight:800;line-height:.94;letter-spacing:-.045em;color:transparent;-webkit-text-stroke:2px var(--ink);font-variation-settings:'wdth' 112,'wght' 800">ERP</div>
+        <div class="anim fade" style="--d:5.8s;--dur:.8s;font-size:26px;font-weight:500;color:var(--muted);letter-spacing:.01em">开源轻量 ERP · 计划层</div>
+      </div>
+
+      <div class="anim rise" style="--d:6.05s;--dur:.9s;margin-top:42px;width:860px">
+        <div style="height:1px;background:var(--line2)"></div>
+        <div style="font-size:27px;line-height:1.66;color:#2b2e31;margin-top:24px">
+          面向 <b style="font-weight:700">50–500 人离散制造</b>：把 BOM、MRP、购销、库存、总账，做成一条
+          <b style="font-weight:700">算得清的链</b>。
+        </div>
+      </div>
+
+      <div class="anim rise" style="--d:6.55s;--dur:.9s;margin-top:38px">
+        <div class="mono" style="font-size:13px;letter-spacing:.04em;color:var(--muted)">
+          销售订单 <span style="color:var(--orangeText);padding:0 6px">→</span> MRP 净需求 <span style="color:var(--orangeText);padding:0 6px">→</span> 采购 / 生产 <span style="color:var(--orangeText);padding:0 6px">→</span> 库存过账 <span style="color:var(--orangeText);padding:0 6px">→</span> 会计凭证
+        </div>
+      </div>
+    </div>
+
+    <!-- the chain panel -->
+    <div class="anim wipe-up" style="--d:5.4s;--dur:.85s;position:absolute;left:1244px;top:118px;width:564px;height:660px;background:var(--ink);padding:36px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="micro" style="color:#8b8f93">The chain · 一条链</span>
+        <span class="mono" style="font-size:11px;color:var(--orange)">05 STEPS</span>
+      </div>
+      <div style="margin-top:32px;position:relative">
+        <div style="position:absolute;left:7px;top:18px;bottom:26px;width:1px;background:rgba(255,255,255,.16)"></div>
+        <div class="anim rise-s" style="--d:5.8s;display:flex;gap:22px;padding:14px 0;position:relative">
+          <span style="width:15px;height:15px;background:var(--ink);border:2px solid var(--orange);flex:0 0 auto;margin-top:3px;display:block"></span>
+          <div><div style="font-size:25px;color:#fff;font-weight:600">销售订单 / 预测</div>
+            <div class="mono" style="font-size:11px;color:#7c8085;letter-spacing:.16em;margin-top:5px">DEMAND</div></div>
+        </div>
+        <div class="anim rise-s" style="--d:6.15s;display:flex;gap:22px;padding:14px 0;position:relative">
+          <span style="width:15px;height:15px;background:var(--ink);border:2px solid rgba(255,255,255,.4);flex:0 0 auto;margin-top:3px;display:block"></span>
+          <div><div style="font-size:25px;color:#fff;font-weight:600">MRP 净需求运算</div>
+            <div class="mono" style="font-size:11px;color:#7c8085;letter-spacing:.16em;margin-top:5px">NET REQUIREMENT</div></div>
+        </div>
+        <div class="anim rise-s" style="--d:6.5s;display:flex;gap:22px;padding:14px 0;position:relative">
+          <span style="width:15px;height:15px;background:var(--ink);border:2px solid rgba(255,255,255,.4);flex:0 0 auto;margin-top:3px;display:block"></span>
+          <div><div style="font-size:25px;color:#fff;font-weight:600">采购单 / 生产单</div>
+            <div class="mono" style="font-size:11px;color:#7c8085;letter-spacing:.16em;margin-top:5px">SUPPLY</div></div>
+        </div>
+        <div class="anim rise-s" style="--d:6.85s;display:flex;gap:22px;padding:14px 0;position:relative">
+          <span style="width:15px;height:15px;background:var(--ink);border:2px solid rgba(255,255,255,.4);flex:0 0 auto;margin-top:3px;display:block"></span>
+          <div><div style="font-size:25px;color:#fff;font-weight:600">收料 / 发货 / 完工</div>
+            <div class="mono" style="font-size:11px;color:#7c8085;letter-spacing:.16em;margin-top:5px">STOCK POSTING</div></div>
+        </div>
+        <div class="anim rise-s" style="--d:7.2s;display:flex;gap:22px;padding:14px 0;position:relative">
+          <span style="width:15px;height:15px;background:var(--orange);border:2px solid var(--orange);flex:0 0 auto;margin-top:3px;display:block"></span>
+          <div><div style="font-size:25px;color:var(--orange);font-weight:600">记账凭证 · 借贷平衡</div>
+            <div class="mono" style="font-size:11px;color:#a0603f;letter-spacing:.16em;margin-top:5px">DOUBLE ENTRY</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI strip -->
+    <div class="anim fade" style="--d:7.3s;--dur:.9s;position:absolute;left:112px;top:876px;width:1696px;border-top:1px solid var(--line2);display:flex">
+      <div style="width:25%;padding:26px 0 0;border-right:1px solid var(--line)">
+        <div class="mono" style="font-size:36px;font-weight:500;letter-spacing:-.02em">M0 → M5</div>
+        <div class="micro" style="margin-top:8px">六个里程碑已交付</div>
+      </div>
+      <div style="width:25%;padding:26px 0 0 40px;border-right:1px solid var(--line)">
+        <div class="mono" style="font-size:36px;font-weight:500;letter-spacing:-.02em">Apache-2.0</div>
+        <div class="micro" style="margin-top:8px">可商用二次开发</div>
+      </div>
+      <div style="width:25%;padding:26px 0 0 40px;border-right:1px solid var(--line)">
+        <div class="mono" style="font-size:36px;font-weight:500;letter-spacing:-.02em">中 / EN</div>
+        <div class="micro" style="margin-top:8px">双语界面与错误信息</div>
+      </div>
+      <div style="width:25%;padding:26px 0 0 40px">
+        <div class="mono" style="font-size:36px;font-weight:500;letter-spacing:-.02em">4</div>
+        <div class="micro" style="margin-top:8px">容器 · 一条命令</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S3  10.7 – 14.8  三个价值 ============ -->
+  <section class="scene" data-start="10.7" data-end="14.8">
+    <i class="anim cutX" style="--d:10.7s;--dur:.55s;background:var(--paper)"></i>
+    <div class="bg" style="background:var(--paper3)"></div>
+    <div class="grid anim fade" style="--d:10.5s;--dur:1s"></div>
+
+    <div class="anim fade" style="--d:10.7s;--dur:.7s;position:absolute;left:112px;top:96px;display:flex;align-items:center;gap:14px">
+      <span style="width:8px;height:8px;background:var(--orange)"></span>
+      <span class="micro">Three things · 不妥协</span>
+    </div>
+
+    <div class="anim rise" style="--d:10.95s;position:absolute;left:112px;top:186px;width:1696px;display:flex;align-items:center">
+      <span class="anim growY" style="--d:10.95s;--dur:.6s;width:4px;height:118px;background:var(--orange);margin-right:38px;display:block"></span>
+      <span class="mono" style="display:inline-block;font-size:14px;color:var(--muted);width:64px">01</span>
+      <div style="width:600px"><div style="font-size:86px;font-weight:800;letter-spacing:-.035em;line-height:1">算得清</div></div>
+      <div style="flex:1">
+        <div class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted)">NET REQUIREMENT</div>
+        <div style="font-size:22px;color:#2b2e31;margin-top:12px">净需求的每一格都摊开给你看：毛需求、现存、在途、安全库存，能一行一行对。</div>
+      </div>
+    </div>
+
+    <div class="anim rise" style="--d:11.8s;position:absolute;left:112px;top:392px;width:1696px;display:flex;align-items:center">
+      <span class="anim growY" style="--d:11.8s;--dur:.6s;width:4px;height:118px;background:var(--orange);margin-right:38px;display:block"></span>
+      <span class="mono" style="display:inline-block;font-size:14px;color:var(--muted);width:64px">02</span>
+      <div style="width:600px"><div style="font-size:86px;font-weight:800;letter-spacing:-.035em;line-height:1">走得通</div></div>
+      <div style="flex:1">
+        <div class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted)">ONE DOC, ONE CHAIN</div>
+        <div style="font-size:22px;color:#2b2e31;margin-top:12px">请购 → 订单 → 收料，报价 → 订单 → 发货；每一行都记得住要它的那一行。</div>
+      </div>
+    </div>
+
+    <div class="anim rise" style="--d:12.65s;position:absolute;left:112px;top:598px;width:1696px;display:flex;align-items:center">
+      <span class="anim growY" style="--d:12.65s;--dur:.6s;width:4px;height:118px;background:var(--orange);margin-right:38px;display:block"></span>
+      <span class="mono" style="display:inline-block;font-size:14px;color:var(--muted);width:64px">03</span>
+      <div style="width:600px"><div style="font-size:86px;font-weight:800;letter-spacing:-.035em;line-height:1">记得住</div></div>
+      <div style="flex:1">
+        <div class="mono" style="font-size:11px;letter-spacing:.2em;color:var(--muted)">DOUBLE ENTRY</div>
+        <div style="font-size:22px;color:#2b2e31;margin-top:12px">过账即记账，一张来源单据只写一张凭证；冲销留痕，借贷一定平。</div>
+      </div>
+    </div>
+
+    <div class="anim fade" style="--d:13.3s;--dur:.7s;position:absolute;left:112px;bottom:104px;display:flex;align-items:center;gap:16px">
+      <span class="mono" style="font-size:12px;color:var(--muted);letter-spacing:.14em">判断标准：不能强化这三件事之一的功能，不进开源版</span>
+    </div>
+  </section>
+
+  <!-- ============ S4  14.8 – 23.0  01 主数据 ============ -->
+  <section class="scene" data-start="14.8" data-end="23.0">
+    <i class="anim cutX" style="--d:14.8s;--dur:.55s;background:var(--paper3)"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:14.6s;--dur:1s"></div>
+
+    <div class="head" style="top:150px">
+      <div class="idx">
+        <span class="num anim fade" style="--d:14.8s;--dur:.5s">01</span>
+        <span class="rule anim grow" style="--d:14.9s;--dur:.6s"></span>
+        <span class="lab anim fade" style="--d:15s;--dur:.6s">Master data · 主数据</span>
+      </div>
+      <h2 class="anim rise" style="--d:14.95s;--dur:.9s">
+        BOM 与工艺，<br>改一处<em>不错两处</em>
+      </h2>
+      <p class="lede anim rise" style="--d:15.25s;--dur:.9s">
+        多级 BOM、多版本、替代料、损耗率；发布即锁定，改版复制新版本，旧版本照样能查。
+      </p>
+    </div>
+
+    <div class="bullets" style="top:566px">
+      <div class="b anim rise-s" style="--d:15.6s"><i></i><span>同一父项多个版本并存，<b>发布后不可改</b>，只能复制新版</span></div>
+      <div class="b anim rise-s" style="--d:15.85s"><i></i><span>替代料与损耗率写在 BOM 行上，<b>MRP 展开时一并计算</b></span></div>
+      <div class="b anim rise-s" style="--d:16.1s"><i></i><span>物料支持 CSV 模板导入，<b>逐行返回校验错误</b></span></div>
+    </div>
+
+    <div class="apiline anim fade" style="--d:16.5s;bottom:96px">
+      <span class="ln"></span><span>API</span><em>/api/masterdata/boms · /items · /routings</em>
+    </div>
+
+    <figure class="shot anim wipe" style="--d:15.15s;--dur:.9s;left:752px;top:170px;width:1088px;height:718px">
+      <div class="offset"></div>
+      <div class="chrome"><span class="url">localhost:5175/masterdata/bom</span><span class="live"><b></b>LIVE</span></div>
+      <div class="vp"><img class="k1" src="assets/masterdata-bom.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="caption anim fade" style="--d:16.9s;--dur:.8s;left:752px;top:914px">
+      <span class="dot"></span><span><b>7</b> 个 BOM 版本 · 父项 · 状态 · 行数 一屏可查</span>
+    </div>
+  </section>
+
+  <!-- ============ S5  23.0 – 31.4  02 MRP ============ -->
+  <section class="scene" data-start="23.0" data-end="31.4">
+    <i class="anim cutX" style="--d:23.0s;--dur:.55s;background:var(--paper)"></i>
+    <div class="bg" style="background:var(--paper3)"></div>
+    <div class="grid anim fade" style="--d:22.8s;--dur:1s"></div>
+
+    <div style="position:absolute;left:112px;top:96px;display:flex;align-items:center;gap:14px">
+      <span class="anim fade" style="--d:23.15s;--dur:.5s;font-family:var(--mono);font-size:15px;color:var(--orangeText)">02</span>
+      <span class="anim grow" style="--d:23.25s;--dur:.6s;width:44px;height:1px;background:var(--line2);display:block;transform-origin:left center"></span>
+      <span class="anim fade" style="--d:23.35s;--dur:.6s;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)">Planning · 需求运算</span>
+    </div>
+
+    <h2 class="anim rise" style="--d:23.3s;--dur:.9s;position:absolute;left:112px;top:140px;margin:0;font-size:68px;font-weight:800;
+      letter-spacing:-.03em;line-height:1.1;font-variation-settings:'wdth' 108,'wght' 800">
+      缺多少，<em style="font-style:normal;color:var(--orangeText)">算给你看</em>
+    </h2>
+
+    <div class="anim fade" style="--d:23.9s;--dur:.9s;position:absolute;left:1188px;top:126px;width:620px;display:flex;border-top:1px solid var(--line2)">
+      <div style="padding:18px 26px 0 0;border-right:1px solid var(--line);width:190px">
+        <div class="mono" style="font-size:42px;color:var(--red);letter-spacing:-.02em">9</div>
+        <div class="micro" style="margin-top:6px">缺料项</div>
+      </div>
+      <div style="padding:18px 26px 0 26px;border-right:1px solid var(--line);width:180px">
+        <div class="mono" style="font-size:42px;color:var(--ink);letter-spacing:-.02em">9</div>
+        <div class="micro" style="margin-top:6px">建议单</div>
+      </div>
+      <div style="padding:18px 0 0 26px">
+        <div class="mono" style="font-size:42px;color:var(--ink);letter-spacing:-.02em">25</div>
+        <div class="micro" style="margin-top:6px">涉及物料</div>
+      </div>
+    </div>
+
+    <figure class="strip anim wipe" style="--d:23.6s;--dur:.9s;left:180px;top:292px;width:1560px;height:675px">
+      <div class="offset"></div>
+      <img src="assets/mrp-plans.png" alt="">
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="caption anim fade" style="--d:25.2s;--dur:.8s;left:180px;top:988px">
+      <span class="dot"></span><span>MRP-20261029-0008 · 窗口 2026-10-20 → 2026-12-31 · 含安全库存 · <b>自制转生产单，采购转采购单</b></span>
+    </div>
+  </section>
+
+  <!-- ============ S6  31.4 – 38.2  净需求算式 ============ -->
+  <section class="scene" data-start="31.4" data-end="38.2">
+    <i class="anim cutX" style="--d:31.4s;--dur:.55s;background:var(--paper)"></i>
+    <div class="bg" style="background:var(--ink)"></div>
+    <div class="grid-dark anim fade" style="--d:31.3s;--dur:.9s;opacity:.55"></div>
+
+    <div class="anim fade" style="--d:31.5s;--dur:.6s;position:absolute;left:112px;top:120px;display:flex;align-items:center;gap:14px">
+      <span style="width:8px;height:8px;background:var(--orange)"></span>
+      <span class="micro" style="color:#8b8f93">Formula · 净需求怎么来的</span>
+    </div>
+
+    <div class="anim rise" style="--d:31.8s;--dur:.8s;position:absolute;left:112px;top:196px;width:1700px">
+      <div class="mono" style="font-size:29px;color:#c9ccce;letter-spacing:.01em;line-height:1.5">
+        净需求 = 毛需求 <span style="color:var(--orange)">+</span> 安全库存 <span style="color:var(--orange)">+</span> 窗口外预留
+        <span style="color:var(--orange)">−</span> 现存 <span style="color:var(--orange)">−</span> 已锁定
+        <span style="color:var(--orange)">−</span> 在途
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,.18);margin-top:26px"></div>
+    </div>
+
+    <div class="anim fade" style="--d:32.4s;--dur:.7s;position:absolute;left:112px;top:296px;display:flex;align-items:center;gap:16px">
+      <span class="mono" style="font-size:12px;letter-spacing:.16em;color:#6f7478">WORKED EXAMPLE</span>
+      <span class="mono" style="font-size:13px;color:#9aa0a4">FG-TC220 · 智能温控器 TC-220</span>
+    </div>
+
+    <div style="position:absolute;left:112px;top:340px;display:flex;align-items:baseline;gap:22px">
+      <span class="anim rise-s" style="--d:32.7s;font-family:var(--mono);font-size:76px;color:#fff;letter-spacing:-.02em">960</span>
+      <span class="anim fade" style="--d:32.75s;font-family:var(--mono);font-size:44px;color:#6f7478">+</span>
+      <span class="anim rise-s" style="--d:32.95s;font-family:var(--mono);font-size:76px;color:#fff;letter-spacing:-.02em">1,200</span>
+      <span class="anim fade" style="--d:33.0s;font-family:var(--mono);font-size:44px;color:#6f7478">−</span>
+      <span class="anim rise-s" style="--d:33.2s;font-family:var(--mono);font-size:76px;color:#fff;letter-spacing:-.02em">1,000</span>
+      <span class="anim fade" style="--d:33.25s;font-family:var(--mono);font-size:44px;color:#6f7478">=</span>
+      <span class="anim rise-s" style="--d:34.3s;font-family:var(--mono);font-size:96px;color:var(--orange);letter-spacing:-.02em">1,160</span>
+      <span class="anim fade" style="--d:34.45s;font-family:var(--mono);font-size:22px;color:#8b8f93;letter-spacing:.1em">PCS</span>
+    </div>
+
+    <div class="anim fade" style="--d:33.5s;--dur:.6s;position:absolute;left:112px;top:496px;display:flex;gap:34px">
+      <span class="mono" style="font-size:13px;color:#7c8085">毛需求 960</span>
+      <span class="mono" style="font-size:13px;color:#7c8085">安全库存 1,200</span>
+      <span class="mono" style="font-size:13px;color:#7c8085">现存 1,000</span>
+      <span class="mono" style="font-size:13px;color:#7c8085">已锁定 0</span>
+      <span class="mono" style="font-size:13px;color:#7c8085">在途 0</span>
+    </div>
+
+    <div class="anim wipe-up" style="--d:34.9s;--dur:.8s;position:absolute;left:112px;top:580px;width:1696px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.16);padding:26px 32px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="micro" style="color:#8b8f93">下单量 · 按最小起订量向上取整</div>
+        <div style="margin-top:14px;font-size:15px;line-height:1.6;color:#9aa0a4">
+          RM-PCB 的净需求是小数，建议行同时给「净需求」和「下单量」，差多少一眼看得见。
+        </div>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:16px;flex:0 0 auto">
+        <span class="mono" style="font-size:34px;color:#9aa0a4">2,951.72</span>
+        <span class="mono" style="font-size:22px;color:var(--orange)">→</span>
+        <span class="mono" style="font-size:34px;color:#fff">3,000 PCS</span>
+      </div>
+    </div>
+
+    <div class="anim fade" style="--d:36.3s;--dur:.8s;position:absolute;left:112px;bottom:96px;display:flex;align-items:flex-start;gap:16px;width:1700px">
+      <span style="width:3px;height:52px;background:var(--orange);display:block;flex:0 0 auto;margin-top:4px"></span>
+      <span style="font-size:19px;line-height:1.6;color:#c9ccce">
+        窗口<b style="color:#fff;font-weight:600">内</b>的预留不加回：货在仓库里已经计入现存，订单已经在毛需求里——加回就是数两遍。
+      </span>
+    </div>
+  </section>
+
+  <!-- ============ S7  38.2 – 45.8  03 转单 ============ -->
+  <section class="scene" data-start="38.2" data-end="45.8">
+    <i class="anim cutX" style="--d:38.2s;--dur:.55s;background:var(--ink)"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:38.0s;--dur:1s"></div>
+
+    <div style="position:absolute;left:112px;top:104px;width:1696px;display:flex;align-items:flex-end;justify-content:space-between">
+      <div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <span class="anim fade" style="--d:38.2s;--dur:.5s;font-family:var(--mono);font-size:15px;color:var(--orangeText)">03</span>
+          <span class="anim grow" style="--d:38.3s;--dur:.6s;width:44px;height:1px;background:var(--line2);display:block;transform-origin:left center"></span>
+          <span class="anim fade" style="--d:38.4s;--dur:.6s;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)">Convert · 转单</span>
+        </div>
+        <h2 class="anim rise" style="--d:38.35s;--dur:.9s;margin:0;font-size:66px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-variation-settings:'wdth' 108,'wght' 800">
+          建议不是清单，<em style="font-style:normal;color:var(--orangeText)">点一下就成单</em>
+        </h2>
+      </div>
+      <div class="anim rise" style="--d:38.7s;--dur:.9s;width:600px;font-size:21px;line-height:1.62;color:#2b2e31;padding-bottom:8px">
+        自制件转生产订单，采购件转采购单，数量在确认时还能改。<br>
+        没有「计划单」这层中间表：不建真单，就等于没安排。
+      </div>
+    </div>
+
+    <figure class="shot anim wipe" style="--d:39.0s;--dur:.85s;left:112px;top:392px;width:824px;height:520px">
+      <div class="offset" style="transform:translate(12px,12px)"></div>
+      <div class="chrome"><span class="url">/planning/production-orders</span><span class="tagL">自制 · 转生产订单</span></div>
+      <div class="vp"><img class="k1" src="assets/production-orders.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <figure class="shot anim wipe" style="--d:39.35s;--dur:.85s;left:984px;top:392px;width:824px;height:520px">
+      <div class="offset" style="transform:translate(12px,12px)"></div>
+      <div class="chrome"><span class="url">/purchase/orders</span><span class="tagL">采购 · 转采购单</span></div>
+      <div class="vp"><img class="k1" src="assets/purchase-orders.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="caption anim fade" style="--d:40.6s;--dur:.8s;left:112px;top:948px">
+      <span class="dot"></span><span>生产订单 <b>8</b> 张 · 采购订单 <b>10</b> 张 · 转过的行记下单号，再跑一次不重复建议</span>
+    </div>
+  </section>
+
+  <!-- ============ S8  45.8 – 53.8  04 库存 ============ -->
+  <section class="scene" data-start="45.8" data-end="53.8">
+    <i class="anim cutX" style="--d:45.8s;--dur:.55s;background:var(--paper)"></i>
+    <div class="bg" style="background:var(--paper3)"></div>
+    <div class="grid anim fade" style="--d:45.6s;--dur:1s"></div>
+
+    <div class="head" style="top:150px">
+      <div class="idx">
+        <span class="num anim fade" style="--d:45.8s;--dur:.5s">04</span>
+        <span class="rule anim grow" style="--d:45.9s;--dur:.6s"></span>
+        <span class="lab anim fade" style="--d:46s;--dur:.6s">Inventory · 库存</span>
+      </div>
+      <h2 class="anim rise" style="--d:45.95s;--dur:.9s">
+        单据过账，<br><em>账才动</em>
+      </h2>
+      <p class="lede anim rise" style="--d:46.25s;--dur:.9s">
+        余额与流水分开：余额就地改写，流水只追加。冲销不删单，生成红字单按原流水原值反向回退。
+      </p>
+    </div>
+
+    <div class="bullets" style="top:566px">
+      <div class="b anim rise-s" style="--d:46.6s"><i></i><span>移动加权平均：<b>总额是权威值</b>，均价是除出来的</span></div>
+      <div class="b anim rise-s" style="--d:46.85s"><i></i><span>草稿 → 已过账 → 已冲销，<b>过账后不可改</b></span></div>
+      <div class="b anim rise-s" style="--d:47.1s"><i></i><span>批次与序列号同表，<b>序列号就是只有一件的批次</b></span></div>
+    </div>
+
+    <div class="apiline anim fade" style="--d:47.5s;bottom:96px">
+      <span class="ln"></span><span>API</span><em>/api/inventory/stock · /documents · /movements</em>
+    </div>
+
+    <figure class="shot anim wipe" style="--d:46.15s;--dur:.9s;left:752px;top:170px;width:1088px;height:718px">
+      <div class="offset"></div>
+      <div class="chrome"><span class="url">localhost:5175/inventory/stock</span><span class="live"><b></b>LIVE</span></div>
+      <div class="vp"><img class="k1" src="assets/inventory-stock.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <!-- inset: movements -->
+    <figure class="shot anim wipe-up" style="--d:48.3s;--dur:.85s;left:1290px;top:640px;width:500px;height:342px">
+      <div class="offset" style="transform:translate(12px,12px);background:var(--orange);opacity:.85"></div>
+      <div class="chrome"><span class="url">/movements</span><span class="tagL">只追加</span></div>
+      <div class="vp"><img src="assets/inventory-movements.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="caption anim fade" style="--d:49.2s;--dur:.8s;left:752px;top:914px">
+      <span class="dot"></span><span>47 条库存余额行 · 27 个物料 · 多仓 · 批次</span>
+    </div>
+  </section>
+
+  <!-- ============ S9  53.8 – 61.4  05 购销 ============ -->
+  <section class="scene" data-start="53.8" data-end="61.4">
+    <i class="anim cutX" style="--d:53.8s;--dur:.55s;background:var(--paper3)"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:53.6s;--dur:1s"></div>
+
+    <div class="head" style="top:150px">
+      <div class="idx">
+        <span class="num anim fade" style="--d:53.8s;--dur:.5s">05</span>
+        <span class="rule anim grow" style="--d:53.9s;--dur:.6s"></span>
+        <span class="lab anim fade" style="--d:54s;--dur:.6s">Purchase &amp; Sales · 购销</span>
+      </div>
+      <h2 class="anim rise" style="--d:53.95s;--dur:.9s">
+        行记得住，<br><em>要它的那一行</em>
+      </h2>
+      <p class="lede anim rise" style="--d:54.25s;--dur:.9s">
+        请购 / 订单 / 收料同住一张表，报价 / 订单 / 发货同住另一张，用单据类型区分；状态迁移只在服务层。
+      </p>
+    </div>
+
+    <div class="bullets" style="top:566px">
+      <div class="b anim rise-s" style="--d:54.6s"><i></i><span>收料行记着它满足哪一条订单行，<b>已执行量自己会累</b></span></div>
+      <div class="b anim rise-s" style="--d:54.85s"><i></i><span>发货先释放占用再出库：<b>占用是承诺，不是数字</b></span></div>
+      <div class="b anim rise-s" style="--d:55.1s"><i></i><span>金额三存：不含税 / 税额 / 价税合计，<b>税额不进库存成本</b></span></div>
+    </div>
+
+    <div class="apiline anim fade" style="--d:55.5s;bottom:96px">
+      <span class="ln"></span><span>API</span><em>/api/sales/documents · /purchase/documents</em>
+    </div>
+
+    <figure class="shot anim wipe" style="--d:54.15s;--dur:.9s;left:752px;top:170px;width:1088px;height:718px">
+      <div class="offset"></div>
+      <div class="chrome"><span class="url">localhost:5175/sales/orders</span><span class="live"><b></b>LIVE</span></div>
+      <div class="vp"><img class="k1" src="assets/sales-orders.png" alt=""></div>
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="anim wipe-up" style="--d:56.2s;--dur:.8s;position:absolute;left:690px;top:700px;width:600px;background:var(--ink);padding:24px 28px">
+      <div class="mono" style="font-size:11px;letter-spacing:.18em;color:#8b8f93">LINE MEMORY</div>
+      <div style="margin-top:14px;font-size:17px;line-height:1.6;color:#e6e7e8">
+        订单行 500 已发 420 · 余 <b class="mono" style="color:var(--orange)">80</b><br>
+        <span style="color:#9aa0a4;font-size:14px">qty_fulfilled 由发货行累加，不是手工填的</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S10  61.4 – 69.4  06 财务 ============ -->
+  <section class="scene" data-start="61.4" data-end="69.4">
+    <i class="anim cutX" style="--d:61.4s;--dur:.55s;background:var(--paper3)"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:61.2s;--dur:1s"></div>
+
+    <div style="position:absolute;left:112px;top:96px;display:flex;align-items:center;gap:14px">
+      <span class="anim fade" style="--d:61.55s;--dur:.5s;font-family:var(--mono);font-size:15px;color:var(--orangeText)">06</span>
+      <span class="anim grow" style="--d:61.65s;--dur:.6s;width:44px;height:1px;background:var(--line2);display:block;transform-origin:left center"></span>
+      <span class="anim fade" style="--d:61.75s;--dur:.6s;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)">Finance · 总账</span>
+    </div>
+
+    <h2 class="anim rise" style="--d:61.7s;--dur:.9s;position:absolute;left:112px;top:140px;margin:0;font-size:68px;font-weight:800;
+      letter-spacing:-.03em;line-height:1.1;font-variation-settings:'wdth' 108,'wght' 800">
+      过账即记账，<em style="font-style:normal;color:var(--orangeText)">借贷必须平</em>
+    </h2>
+
+    <div class="anim fade" style="--d:62.2s;--dur:.9s;position:absolute;left:1188px;top:126px;width:620px;display:flex;border-top:1px solid var(--line2)">
+      <div style="padding:16px 22px 0 0;border-right:1px solid var(--line);width:236px">
+        <div class="mono" style="font-size:28px;color:var(--ink);letter-spacing:-.02em">562,704.07</div>
+        <div class="micro" style="margin-top:8px">应收余额 · 7 笔未结</div>
+      </div>
+      <div style="padding:16px 22px 0 22px;border-right:1px solid var(--line);width:236px">
+        <div class="mono" style="font-size:28px;color:var(--ink);letter-spacing:-.02em">261,408.55</div>
+        <div class="micro" style="margin-top:8px">应付余额 · 8 笔未结</div>
+      </div>
+      <div style="padding:18px 0 0 22px">
+        <div class="mono" style="font-size:21px;color:var(--green);letter-spacing:.02em">借贷平衡 ✓</div>
+        <div class="micro" style="margin-top:14px">试算结果</div>
+      </div>
+    </div>
+
+    <figure class="strip anim wipe" style="--d:62.1s;--dur:.9s;left:180px;top:306px;width:1560px;height:541px">
+      <div class="offset"></div>
+      <img src="assets/finance-trial.png" alt="">
+      <i class="cm tl"></i><i class="cm br"></i>
+    </figure>
+
+    <div class="anim fade" style="--d:63.6s;--dur:.85s;position:absolute;left:180px;top:890px;width:1560px;display:flex;align-items:flex-start;gap:16px">
+      <span style="width:3px;height:48px;background:var(--orange);display:block;flex:0 0 auto;margin-top:3px"></span>
+      <span style="font-size:19px;line-height:1.6;color:#2b2e31">
+        收料、发货、完工入库各自写下自己的凭证：<b style="font-weight:600">一张来源单据只写一张</b>，科目由角色决定，不写死代码。
+      </span>
+    </div>
+
+    <div class="caption anim fade" style="--d:64.9s;--dur:.8s;left:180px;top:1000px">
+      <span class="dot"></span><span>红字冲销 = 原凭证仍计入 + 旁边一张借贷对调的冲销凭证，相抵为零</span>
+    </div>
+  </section>
+
+  <!-- ============ S11  69.4 – 77.0  07 MES 集成 ============ -->
+  <section class="scene" data-start="69.4" data-end="77.0">
+    <i class="anim cutX" style="--d:69.4s;--dur:.55s;background:var(--paper)"></i>
+    <div class="bg" style="background:#0b0d0e"></div>
+    <div class="grid-dark anim fade" style="--d:69.2s;--dur:.85s;opacity:.5"></div>
+
+    <div style="position:absolute;left:112px;top:104px;width:1200px">
+      <div class="anim fade" style="--d:69.5s;--dur:.6s;display:flex;align-items:center;gap:14px">
+        <span class="mono" style="font-size:15px;color:var(--orange)">07</span>
+        <span style="display:block;width:44px;height:1px;background:rgba(255,255,255,.3)"></span>
+        <span class="micro" style="color:#8b8f93">Integration · 计划层 + 执行层</span>
+      </div>
+      <h2 class="anim rise" style="--d:69.65s;--dur:.9s;margin:28px 0 0;font-size:74px;line-height:1.14;font-weight:800;
+        letter-spacing:-.03em;color:#fff;font-variation-settings:'wdth' 108,'wght' 800">
+        计划下得去，<br><span style="color:var(--orange)">完工回得来</span>
+      </h2>
+    </div>
+
+    <!-- flow -->
+    <div style="position:absolute;left:112px;top:426px;display:flex;align-items:stretch;gap:0">
+      <div class="node anim rise-s" style="--d:70.4s;width:400px;height:150px">
+        <div class="k">ERP</div>
+        <div class="t">生产订单 · 已下达</div>
+        <div class="s">MO-20261029-0001</div>
+      </div>
+      <div class="anim fade" style="--d:70.8s;width:230px;position:relative">
+        <div style="position:absolute;top:52px;left:14px;right:20px;height:1px;background:rgba(255,255,255,.28);
+          transform-origin:left center;animation:dashX .7s cubic-bezier(.34,.66,.2,1) 70.9s both"></div>
+        <div style="position:absolute;top:38px;right:12px;width:0;height:0;border-left:9px solid rgba(255,255,255,.45);
+          border-top:6px solid transparent;border-bottom:6px solid transparent"></div>
+        <div class="mono" style="position:absolute;top:8px;left:14px;font-size:12px;letter-spacing:.08em;color:#7c8085">
+          POST /work-orders
+        </div>
+        <div class="mono" style="position:absolute;top:66px;left:14px;font-size:12px;letter-spacing:.08em;color:var(--orange)">
+          发件箱 · 幂等
+        </div>
+      </div>
+      <div class="node anim rise-s" style="--d:71.2s;width:400px;height:150px;background:#15181a;border-color:rgba(255,255,255,.22)">
+        <div class="k" style="color:#a0603f">GENISOURCE MES</div>
+        <div class="t" style="color:#fff">派工 · 报工 · 防错</div>
+        <div class="s" style="color:#8b8f93">WO-20261029-007</div>
+      </div>
+      <div class="anim fade" style="--d:71.6s;width:230px;position:relative">
+        <div style="position:absolute;top:52px;left:14px;right:20px;height:1px;background:rgba(255,255,255,.28);
+          transform-origin:left center;animation:dashX .7s cubic-bezier(.34,.66,.2,1) 71.7s both"></div>
+        <div style="position:absolute;top:38px;right:12px;width:0;height:0;border-left:9px solid rgba(255,255,255,.45);
+          border-top:6px solid transparent;border-bottom:6px solid transparent"></div>
+        <div class="mono" style="position:absolute;top:8px;left:14px;font-size:12px;letter-spacing:.08em;color:#7c8085">
+          POST /mes/completions
+        </div>
+        <div class="mono" style="position:absolute;top:66px;left:14px;font-size:12px;letter-spacing:.08em;color:var(--orange)">
+          完工回传 · 幂等
+        </div>
+      </div>
+      <div class="node anim rise-s" style="--d:72.0s;width:400px;height:150px">
+        <div class="k">ERP</div>
+        <div class="t">完工入库 + 凭证</div>
+        <div class="s">同一事务 · 不半入库</div>
+      </div>
+    </div>
+
+    <div style="position:absolute;left:112px;top:646px;display:flex;gap:44px;width:1120px">
+      <div class="anim rise-s" style="--d:72.6s;display:flex;gap:14px;width:520px">
+        <i style="width:9px;height:9px;background:var(--orange);margin-top:8px;flex:0 0 auto;display:block"></i>
+        <span style="font-size:19px;line-height:1.55;color:#e6e7e8">下达走<b style="color:#fff">发件箱</b>：MES 停机，订单照样发得出去，消息排队重试</span>
+      </div>
+      <div class="anim rise-s" style="--d:72.9s;display:flex;gap:14px;width:520px">
+        <i style="width:9px;height:9px;background:var(--orange);margin-top:8px;flex:0 0 auto;display:block"></i>
+        <span style="font-size:19px;line-height:1.55;color:#e6e7e8">超量完工 422、未知工单 404、未知仓库 422 —— <b style="color:#fff">不猜</b></span>
+      </div>
+    </div>
+
+    <!-- inset proof -->
+    <figure class="shot dark anim wipe-up" style="--d:73.4s;--dur:.85s;left:1268px;top:626px;width:540px;height:372px;background:#0e1012;border-color:rgba(255,255,255,.18)">
+      <div class="chrome" style="background:#15181a;border-bottom-color:rgba(255,255,255,.12)">
+        <span class="url" style="color:#8b8f93">/system/integration</span></div>
+      <div class="vp"><img src="assets/system-integration.png" alt=""></div>
+      <i class="cm tl" style="border-color:rgba(255,255,255,.35)"></i><i class="cm br" style="border-color:rgba(255,255,255,.35)"></i>
+    </figure>
+    <div class="anim fade" style="--d:74.4s;--dur:.8s;position:absolute;left:1268px;top:1018px;width:540px">
+      <span class="mono" style="font-size:11.5px;color:#6f7478">发件箱为空 —— 说明两边说法一致</span>
+    </div>
+  </section>
+
+  <!-- ============ S12  77.0 – 85.6  08 部署 ============ -->
+  <section class="scene" data-start="77.0" data-end="85.6">
+    <i class="anim cutX" style="--d:77.0s;--dur:.55s;background:#0b0d0e"></i>
+    <div class="bg" style="background:#0b0d0e"></div>
+    <div class="grid-dark anim fade" style="--d:76.8s;--dur:.85s;opacity:.5"></div>
+
+    <div style="position:absolute;left:112px;top:136px;width:760px">
+      <div class="anim fade" style="--d:77.1s;--dur:.6s;display:flex;align-items:center;gap:14px">
+        <span class="mono" style="font-size:15px;color:var(--orange)">08</span>
+        <span style="display:block;width:44px;height:1px;background:rgba(255,255,255,.3)"></span>
+        <span class="micro" style="color:#8b8f93">Deploy · 交付</span>
+      </div>
+      <h2 class="anim rise" style="--d:77.25s;--dur:.9s;margin:30px 0 0;font-size:80px;line-height:1.1;font-weight:800;
+        letter-spacing:-.03em;color:#fff;font-variation-settings:'wdth' 108,'wght' 800">
+        一条命令，<br><span style="color:var(--orange)">30 分钟</span>上线
+      </h2>
+      <div class="anim rise" style="--d:77.6s;--dur:.9s;margin-top:30px;font-size:21px;line-height:1.62;color:#c9ccce;width:700px">
+        安装脚本自动生成 .env 与随机密码，构建并启动四个容器；
+        工厂内网单机即可跑，不依赖公有云。
+      </div>
+      <div style="margin-top:36px;display:flex;flex-wrap:wrap;gap:12px;width:700px">
+        <span class="anim rise-s" style="--d:78.0s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9ccce;border:1px solid rgba(255,255,255,.24);padding:10px 16px">APACHE-2.0</span>
+        <span class="anim rise-s" style="--d:78.15s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9ccce;border:1px solid rgba(255,255,255,.24);padding:10px 16px">离线安装包</span>
+        <span class="anim rise-s" style="--d:78.3s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9ccce;border:1px solid rgba(255,255,255,.24);padding:10px 16px">备份 / 恢复 / 升级</span>
+        <span class="anim rise-s" style="--d:78.45s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#c9ccce;border:1px solid rgba(255,255,255,.24);padding:10px 16px">中 / EN</span>
+      </div>
+    </div>
+
+    <div class="anim wipe-up" style="--d:77.4s;--dur:.85s;position:absolute;left:900px;top:168px;width:908px;height:474px;background:#0e1012;border:1px solid rgba(255,255,255,.14);padding:30px 34px">
+      <div style="display:flex;gap:8px;margin-bottom:22px">
+        <span style="width:10px;height:10px;background:#2a2e31;border-radius:50%"></span>
+        <span style="width:10px;height:10px;background:#2a2e31;border-radius:50%"></span>
+        <span style="width:10px;height:10px;background:var(--orange);border-radius:50%"></span>
+      </div>
+      <div style="font-family:var(--mono);font-size:19px;line-height:2.05;color:#d7d9da">
+        <div class="anim" style="--d:78.1s;--dur:1.1s;animation-name:type;animation-timing-function:steps(30,end);--w:31ch;white-space:nowrap;overflow:hidden">
+          <span style="color:var(--orange)">$</span> ./deploy/scripts/install.sh
+        </div>
+        <div class="anim fade" style="--d:79.4s;--dur:.5s;color:#8b9095">→ .env 已生成（随机密码）</div>
+        <div class="anim fade" style="--d:80.1s;--dur:.5s;color:#8b9095">→ 构建镜像 · 启动 4 个容器</div>
+        <div class="anim fade" style="--d:80.8s;--dur:.5s;color:#8b9095">→ 数据库迁移与演示数据就绪</div>
+        <div class="anim fade" style="--d:81.5s;--dur:.5s;color:#fff">
+          <span style="color:var(--green)">●</span> http://localhost:8080
+          <span style="color:#6f7478;font-size:15px"> 管理后台 / API 文档</span>
+        </div>
+        <div class="anim fade" style="--d:82.3s;--dur:.5s;color:#6f7478">_</div>
+      </div>
+      <div style="position:absolute;left:34px;right:34px;bottom:24px;border-top:1px solid rgba(255,255,255,.12);padding-top:16px;display:flex;flex-direction:column;gap:9px">
+        <div class="anim fade" style="--d:81.9s;--dur:.4s;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b9095"><span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>web<span style="flex:1"></span>serving :8080</div>
+        <div class="anim fade" style="--d:82.05s;--dur:.4s;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b9095"><span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>app<span style="flex:1"></span>healthy</div>
+        <div class="anim fade" style="--d:82.2s;--dur:.4s;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#8b9095"><span style="width:6px;height:6px;border-radius:50%;background:var(--green)"></span>db · cache<span style="flex:1"></span>healthy</div>
+      </div>
+    </div>
+
+    <div class="anim fade" style="--d:79.0s;--dur:.8s;position:absolute;left:900px;top:690px;width:908px;display:flex;align-items:flex-start;justify-content:space-between;border-top:1px solid rgba(255,255,255,.14);padding-top:22px">
+      <span class="mono" style="font-size:12px;line-height:1.7;color:#8b9095;width:600px">
+        首次启动约 3–10 分钟（含拉取镜像与下载依赖）；<br>
+        备份、恢复、升级各有一个脚本，离线包可整包带走。
+      </span>
+      <span class="mono" style="font-size:11px;letter-spacing:.16em;color:#6f7478;text-align:right">DOCKER 24+<br>COMPOSE V2</span>
+    </div>
+  </section>
+
+  <!-- ============ S13  85.6 – 99.4  收尾 ============ -->
+  <section class="scene" data-start="85.6" data-end="99.4">
+    <i class="anim cutX" style="--d:85.6s;--dur:.55s;background:#0b0d0e"></i>
+    <div class="bg" style="background:var(--paper)"></div>
+    <div class="grid anim fade" style="--d:85.4s;--dur:1s"></div>
+
+    <div style="position:absolute;left:112px;top:126px;width:1500px">
+      <div class="anim rise" style="--d:85.65s;--dur:.85s;font-size:90px;line-height:1.16;font-weight:800;letter-spacing:-.035em;font-variation-settings:'wdth' 106,'wght' 800">
+        让每一张单，<br>都记得住<span style="color:var(--orangeText)">来路</span>。
+      </div>
+      <div class="anim rise" style="--d:86.15s;--dur:.9s;margin-top:34px;font-size:24px;line-height:1.6;color:#2b2e31;width:1060px">
+        不是更全的 ERP，而是把 BOM → MRP → 购销 → 库存 → 总账 这条链，算准、记清、对得上。
+      </div>
+    </div>
+
+    <!-- milestones -->
+    <div class="anim fade" style="--d:86.6s;--dur:.9s;position:absolute;left:112px;top:512px;width:1696px;border-top:1px solid var(--line2);display:flex">
+      <div style="flex:1;padding:20px 16px 0 0">
+        <div class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.14em">M0</div>
+        <div style="font-size:15px;margin-top:10px;color:#2b2e31">脚手架 · 多租户</div>
+      </div>
+      <div style="flex:1;padding:20px 16px 0">
+        <div class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.14em">M1</div>
+        <div style="font-size:15px;margin-top:10px;color:#2b2e31">主数据 · BOM</div>
+      </div>
+      <div style="flex:1;padding:20px 16px 0">
+        <div class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.14em">M2</div>
+        <div style="font-size:15px;margin-top:10px;color:#2b2e31">库存 · 单据 · 流水</div>
+      </div>
+      <div style="flex:1;padding:20px 16px 0">
+        <div class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.14em">M3</div>
+        <div style="font-size:15px;margin-top:10px;color:#2b2e31">采购到付款 · 销售到收款</div>
+      </div>
+      <div style="flex:1;padding:20px 16px 0">
+        <div class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.14em">M4</div>
+        <div style="font-size:15px;margin-top:10px;color:#2b2e31">MRP · 生产订单</div>
+      </div>
+      <div style="flex:1;padding:20px 0 0;position:relative">
+        <div style="position:absolute;top:-1px;left:0;right:0;height:2px;background:var(--orange)"></div>
+        <div class="mono" style="font-size:11px;color:var(--orangeText);letter-spacing:.14em">M5</div>
+        <div style="font-size:15px;margin-top:10px;color:var(--orangeText)">总账 · 三大报表 · MES 集成</div>
+      </div>
+    </div>
+
+    <div class="anim wipe-up" style="--d:87.1s;--dur:.9s;position:absolute;left:112px;top:672px;width:960px;background:var(--ink);padding:32px 40px">
+      <div class="mono" style="font-size:11px;letter-spacing:.2em;color:#8b9095">GET STARTED</div>
+      <div style="font-family:var(--mono);font-size:24px;color:#fff;margin-top:14px">
+        <span style="color:var(--orange)">$</span> docker compose up -d --build
+      </div>
+      <div style="font-family:var(--mono);font-size:16px;color:#9aa0a4;margin-top:12px">
+        → http://localhost:8080 &nbsp;·&nbsp; 管理后台 / API 文档
+      </div>
+    </div>
+
+    <div style="position:absolute;left:1132px;top:672px;width:676px">
+      <div class="stamp anim" style="--d:87.6s;display:inline-block;border:2px solid var(--orangeText);color:var(--orangeText);padding:14px 22px;font-family:var(--mono);font-size:20px;letter-spacing:.06em">
+        v1.0.0
+      </div>
+      <div class="anim fade" style="--d:88.0s;--dur:.8s;margin-top:22px;font-size:16px;line-height:1.75;color:var(--muted)">
+        Apache-2.0 · 可自由二次开发<br>
+        单厂私有化 · 一条命令起四个容器<br>
+        侧栏标「未开放」的，就是还没做
+      </div>
+    </div>
+
+    <div class="anim fade" style="--d:88.8s;--dur:.8s;position:absolute;left:112px;bottom:56px;display:flex;align-items:center;gap:18px">
+      <span style="width:10px;height:10px;background:var(--orange);display:block"></span>
+      <span class="mono" style="font-size:13px;letter-spacing:.18em;color:var(--ink)">GENISOURCE ERP</span>
+      <span style="width:32px;height:1px;background:var(--line2);display:block"></span>
+      <span class="mono" style="font-size:12px;letter-spacing:.1em;color:var(--muted)">开源轻量 ERP · 面向中小离散制造</span>
+    </div>
+
+    <div class="anim fade" style="--d:96.4s;--dur:1.5s;position:absolute;inset:0;background:#0b0d0e"></div>
+  </section>
+
+  <!-- ============ S14  99.4 – 104.4  尾板 ============ -->
+  <section class="scene" data-start="99.4" data-end="104.6">
+    <div class="bg" style="background:#0b0d0e"></div>
+    <div class="grid-dark anim fade" style="--d:99.4s;--dur:.8s;opacity:.45"></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px">
+      <div class="anim fade" style="--d:99.7s;--dur:1.1s;display:flex;align-items:center;gap:18px">
+        <span style="width:14px;height:14px;background:var(--orange);display:block"></span>
+        <span style="font-size:56px;font-weight:800;letter-spacing:-.02em;color:#fff;font-variation-settings:'wdth' 104,'wght' 800">Genisource ERP</span>
+      </div>
+      <div class="anim fade" style="--d:100.2s;--dur:1s;font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:#6f7478">
+        PLAN · POST · BALANCE
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  const scenes = [...document.querySelectorAll('.scene')];
+  window.DURATION = 104.4;
+
+  window.seek = (t) => {
+    for (const s of scenes) {
+      const a = +s.dataset.start, b = +s.dataset.end;
+      s.style.visibility = (t >= a && t < b) ? 'visible' : 'hidden';
+    }
+    // force style/anim creation before seeking
+    void document.documentElement.offsetHeight;
+    for (const a of document.getAnimations()) {
+      try { a.pause(); a.currentTime = t * 1000; } catch (e) {}
+    }
+  };
+
+  window.__ready = (async () => {
+    await document.fonts.ready;
+    const imgs = [...document.images];
+    await Promise.all(imgs.map(i => i.complete ? Promise.resolve() : new Promise(r => { i.onload = i.onerror = r; })));
+    window.seek(0);
+    return true;
+  })();
+})();
+</script>
+</body>
+</html>

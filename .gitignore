@@ -42,5 +42,12 @@ dist/
 # Helm
 deploy/k8s/**/charts/*.tgz
 
+# Promo video workspace: keep the authoring code, drop the regenerable 50 MB of assets
+promo/node_modules/
+promo/assets/
+promo/tools/music.wav
+promo/*.mp4
+promo/out/
+
 # Assistant working notes (kept locally, never published with the open-source repo)
 .workbuddy/
