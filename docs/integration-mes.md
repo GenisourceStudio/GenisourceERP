@@ -1,6 +1,6 @@
 # ERP ↔ MES 集成规范
 
-Genisource ERP 与 [Genisource MES](https://github.com/genisource-mes) 是两个**独立仓库、独立部署**的产品，通过 REST API 集成。工厂可以只上 ERP、只上 MES，或两者一起上。
+Genisource ERP 与 [Genisource MES](https://github.com/GenisourceStudio/GenisourceMES) 是两个**独立仓库、独立部署**的产品，通过 REST API 集成。工厂可以只上 ERP、只上 MES，或两者一起上。
 
 本文定义职责边界与接口契约。M0 只落地适配器的模块骨架；实际调用在 M5 实现。
 

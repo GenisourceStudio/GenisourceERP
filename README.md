@@ -1,6 +1,6 @@
 # Genisource ERP
 
-面向国内中小制造业的**开源 ERP**：以 MRP 运算为内核，与 [Genisource MES](https://github.com/genisource-mes) 组成「计划层 + 执行层」的完整制造业套件——采购、销售、库存、BOM、MRP 算得清，车间执行管得住。
+面向国内中小制造业的**开源 ERP**：以 MRP 运算为内核，与 [Genisource MES](https://github.com/GenisourceStudio/GenisourceMES) 组成「计划层 + 执行层」的完整制造业套件——采购、销售、库存、BOM、MRP 算得清，车间执行管得住。
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 ![Java](https://img.shields.io/badge/Java-21-orange)
@@ -52,7 +52,7 @@
 要求：Docker 24+（含 Compose v2），4 GB 内存。首次启动会拉取镜像并下载依赖，约 3–10 分钟。
 
 ```bash
-git clone <this-repo> genisource-erp
+git clone https://github.com/GenisourceStudio/GenisourceERP.git genisource-erp
 cd genisource-erp
 ./deploy/scripts/install.sh
 ```

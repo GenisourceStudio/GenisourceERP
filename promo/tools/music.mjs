@@ -187,7 +187,7 @@ for (let t = 16.2; t < 84.2; t += beat) {
 // section impacts
 impact(4.65, 0.34);
 impact(22.95, 0.22);
-impact(31.35, 0.18);
+impact(29.35, 0.18);
 impact(38.15, 0.18);
 impact(45.75, 0.16);
 impact(53.75, 0.16);
