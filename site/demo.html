@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>预约演示 — Genisource ERP</title>
+<meta name="description" content="约一次演示，用你手上的一张真实订单走一遍：算料、下单、领料、交货、开票。看完再决定要不要动。">
+<meta name="theme-color" content="#ece8df">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://genisource-erp.vercel.app/demo.html">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Genisource ERP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:url" content="https://genisource-erp.vercel.app/demo.html">
+<meta property="og:title" content="预约演示 — Genisource ERP">
+<meta property="og:description" content="用你手上的一张真实订单走一遍：算料、下单、领料、交货、开票。看完再决定要不要动。">
+<meta property="og:image" content="https://genisource-erp.vercel.app/assets/img/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://genisource-erp.vercel.app/assets/img/og-cover.jpg">
+
+<link rel="preload" href="assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track" id="ticker-track">
+    <span class="ticker__item">用你的真实订单走一遍</span>
+    <span class="ticker__item">不谈概念，只看界面</span>
+    <span class="ticker__item">先上一个模块也可以</span>
+    <span class="ticker__item">数据在自己手里</span>
+  </div>
+</div>
+
+<header class="masthead" id="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="index.html" aria-label="Genisource ERP 首页">
+      <span class="brand__mark" aria-hidden="true">GS</span>
+      <span class="brand__text">
+        <span class="brand__name">Genisource</span>
+        <span class="brand__sub">ERP · 计划与一本账</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="index.html#status-quo">为什么</a>
+      <a href="index.html#chain">一条链</a>
+      <a href="index.html#promise">承诺</a>
+      <a href="index.html#capabilities">能力</a>
+      <a href="index.html#fit">适合谁</a>
+      <a href="faq.html">常见问题</a>
+      <a href="demo.html" aria-current="page">预约演示</a>
+    </nav>
+    <div class="masthead__actions">
+      <a class="btn btn--ghost btn--sm" href="faq.html">常见问题</a>
+      <a class="btn btn--primary btn--sm" href="demo.html">预约演示</a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="mobile-nav" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="index.html#status-quo">为什么 <span>WHY</span></a>
+    <a href="index.html#chain">一条链 <span>THE CHAIN</span></a>
+    <a href="index.html#promise">承诺 <span>PROMISE</span></a>
+    <a href="index.html#capabilities">能力 <span>CAPABILITIES</span></a>
+    <a href="index.html#fit">适合谁 <span>FIT</span></a>
+    <a href="faq.html">常见问题 <span>FAQ</span></a>
+    <a href="demo.html">预约演示 <span>DEMO</span></a>
+    <div class="mobile-nav__cta">
+      <a class="btn btn--primary" href="#wecom">扫码加企业微信</a>
+      <a class="btn" href="index.html">回首页</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-head">
+    <div class="wrap">
+      <p class="crumb"><a href="index.html">首页</a> <span aria-hidden="true">/</span> 预约演示</p>
+      <h1>用你手上的一张订单，<br>走一遍从算料到回款。</h1>
+      <p class="lede">不用你先装什么、也不用准备一堆资料。你把真实场景讲清楚，我们打开界面按你的流程走一遍，卡在哪、能不能解，当场看。</p>
+    </div>
+  </section>
+
+  <!-- 预约流程 -->
+  <section class="section section--tight" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">01</span> 怎么做</p>
+          <h2 class="sec-head__title">三步，约一次演示。</h2>
+        </div>
+        <p class="sec-head__aside">不占用你太多时间</p>
+      </div>
+
+      <ol class="steplist reveal">
+        <li>
+          <div>
+            <b>扫码加企业微信</b>
+            <span>用页面下方的企业微信二维码加我们。一句话说清：厂里做什么产品、大概多少人、现在用什么在管料和账。</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>约 30 分钟演示</b>
+            <span>线上会议，或者到你厂里都行。我们打开真实运行的界面，按你的订单和物料走一遍，不念 PPT，也不讲概念。</span>
+          </div>
+        </li>
+        <li>
+          <div>
+            <b>拿到一份「先上哪个」的建议</b>
+            <span>演示后，针对你的现状给一份落地建议：先上哪一两个模块、能解决哪几个具体问题、哪些现在不必上。</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 演示能看到什么 -->
+  <section class="section section--tight" id="see">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">02</span> 演示里</p>
+          <h2 class="sec-head__title">你能看到什么。</h2>
+        </div>
+        <p class="sec-head__aside">都是跑过的真实界面</p>
+      </div>
+
+      <div class="cardgrid cardgrid--3 reveal">
+        <div class="doccard">
+          <div class="doccard__top">
+            <h3>真实运行界面</h3>
+            <span class="micro">LIVE</span>
+          </div>
+          <p>销售订单、算料、采购收料、库存台账、生产订单、应收应付、财务报表——直接看怎么操作，不靠截图想象。</p>
+        </div>
+        <div class="doccard">
+          <div class="doccard__top">
+            <h3>你的场景怎么落地</h3>
+            <span class="micro">YOUR SHOP</span>
+          </div>
+          <p>拿你厂里的一张订单和一个 BOM，演示「算料 → 采购 → 领料 → 交货 → 开票 → 回款」全过程，包括卡住的地方。</p>
+        </div>
+        <div class="doccard">
+          <div class="doccard__top">
+            <h3>费用与上线节奏</h3>
+            <span class="micro">COST</span>
+          </div>
+          <p>按模块范围直说报价区间与上线节奏。先上一两个模块，看到效果再扩，不要求你一次性重投入。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 联系我们 -->
+  <section class="section ink-block on-dark" id="contact">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">03</span> 联系我们</p>
+          <h2 class="sec-head__title">说一声，我们就约。</h2>
+        </div>
+        <p class="sec-head__aside">通常一个工作日内回复</p>
+      </div>
+
+      <div class="deploy">
+        <div class="reveal">
+          <p class="lede">扫右侧的企业微信二维码加我们。添加时备注厂名与主要产品，方便我们对上号——我们不想用一套通用话术应付你。</p>
+          <p class="lede" style="margin-top:16px">如果你的问题在演示里没被解决，我们会直说「这个我们做不好」，而不是硬接下来。</p>
+          <div class="hero__cta" style="margin-top:22px">
+            <a class="btn btn--primary" href="#wecom">扫码添加企业微信 <span class="btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+          <p class="micro" style="margin-top:18px">添加时请备注您的厂名与主要产品。</p>
+        </div>
+
+        <div class="reveal" id="wecom">
+          <div class="wecom-card">
+            <img src="assets/img/wecom-qr.jpg" alt="Genisource 企业微信二维码" width="240" height="240" loading="lazy">
+            <div class="wecom-card__cap">扫码添加 Genisource 企业微信</div>
+            <div class="wecom-card__sub">添加后一句话讲清你的厂：做什么产品、多少人、现在怎么管料和账。我们一个工作日内回复，约演示时间。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 诚实的边界 -->
+  <section class="section section--tight" id="honest">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">04</span> 先说清楚</p>
+          <h2 class="sec-head__title">现在能到哪一步。</h2>
+        </div>
+        <p class="sec-head__aside">适合试点，不适合盲目全铺</p>
+      </div>
+
+      <div class="boundary reveal">
+        <div class="boundary--yes">
+          <h3>已经跑通</h3>
+          <p><strong>「料、单、账」这条链是通的</strong>：销售订单、算料、请购与采购、收料入库、库存台账、生产订单领料与完工、应收应付、记账凭证与三大报表，都已在真实运行界面里跑过。</p>
+        </div>
+        <div class="boundary--no">
+          <h3>暂未做（诚实交代）</h3>
+          <p>高级排程算法、车间扫码报工与防错、多工厂集团合并、立库调度，暂时不在范围内。这些需要另一套系统，我们不拿没做好的东西当卖点。</p>
+        </div>
+      </div>
+
+      <p class="note reveal"><b>建议先上一个模块。</b> 大多数厂从「库存 + 算料」开始，两三个月看到效果再往上加。<b>不建议一次全上</b>——系统再好，也顶不住流程一次改完。</p>
+
+      <div class="hero__cta reveal" style="margin-top:28px">
+        <a class="btn btn--primary" href="index.html#capabilities">回去看能力 <span class="btn__arrow" aria-hidden="true">→</span></a>
+        <a class="btn" href="faq.html">常见问题</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a class="brand" href="index.html" aria-label="Genisource ERP 首页">
+          <span class="brand__mark" aria-hidden="true">GS</span>
+          <span class="brand__text">
+            <span class="brand__name">Genisource</span>
+            <span class="brand__sub">ERP · 计划与一本账</span>
+          </span>
+        </a>
+        <p>面向中小制造企业的计划与账务系统。接单、算料、采购、库存、生产、财务，六个环节共用一套数。</p>
+      </div>
+      <div>
+        <h2 class="footer__h">产品</h2>
+        <ul>
+          <li><a href="index.html#status-quo">为什么换</a></li>
+          <li><a href="index.html#chain">一条链</a></li>
+          <li><a href="index.html#capabilities">能力</a></li>
+          <li><a href="index.html#fit">适合谁</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">了解</h2>
+        <ul>
+          <li><a href="faq.html">常见问题</a></li>
+          <li><a href="demo.html">预约演示</a></li>
+          <li><a href="index.html#opensource">为什么开源</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">联系</h2>
+        <ul>
+          <li><a href="demo.html">预约一次演示</a></li>
+          <li><a href="#wecom">企业微信扫码添加</a></li>
+          <li><a href="faq.html#data">数据放在哪</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Genisource · Apache-2.0</span>
+      <span class="ver">V1.0 · 可试点</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js" defer></script>
+</body>
+</html>

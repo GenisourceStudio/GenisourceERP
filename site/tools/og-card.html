@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<!-- 社交分享卡片（OG image）源文件：1200×630。用 tools/og.mjs 渲染成 assets/img/og-cover.jpg -->
+<style>
+  @font-face {
+    font-family: 'Archivo';
+    src: url('../assets/fonts/archivo-latin-wdth-normal.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: block;
+  }
+  @font-face {
+    font-family: 'DMMono';
+    src: url('../assets/fonts/dm-mono-latin-400-normal.woff2') format('woff2');
+    font-weight: 400;
+    font-display: block;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: #ece8df;
+    color: #101214;
+    font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    grid-template-columns: 660px 1fr;
+    align-items: center;
+    padding: 0 68px;
+    position: relative;
+  }
+  /* 左侧发丝竖线，和站点版式一致 */
+  .rule {
+    position: absolute;
+    left: 728px; top: 0; bottom: 0;
+    width: 1px; background: rgba(16, 18, 20, .16);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'DMMono', monospace; font-size: 15px; letter-spacing: .14em;
+    text-transform: uppercase; color: #101214; margin-bottom: 30px;
+  }
+  .eyebrow i { width: 10px; height: 10px; background: #ff4b12; display: block; }
+  h1 {
+    font-size: 58px; line-height: 1.18; font-weight: 800;
+    letter-spacing: -.02em; font-family: 'Archivo', -apple-system, 'PingFang SC', sans-serif;
+  }
+  h1 em { font-style: normal; color: #ff4b12; display: block; }
+  .sub {
+    margin-top: 26px; font-size: 19px; line-height: 1.7; color: #3d4147; max-width: 560px;
+  }
+  .meta {
+    margin-top: 40px; display: flex; align-items: center; gap: 18px;
+    font-family: 'DMMono', monospace; font-size: 14px; letter-spacing: .06em; color: #5a5f66;
+  }
+  .meta b { font-weight: 400; color: #101214; border-bottom: 1px solid rgba(16,18,20,.3); padding-bottom: 2px; }
+  /* 右侧截图 */
+  .shotwrap { justify-self: center; position: relative; }
+  .shotwrap img {
+    display: block; width: 452px; height: auto;
+    border: 1px solid rgba(16, 18, 20, .22);
+    box-shadow: 14px 14px 0 rgba(16, 18, 20, .07);
+  }
+  /* L 形角标 */
+  .corner { position: absolute; width: 16px; height: 16px; }
+  .corner.tl { left: -1px; top: -1px; border-left: 2px solid #ff4b12; border-top: 2px solid #ff4b12; }
+  .corner.br { right: -1px; bottom: -1px; border-right: 2px solid #ff4b12; border-bottom: 2px solid #ff4b12; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="eyebrow"><i></i>Genisource ERP</div>
+    <h1>订单接得下，<em>料算得清，账收得回。</em></h1>
+    <p class="sub">面向 50–500 人制造企业：接单、算料、采购、库存、生产、账务，六个环节共用一套数。</p>
+    <div class="meta"><span>缺什么 · 缺多少 · 哪天到</span><b>genisource-erp.vercel.app</b></div>
+  </div>
+  <div class="rule"></div>
+  <div class="shotwrap">
+    <img src="../assets/img/mrp-1200.webp" alt="净需求运算界面">
+    <span class="corner tl"></span>
+    <span class="corner br"></span>
+  </div>
+</body>
+</html>

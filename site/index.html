@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genisource ERP — 让中小制造厂，把料、单、账算成一本</title>
+<meta name="description" content="面向 50–500 人制造企业的计划与账务系统：接单、算料、采购、库存、生产、应收应付、财务报表，六个环节共用一套数。缺什么、缺多少、哪天到、这单赚多少，系统先说话。">
+<meta name="theme-color" content="#ece8df">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+
+<link rel="canonical" href="https://genisource-erp.vercel.app/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Genisource ERP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:url" content="https://genisource-erp.vercel.app/">
+<meta property="og:title" content="Genisource ERP — 订单接得下，料算得清，账收得回">
+<meta property="og:description" content="面向中小制造企业的计划与账务系统。从客户下单到回款，六个环节共用一套数：算料、采购、库存、生产、应收应付、财务报表。">
+<meta property="og:image" content="https://genisource-erp.vercel.app/assets/img/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Genisource ERP 净需求运算界面">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://genisource-erp.vercel.app/assets/img/og-cover.jpg">
+
+<link rel="preload" href="assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/dm-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 顶部状态带 -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track" id="ticker-track">
+    <span class="ticker__item">订单、料、账，共用一套数</span>
+    <span class="ticker__item">缺什么、缺多少、哪天到，系统先说话</span>
+    <span class="ticker__item">交期是算出来的，不是拍出来的</span>
+    <span class="ticker__item">月底结账，不用再对三天</span>
+    <span class="ticker__item">开源，不被供应商绑死</span>
+  </div>
+</div>
+
+<header class="masthead" id="masthead">
+  <div class="wrap masthead__inner">
+    <a class="brand" href="index.html" aria-label="Genisource ERP 首页">
+      <span class="brand__mark" aria-hidden="true">GS</span>
+      <span class="brand__text">
+        <span class="brand__name">Genisource</span>
+        <span class="brand__sub">ERP · 计划与一本账</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="主导航">
+      <a href="#status-quo">为什么</a>
+      <a href="#chain">一条链</a>
+      <a href="#promise">承诺</a>
+      <a href="#capabilities">能力</a>
+      <a href="#fit">适合谁</a>
+      <a href="faq.html">常见问题</a>
+      <a href="demo.html">预约演示</a>
+    </nav>
+
+    <div class="masthead__actions">
+      <a class="btn btn--ghost btn--sm" href="faq.html">常见问题</a>
+      <a class="btn btn--primary btn--sm" href="demo.html">预约演示</a>
+      <button class="burger" id="burger" aria-expanded="false" aria-controls="mobile-nav" aria-label="打开菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#status-quo">为什么 <span>WHY</span></a>
+    <a href="#chain">一条链 <span>THE CHAIN</span></a>
+    <a href="#promise">承诺 <span>PROMISE</span></a>
+    <a href="#capabilities">能力 <span>CAPABILITIES</span></a>
+    <a href="#fit">适合谁 <span>FIT</span></a>
+    <a href="faq.html">常见问题 <span>FAQ</span></a>
+    <a href="demo.html">预约演示 <span>DEMO</span></a>
+    <div class="mobile-nav__cta">
+      <a class="btn btn--primary" href="demo.html">预约演示</a>
+      <a class="btn" href="#contact">企业微信</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================= Hero ================= -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero__grid">
+        <div class="reveal">
+          <p class="eyebrow">面向 50–500 人制造企业 · 计划与一本账</p>
+          <h1>订单接得下，<br><span class="hi">料算得清，账收得回</span>。</h1>
+          <p class="hero__lede">
+            从客户下单，到算料、采购、收料、领料生产、交货、回款——
+            六个环节共用一套数，不再是六份 Excel。
+            缺什么料、缺多少、哪天到、这单赚多少，<strong>系统先告诉你</strong>。
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="demo.html">预约演示 <span class="btn__arrow" aria-hidden="true">→</span></a>
+            <a class="btn" href="#capabilities">看真实界面 <span class="btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+          <p class="hero__meta">
+            <span>一套数</span>
+            <span>按模块分步上线</span>
+            <span>数据在自己手里</span>
+            <span>开源不被绑</span>
+          </p>
+        </div>
+
+        <aside class="jobcard reveal" aria-label="一条链六步">
+          <div class="jobcard__head">
+            <span class="micro">一条链 / The chain</span>
+            <span class="led">6 steps</span>
+          </div>
+          <ol class="flowlist">
+            <li><span class="flowlist__n">01</span><span class="flowlist__t">客户下单</span><span class="flowlist__e">Order</span></li>
+            <li><span class="flowlist__n">02</span><span class="flowlist__t">算料</span><span class="flowlist__e">Material plan</span></li>
+            <li><span class="flowlist__n">03</span><span class="flowlist__t">采购到货</span><span class="flowlist__e">Purchase</span></li>
+            <li><span class="flowlist__n">04</span><span class="flowlist__t">领料生产</span><span class="flowlist__e">Production</span></li>
+            <li><span class="flowlist__n">05</span><span class="flowlist__t">交货开票</span><span class="flowlist__e">Ship &amp; bill</span></li>
+            <li><span class="flowlist__n">06</span><span class="flowlist__t">回款核销</span><span class="flowlist__e">Collect</span></li>
+          </ol>
+          <div class="jobcard__foot">
+            <div>
+              <div class="micro">从接单到回款</div>
+              <div class="jobcard__big">一本账</div>
+            </div>
+            <span class="stamp">开源<br>ERP</span>
+          </div>
+        </aside>
+      </div>
+
+      <div class="kpibar ink-block reveal">
+        <div class="kpibar__cell">
+          <div class="kpibar__v">一套数</div>
+          <div class="kpibar__k">订单、库存、账不再是三份 Excel</div>
+        </div>
+        <div class="kpibar__cell">
+          <div class="kpibar__v">算得清</div>
+          <div class="kpibar__k">按 BOM 与库存算出真实缺口</div>
+        </div>
+        <div class="kpibar__cell">
+          <div class="kpibar__v">答得出</div>
+          <div class="kpibar__k">交期按料况与产能倒推</div>
+        </div>
+        <div class="kpibar__cell">
+          <div class="kpibar__v">留得住</div>
+          <div class="kpibar__k">数据在自己手里，换人不重来</div>
+        </div>
+      </div>
+
+      <figure class="shot hero-shot reveal">
+        <img src="assets/img/mrp-1200.webp"
+             srcset="assets/img/mrp-800.webp 800w, assets/img/mrp-1200.webp 1200w"
+             sizes="(min-width: 1280px) 1180px, 92vw"
+             width="1200" height="834" fetchpriority="high" decoding="async"
+             alt="净需求运算界面：每个物料的毛需求、现存、安全库存、净需求，以及建议买还是自己做">
+        <figcaption class="shot__cap">
+          <span><b>净需求运算</b> · material plan</span>
+          <span>真实运行界面 / 缺什么、缺多少，一次算清</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= 01 为什么 ================= -->
+  <section class="section" id="status-quo">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">01</span> 为什么</p>
+          <h2 class="sec-head__title">Excel、微信群、电话，<br>撑不住越来越多的订单。</h2>
+        </div>
+        <p class="sec-head__aside">不是人不努力，是数不在一处</p>
+      </div>
+
+      <div class="failgrid reveal">
+        <article class="failcard">
+          <div class="failcard__top">
+            <span class="failcard__n">01</span>
+            <span class="failcard__x" aria-hidden="true">✕</span>
+          </div>
+          <h3>Excel 排产</h3>
+          <p>一份订单表三个版本，谁在改、改到哪，说不清。月底数量对不上，只能全部重数一遍。</p>
+        </article>
+        <article class="failcard">
+          <div class="failcard__top">
+            <span class="failcard__n">02</span>
+            <span class="failcard__x" aria-hidden="true">✕</span>
+          </div>
+          <h3>电话催料</h3>
+          <p>料在仓里，够不够下周的订单却没人答得上。等停线了才发现，缺的只是那颗六毛钱的电容。</p>
+        </article>
+        <article class="failcard">
+          <div class="failcard__top">
+            <span class="failcard__n">03</span>
+            <span class="failcard__x" aria-hidden="true">✕</span>
+          </div>
+          <h3>月底结账</h3>
+          <p>单据在车间、台账在财务、成本在老板脑子里。这个月到底赚没赚，要等到下个月才敢说。</p>
+        </article>
+      </div>
+
+      <blockquote class="quote reveal">
+        <p>这一单，到底<span>赚了多少</span>？</p>
+        <cite>老板问 · 财务算三天 · 车间说不知道</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- ================= 02 一条链 ================= -->
+  <section class="section section--tight" id="chain">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">02</span> 一条链</p>
+          <h2 class="sec-head__title">六个环节，<br>走的是同一套数。</h2>
+        </div>
+        <p class="sec-head__aside">从客户下单到钱回账上</p>
+      </div>
+
+      <div class="loop reveal">
+        <div class="loop__step">
+          <div class="loop__n">01</div>
+          <h3 class="loop__t">客户下单</h3>
+          <div class="loop__e">Order</div>
+          <p class="loop__d">价格、数量、账期、交期一次录清。低于成本线、超出信用额度，当场提醒。</p>
+        </div>
+        <div class="loop__step">
+          <div class="loop__n">02</div>
+          <h3 class="loop__t">算料</h3>
+          <div class="loop__e">Material plan</div>
+          <p class="loop__d">按 BOM 逐层展开，扣掉现存、已锁定和在途，算出每个料真正缺多少、最晚哪天要到。</p>
+        </div>
+        <div class="loop__step">
+          <div class="loop__n">03</div>
+          <h3 class="loop__t">采购到货</h3>
+          <div class="loop__e">Purchase</div>
+          <p class="loop__d">缺口一键转采购单，按供应商的交货天数倒排下单日；超预算的单据走审批。</p>
+        </div>
+        <div class="loop__step">
+          <div class="loop__n">04</div>
+          <h3 class="loop__t">领料生产</h3>
+          <div class="loop__e">Production</div>
+          <p class="loop__d">工单下达先占料，缺料当场拦下不许开工；完工入库，成本自动进账。</p>
+        </div>
+        <div class="loop__step">
+          <div class="loop__n">05</div>
+          <h3 class="loop__t">交货开票</h3>
+          <div class="loop__e">Ship &amp; bill</div>
+          <p class="loop__d">发货扣库存、生成应收；成本按移动加权平均结转，这一单赚多少，发货当天就有数。</p>
+        </div>
+        <div class="loop__step">
+          <div class="loop__n">06</div>
+          <h3 class="loop__t">回款核销</h3>
+          <div class="loop__e">Collect</div>
+          <p class="loop__d">收到钱直接核销到单；谁欠多久、逾期几天，一张表看全，不用再翻对账单。</p>
+        </div>
+      </div>
+
+      <div class="boundary reveal">
+        <div class="boundary--yes">
+          <h3>是 / What it is</h3>
+          <p><strong>给 50–500 人制造厂用的计划与账务系统。</strong>把「料、单、账」三件事做透：算得清、管得住、对得上。可以整套上，也可以先上一个模块。</p>
+        </div>
+        <div class="boundary--no">
+          <h3>不是 / What it isn't</h3>
+          <p>不是给集团用的庞然大物，也不做高级排程、立库调度这类我们做不好的事。宁可边界清楚，也不拿半成品当卖点。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 03 三个承诺 ================= -->
+  <section class="section ink-block on-dark" id="promise">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">03</span> 承诺</p>
+          <h2 class="sec-head__title">对企业主，只承诺三件事。</h2>
+        </div>
+        <p class="sec-head__aside">做每个功能时的底线</p>
+      </div>
+
+      <div class="pillars reveal">
+        <article class="pillar">
+          <div class="pillar__n">01</div>
+          <h3>算得清</h3>
+          <div class="pillar__e">Calculate</div>
+          <p>缺料不是靠感觉，是算出来的：毛需求加上安全库存、扣掉现存与在途，剩下的才是真要买的。每一步都能点开看数从哪来。</p>
+          <ul>
+            <li>缺料清单带数量与到货日</li>
+            <li>建议区分「买」还是「自己做」</li>
+            <li>结果可逐层追溯到组件</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <div class="pillar__n">02</div>
+          <h3>账对得上</h3>
+          <div class="pillar__e">Reconcile</div>
+          <p>收货、发货、完工都会自己生成凭证，不用财务再录一遍。记错了是红字冲销而不是删掉，历史永远查得到。</p>
+          <ul>
+            <li>业务单据自动生成会计凭证</li>
+            <li>总账、试算平衡、三大报表同步</li>
+            <li>冲销留痕，账不被人悄悄改</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <div class="pillar__n">03</div>
+          <h3>换得掉</h3>
+          <div class="pillar__e">Not locked in</div>
+          <p>开源、可导出、能自己改。哪天不想用我们了，数据带走、找别的团队接手都行——我们靠把产品做好留住你，不靠把门锁上。</p>
+          <ul>
+            <li>数据随时完整导出</li>
+            <li>流程可按自己习惯调整</li>
+            <li>没有必须年年交的买路钱</li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="standard reveal">这三条，是我们砍功能时唯一的标准：算不清、对不上、带不走的，不做。</p>
+    </div>
+  </section>
+
+  <!-- ================= 04 能力 ================= -->
+  <section class="section" id="capabilities">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">04</span> 能力</p>
+          <h2 class="sec-head__title">八个界面，都是跑过的。</h2>
+        </div>
+        <p class="sec-head__aside">截图取自一家控制器厂的真实数据</p>
+      </div>
+
+      <div class="caps">
+        <div class="caps__tabs" role="tablist" aria-label="能力章节">
+          <button class="cap-tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true" tabindex="0">
+            <span class="cap-tab__n">01</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">销售订单</span><span class="cap-tab__e">Sales</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">02</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">算料</span><span class="cap-tab__e">Material plan</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">03</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">采购与收料</span><span class="cap-tab__e">Purchase</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-4" aria-controls="panel-4" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">04</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">库存台账</span><span class="cap-tab__e">Inventory</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-5" aria-controls="panel-5" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">05</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">生产订单</span><span class="cap-tab__e">Production</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-6" aria-controls="panel-6" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">06</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">应收应付</span><span class="cap-tab__e">Receivables</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-7" aria-controls="panel-7" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">07</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">财务报表</span><span class="cap-tab__e">Reports</span></span>
+          </button>
+          <button class="cap-tab" role="tab" id="tab-8" aria-controls="panel-8" aria-selected="false" tabindex="-1">
+            <span class="cap-tab__n">08</span>
+            <span class="cap-tab__body"><span class="cap-tab__t">BOM 与工艺</span><span class="cap-tab__e">BOM</span></span>
+          </button>
+        </div>
+
+        <div class="caps__panel">
+          <section class="cap-panel" role="tabpanel" id="panel-1" aria-labelledby="tab-1" tabindex="0">
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>01</b> 销售订单 · Sales</span>
+            </div>
+            <h3>客户问交期，<span class="hi">不用再问车间</span></h3>
+            <p class="cap-panel__desc">报价、订单、发货一条线。每张单走到哪一步、还剩多少没发、钱收到没有，打开就能答客户。</p>
+            <ul class="cap-panel__points">
+              <li>订单状态、已发未发数量一目了然</li>
+              <li>超过信用额度、低于成本价会提醒</li>
+              <li>发货直接扣库存、自动记应收</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/sales-orders-1200.webp"
+                   srcset="assets/img/sales-orders-800.webp 800w, assets/img/sales-orders-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="销售订单列表：单据号、客户、状态、数量、价税合计、业务日期">
+              <figcaption class="shot__cap"><span><b>销售订单</b> · sales</span><span>已发多少、还差多少，一眼看清</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-2" aria-labelledby="tab-2" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>02</b> 算料 · Material plan</span>
+            </div>
+            <h3>缺什么、缺多少，<span class="hi">一次算清</span></h3>
+            <p class="cap-panel__desc">把订单需求按 BOM 往下拆，扣掉仓库现存、已锁定和在途，剩下的缺口按交期倒排——该买就买，该自己做就下工单。</p>
+            <ul class="cap-panel__points">
+              <li>净需求带数量、最晚到货日</li>
+              <li>建议分两类：采购 / 自制</li>
+              <li>一键把建议变成采购单或生产订单</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/mrp-1200.webp"
+                   srcset="assets/img/mrp-800.webp 800w, assets/img/mrp-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="净需求运算结果：毛需求、现存、安全库存与净需求">
+              <figcaption class="shot__cap"><span><b>净需求运算</b> · material plan</span><span>算完就能下单，不用二次录</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-3" aria-labelledby="tab-3" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>03</b> 采购与收料 · Purchase</span>
+            </div>
+            <h3>从请购到入库，<span class="hi">账随货走</span></h3>
+            <p class="cap-panel__desc">请购、比价、下单、收料一路到底。收料那一刻，库存增加、应付增加、凭证生成，三件事一次做完。</p>
+            <ul class="cap-panel__points">
+              <li>超金额门槛自动走审批，留痕可查</li>
+              <li>按单收料，收多收少都记在行上</li>
+              <li>供应商交期与实际到货对比</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/purchase-orders-1200.webp"
+                   srcset="assets/img/purchase-orders-800.webp 800w, assets/img/purchase-orders-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="采购订单列表：供应商、仓库、状态、数量与价税合计">
+              <figcaption class="shot__cap"><span><b>采购订单</b> · purchase</span><span>谁家的料、到哪一步，清楚</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-4" aria-labelledby="tab-4" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>04</b> 库存台账 · Inventory</span>
+            </div>
+            <h3>仓库里有什么，<span class="hi">不用再去数</span></h3>
+            <p class="cap-panel__desc">多个仓库、库位、批次一起管。数字由单据走出来的，不是人敲进去的——所以敢拿来算料、也敢拿来报成本。</p>
+            <ul class="cap-panel__points">
+              <li>现存、已锁定、可用分开算</li>
+              <li>批次可追，出问题查得到去向</li>
+              <li>成本按移动加权平均自动结转</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/stock-1200.webp"
+                   srcset="assets/img/stock-800.webp 800w, assets/img/stock-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="库存台账：物料、仓库库位、现存、锁定与可用数量">
+              <figcaption class="shot__cap"><span><b>库存台账</b> · inventory</span><span>能用多少、被谁占了，写明白</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-5" aria-labelledby="tab-5" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>05</b> 生产订单 · Production</span>
+            </div>
+            <h3>料不齐，<span class="hi">不许开工</span></h3>
+            <p class="cap-panel__desc">工单按工艺展开工序、按 BOM 展开用料。下达先占料，领料才出库——缺料在开工前就拦住，而不是做到一半停线。</p>
+            <ul class="cap-panel__points">
+              <li>下达即占料，别人抢不走</li>
+              <li>缺料直接拦，写明缺哪一样</li>
+              <li>完工入库，成本按标准成本入账</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/production-1200.webp"
+                   srcset="assets/img/production-800.webp 800w, assets/img/production-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="生产订单列表：工单号、产品、计划量、完工量与状态">
+              <figcaption class="shot__cap"><span><b>生产订单</b> · production</span><span>计划多少、完工多少，一目了然</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-6" aria-labelledby="tab-6" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>06</b> 应收应付 · Receivables</span>
+            </div>
+            <h3>谁欠我、我欠谁，<span class="hi">不用猜</span></h3>
+            <p class="cap-panel__desc">发货即生成应收，收料即生成应付。收一笔钱就核销到具体单据，账龄、逾期一眼看全，催款不用再翻 Excel。</p>
+            <ul class="cap-panel__points">
+              <li>按客户/供应商看未结余额</li>
+              <li>逾期天数与金额自动算</li>
+              <li>收款付款直接核销到单，不重复记账</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/receivables-1200.webp"
+                   srcset="assets/img/receivables-800.webp 800w, assets/img/receivables-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="应收账款页面：发生额、已收款、未结余额与逐笔明细">
+              <figcaption class="shot__cap"><span><b>应收账款</b> · receivables</span><span>未结多少、逾期几笔，打开就知</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-7" aria-labelledby="tab-7" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>07</b> 财务报表 · Reports</span>
+            </div>
+            <h3>这个月赚没赚，<span class="hi">不用等下个月</span></h3>
+            <p class="cap-panel__desc">凭证由业务自动生成，总账、试算平衡、资产负债表、利润表、现金流量表随时可出，不用财务月底再抄一遍。</p>
+            <ul class="cap-panel__points">
+              <li>资产负债表 / 利润表 / 现金流量表</li>
+              <li>科目余额与明细账可下钻</li>
+              <li>任何时点都能结一次，不必等月结</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/reports-1200.webp"
+                   srcset="assets/img/reports-800.webp 800w, assets/img/reports-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="财务报表页面：资产负债表科目与金额">
+              <figcaption class="shot__cap"><span><b>财务报表</b> · reports</span><span>三大报表同源，数字互相咬得上</span></figcaption>
+            </figure>
+          </section>
+
+          <section class="cap-panel" role="tabpanel" id="panel-8" aria-labelledby="tab-8" tabindex="0" hidden>
+            <div class="cap-panel__head">
+              <span class="cap-panel__eyebrow"><b>08</b> BOM 与工艺 · BOM</span>
+            </div>
+            <h3>料怎么组成，<span class="hi">一次录对处处用</span></h3>
+            <p class="cap-panel__desc">多级 BOM、替代料、工艺路线集中管。发布即锁定版本，改版留痕——算料、领料、成本都从这里取数，不再各说各话。</p>
+            <ul class="cap-panel__points">
+              <li>多级 BOM 树，子件可下钻</li>
+              <li>版本发布后锁定，改版留记录</li>
+              <li>工艺路线带工时，可用于排产与核价</li>
+            </ul>
+            <figure class="shot">
+              <img src="assets/img/bom-1200.webp"
+                   srcset="assets/img/bom-800.webp 800w, assets/img/bom-1200.webp 1200w"
+                   sizes="(min-width: 980px) 780px, 92vw" width="1200" height="834" loading="lazy" decoding="async"
+                   alt="BOM 与工艺页面：父项物料、版本、状态、行数与生效区间">
+              <figcaption class="shot__cap"><span><b>BOM 与工艺</b> · BOM</span><span>录一次，算料和成本都用它</span></figcaption>
+            </figure>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 05 适合谁 ================= -->
+  <section class="section" id="fit">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">05</span> 适合谁</p>
+          <h2 class="sec-head__title">先说清楚，<br>它不适合所有人。</h2>
+        </div>
+        <p class="sec-head__aside">对号入座，比听介绍有用</p>
+      </div>
+
+      <div class="boundary reveal">
+        <div class="boundary--yes">
+          <h3>适合 / Fit</h3>
+          <p>如果你是这样，它大概率能帮上忙：</p>
+          <ul class="cap-panel__points">
+            <li>50–500 人的离散制造厂，产品有 BOM、有工序</li>
+            <li>订单多了以后，靠 Excel 和微信群已经管不过来</li>
+            <li>经常为「缺料停线」和「库存压太多」两头受气</li>
+            <li>想把成本算清，知道自己哪一单赚钱、哪一单不赚</li>
+            <li>不想再被一套系统绑死，也不想花两年上线</li>
+          </ul>
+        </div>
+        <div class="boundary--no">
+          <h3>暂不适合 / Not yet</h3>
+          <p>这些情况，先别急：</p>
+          <ul class="cap-panel__points">
+            <li>流程制造（化工、食品配方类），BOM 逻辑不一样</li>
+            <li>最需要的是车间扫码报工、防错与追溯（那是另一套系统的事）</li>
+            <li>多工厂、多法人的集团合并报表</li>
+            <li>需要高级排程算法做分钟级优化</li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="note reveal"><b>建议先上一个模块。</b> 大多数厂从「库存 + 算料」开始，两三个月看到效果，再往上加采购、生产与财务。<b>不建议一次全上。</b></p>
+    </div>
+  </section>
+
+  <!-- ================= 06 开源 ================= -->
+  <section class="section ink-block on-dark" id="opensource">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">06</span> 开源</p>
+          <h2 class="sec-head__title">钱花在服务上，<br>不是花在门锁上。</h2>
+        </div>
+        <p class="sec-head__aside">把选择权留在你手里</p>
+      </div>
+
+      <div class="opensource">
+        <div class="reveal">
+          <div class="license-box">
+            <div class="license-box__t">Apache-2.0</div>
+            <p>系统本身开放，你可以自己用、自己改、找第三方维护，也可以随时把数据整包带走。我们不靠「你走不了」赚钱。</p>
+          </div>
+          <p class="lede" style="margin-top:22px">我们靠把产品做扎实、把实施做踏实来赢得你，而不是把系统做复杂、把你困住。</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="demo.html">预约演示 <span class="btn__arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn--ghost" href="faq.html">常见问题</a>
+          </div>
+        </div>
+
+        <ol class="steplist reveal">
+          <li>
+            <div>
+              <b>数据是你的</b>
+              <span>客户、物料、单据、账，随时完整导出。哪天不合作了，东西带走，不用求人。</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <b>不锁供应商</b>
+              <span>可以自己团队维护，也可以交给任何第三方接手；即便我们不在，厂里的系统照样转。</span>
+            </div>
+          </li>
+          <li>
+            <div>
+              <b>跟着真实工厂长</b>
+              <span>功能优先级由一线计划员和会计的反馈决定，不堆用不上的花活。</span>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 联系 / 二维码 ================= -->
+  <section class="section" id="contact">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow"><span class="sec-num">07</span> 联系</p>
+          <h2 class="sec-head__title">加个微信，<br>把情况说清楚就行。</h2>
+        </div>
+        <p class="sec-head__aside">通常一个工作日内回复</p>
+      </div>
+
+      <div class="deploy">
+        <div class="reveal">
+          <p class="lede">扫码加我们的企业微信，说一句你的厂做什么产品、大概多少人、现在用什么在管账和生产。我们会先用你的实际场景，讲清楚哪几个模块值得先上、哪些可以先不上。</p>
+          <p class="lede" style="margin-top:16px">不推销全套，也不建议一上来就大改流程——先让数字对得上，再谈优化。</p>
+          <div class="hero__cta" style="margin-top:22px">
+            <a class="btn btn--primary" href="demo.html">预约一次演示 <span class="btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+          <p class="micro" style="margin-top:18px">添加时请备注厂名与主要产品，方便我们对上号。</p>
+        </div>
+
+        <div class="reveal" id="wecom">
+          <div class="wecom-card">
+            <img src="assets/img/wecom-qr.jpg" alt="Genisource 企业微信二维码" width="240" height="240" loading="lazy">
+            <div class="wecom-card__cap">扫码添加 Genisource 企业微信</div>
+            <div class="wecom-card__sub">添加后一句话讲清你的厂：做什么产品、多少人、现在怎么管料和账。我们一个工作日内回复。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 收尾 CTA ================= -->
+  <section class="section ink-block on-dark" id="cta">
+    <div class="wrap reveal" style="text-align:center; max-width:760px; margin:0 auto">
+      <p class="eyebrow" style="justify-content:center">开始</p>
+      <h2 class="sec-head__title" style="text-align:center">想看看它在你厂里是什么样？</h2>
+      <p class="lede" style="margin:14px auto 26px; max-width:60ch">约一次演示，用你手上的一张真实订单走一遍：算料、下单、领料、交货、开票。看完再决定要不要动。</p>
+      <div class="hero__cta" style="justify-content:center">
+        <a class="btn btn--primary" href="demo.html">预约演示 <span class="btn__arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="faq.html">常见问题</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a class="brand" href="index.html" aria-label="Genisource ERP 首页">
+          <span class="brand__mark" aria-hidden="true">GS</span>
+          <span class="brand__text">
+            <span class="brand__name">Genisource</span>
+            <span class="brand__sub">ERP · 计划与一本账</span>
+          </span>
+        </a>
+        <p>面向中小制造企业的计划与账务系统。接单、算料、采购、库存、生产、财务，六个环节共用一套数。</p>
+      </div>
+      <div>
+        <h2 class="footer__h">产品</h2>
+        <ul>
+          <li><a href="#status-quo">为什么换</a></li>
+          <li><a href="#chain">一条链</a></li>
+          <li><a href="#capabilities">能力</a></li>
+          <li><a href="#fit">适合谁</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">了解</h2>
+        <ul>
+          <li><a href="faq.html">常见问题</a></li>
+          <li><a href="demo.html">预约演示</a></li>
+          <li><a href="#opensource">为什么开源</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">联系</h2>
+        <ul>
+          <li><a href="demo.html">预约一次演示</a></li>
+          <li><a href="#wecom">企业微信扫码添加</a></li>
+          <li><a href="faq.html#data">数据放在哪</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Genisource · Apache-2.0</span>
+      <span class="ver">V1.0 · 可试点</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/site.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Genisource ERP",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "On-premise, Self-hosted",
+  "description": "面向 50–500 人制造企业的计划与账务系统：销售订单、算料、采购与收料、库存台账、生产订单、应收应付、财务报表、BOM 与工艺。",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "softwareVersion": "1.0.0",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+</body>
+</html>
